@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 
 import jax
 import jax.numpy as jnp
@@ -47,7 +47,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: float = 1e-1,
+        mala_step_size: Union[float, Float[Array, " n_dim n_dim"]] = 1e-1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,

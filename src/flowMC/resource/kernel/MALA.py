@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 from jax.scipy.stats import multivariate_normal
 from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
-from typing import Callable
+from typing import Callable, Union
 
 from flowMC.resource.logPDF import LogPDF
 from flowMC.resource.kernel.base import ProposalBase
@@ -18,7 +18,7 @@ class MALA(ProposalBase):
 
     def __init__(
         self,
-        step_size: Float,
+        step_size: Union[float, Float[Array, " n_dim n_dim"]],
     ):
         super().__init__()
         self.step_size = step_size
@@ -47,10 +47,14 @@ class MALA(ProposalBase):
         """
 
         def body(
-            carry: tuple[Float[Array, " n_dim"], float, dict],
+            carry: tuple[
+                Float[Array, " n_dim"], Union[float, Float[Array, " n_dim n_dim"]], dict
+            ],
             this_key: PRNGKeyArray,
         ) -> tuple[
-            tuple[Float[Array, " n_dim"], float, dict],
+            tuple[
+                Float[Array, " n_dim"], Union[float, Float[Array, " n_dim n_dim"]], dict
+            ],
             tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],
         ]:
             print("Compiling MALA body")
@@ -65,7 +69,7 @@ class MALA(ProposalBase):
 
         key1, key2 = jax.random.split(rng_key)
 
-        dt: Float = self.step_size
+        dt: Union[float, Float[Array, " n_dim n_dim"]] = self.step_size
         dt2 = dt * dt
 
         _, (proposal, logprob, d_logprob) = jax.lax.scan(
