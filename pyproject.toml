@@ -35,7 +35,7 @@ dependencies = [
 license = { file = "LICENSE" }
 
 [project.urls]
-Documentation = "https://github.com/kazewong/flowMC"
+Documentation = "https://github.com/GW-JAX-Team/flowMC"
 
 
 [project.optional-dependencies]
