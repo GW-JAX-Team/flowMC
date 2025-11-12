@@ -1,8 +1,8 @@
 site_name: flowMC
 site_description: Normalizing-flow enhanced sampling package for probabilistic inference in Jax
-site_author: Kaze Wong
-repo_url: https://github.com/kazewong/flowMC
-repo_name: kazewong/kazewong
+site_author: GW JAX Team
+repo_url: https://github.com/GW-JAX-Team/flowMC
+repo_name: GW-JAX-Team/flowMC
 
 theme:
     name: material
@@ -26,9 +26,6 @@ theme:
           toggle:
              icon: material/brightness-2
              name: Light mode
-
-    twitter_name: "@physicskaze"
-    twitter_url: "https://twitter.com/physicskaze"
 
 markdown_extensions:
     - pymdownx.arithmatex:  # Render LaTeX via MathJax

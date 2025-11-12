@@ -24,7 +24,7 @@ pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-re
 If you want to install the latest version of flowMC, you can clone this repo and install it locally:
 
 ```
-git clone https://github.com/kazewong/flowMC.git
+git clone https://github.com/GW-JAX-Team/flowMC.git
 cd flowMC
 pip install -e .
 ```
