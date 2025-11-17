@@ -104,11 +104,9 @@ class NFProposal(ProposalBase):
         rng_key: PRNGKeyArray,
         n_steps: int,
     ):
-        # Generate all samples at once
         proposal_position = self.model.sample(rng_key, n_steps)
 
         if n_steps > self.n_batch_size:
-            # Use jax.lax.map with batch_size for memory-efficient log_prob computation
             proposed_log_prob = jax.lax.map(
                 self.model.log_prob, proposal_position, batch_size=self.n_batch_size
             )
