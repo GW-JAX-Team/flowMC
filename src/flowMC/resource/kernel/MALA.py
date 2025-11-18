@@ -12,6 +12,9 @@ class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
     step_size: Float
+    periodic_mask: Bool[Array, " n_dim"]
+    periods: Float[Array, " n_dim"]
+    periodic_lower_bound: Float[Array, " n_dim"]
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
@@ -19,9 +22,14 @@ class MALA(ProposalBase):
     def __init__(
         self,
         step_size: Union[float, Float[Array, " n_dim n_dim"]],
+        periodic_mask: Bool[Array, " n_dim"],
+        periods: Float[Array, " n_dim 2"],
     ):
         super().__init__()
         self.step_size = step_size
+        self.periodic_mask = periodic_mask
+        self.periods = periods[:, 1] - periods[:, 0]
+        self.periodic_lower_bound = periods[:, 0]
 
     def kernel(
         self,
@@ -65,6 +73,7 @@ class MALA(ProposalBase):
             proposal += jnp.dot(
                 dt, jax.random.normal(this_key, shape=this_position.shape)
             )
+            proposal = jnp.where(self.periodic_mask, jnp.mod(proposal-self.periodic_lower_bound, self.periods)+self.periodic_lower_bound, proposal)
             return (proposal, dt, data), (proposal, this_log_prob, this_d_log)
 
         key1, key2 = jax.random.split(rng_key)

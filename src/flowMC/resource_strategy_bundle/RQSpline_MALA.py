@@ -1,6 +1,7 @@
 from typing import Callable, Union
 
 import jax
+import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
 import equinox as eqx
 
@@ -42,6 +43,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         n_production_loops: int,
         n_epochs: int,
         mala_step_size: Union[float, Float[Array, " n_dim n_dim"]] = 1e-1,
+        periodic: dict[int, tuple[float, float]] = {},
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -89,7 +91,17 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
-        local_sampler = MALA(step_size=mala_step_size)
+        periodic_mask = jnp.zeros(n_dims, dtype=bool)
+        periods = jnp.zeros((n_dims, 2))
+        for dim_idx, (lower, upper) in periodic.items():
+            periodic_mask = periodic_mask.at[dim_idx].set(True)
+            periods = periods.at[dim_idx].set(jnp.array([lower, upper]))
+
+        local_sampler = MALA(
+            step_size=mala_step_size,
+            periodic_mask=periodic_mask,
+            periods=periods,
+        )
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
