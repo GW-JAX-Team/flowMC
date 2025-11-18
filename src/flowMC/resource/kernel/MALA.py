@@ -73,7 +73,12 @@ class MALA(ProposalBase):
             proposal += jnp.dot(
                 dt, jax.random.normal(this_key, shape=this_position.shape)
             )
-            proposal = jnp.where(self.periodic_mask, jnp.mod(proposal-self.periodic_lower_bound, self.periods)+self.periodic_lower_bound, proposal)
+            proposal = jnp.where(
+                self.periodic_mask,
+                jnp.mod(proposal - self.periodic_lower_bound, self.periods)
+                + self.periodic_lower_bound,
+                proposal,
+            )
             return (proposal, dt, data), (proposal, this_log_prob, this_d_log)
 
         key1, key2 = jax.random.split(rng_key)
