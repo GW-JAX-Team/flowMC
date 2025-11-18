@@ -13,7 +13,7 @@ class MALA(ProposalBase):
 
     step_size: Float
     periodic_mask: Bool[Array, " n_dim"]
-    periods: Float[Array, " n_dim"]
+    period: Float[Array, " n_dim"]
     periodic_lower_bound: Float[Array, " n_dim"]
 
     def __repr__(self):
@@ -23,14 +23,14 @@ class MALA(ProposalBase):
         self,
         step_size: Union[float, Float[Array, " n_dim n_dim"]],
         periodic_mask: Bool[Array, " n_dim"],
-        periods: Float[Array, " n_dim 2"],
+        periodic_bounds: Float[Array, " n_dim 2"],
     ):
         super().__init__()
         self.step_size = step_size
         self.periodic_mask = periodic_mask
-        self.periods = periods[:, 1] - periods[:, 0]
-        self.periods = jnp.where(self.periodic_mask, self.periods, jnp.ones_like(self.periods))
-        self.periodic_lower_bound = periods[:, 0]
+        self.period = periodic_bounds[:, 1] - periodic_bounds[:, 0]
+        self.period = jnp.where(self.periodic_mask, self.period, jnp.ones_like(self.period))
+        self.periodic_lower_bound = periodic_bounds[:, 0]
 
     def kernel(
         self,
@@ -76,7 +76,7 @@ class MALA(ProposalBase):
             )
             proposal = jnp.where(
                 self.periodic_mask,
-                jnp.mod(proposal - self.periodic_lower_bound, self.periods)
+                jnp.mod(proposal - self.periodic_lower_bound, self.period)
                 + self.periodic_lower_bound,
                 proposal,
             )

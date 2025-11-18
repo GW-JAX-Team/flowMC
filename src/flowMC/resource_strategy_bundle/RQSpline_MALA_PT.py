@@ -102,15 +102,15 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         periodic_mask = jnp.zeros(n_dims, dtype=bool)
-        periods = jnp.zeros((n_dims, 2))
+        periodic_bounds = jnp.zeros((n_dims, 2))
         for dim_idx, (lower, upper) in periodic.items():
             periodic_mask = periodic_mask.at[dim_idx].set(True)
-            periods = periods.at[dim_idx].set(jnp.array([lower, upper]))
+            periodic_bounds = periodic_bounds.at[dim_idx].set(jnp.array([lower, upper]))
 
         local_sampler = MALA(
             step_size=mala_step_size,
             periodic_mask=periodic_mask,
-            periods=periods,
+            periodic_bounds=periodic_bounds,
         )
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
