@@ -106,7 +106,7 @@ class TakeSteps(Strategy):
                 in_axes=(0, 0, None, None),
             )
         )
-        
+
         n_chains = initial_position.shape[0]
         if self.chain_batch_size > 1 and n_chains > self.chain_batch_size:
             positions_list = []
