@@ -29,6 +29,7 @@ class MALA(ProposalBase):
         self.step_size = step_size
         self.periodic_mask = periodic_mask
         self.periods = periods[:, 1] - periods[:, 0]
+        self.periods = jnp.where(self.periodic_mask, self.periods, jnp.ones_like(self.periods))
         self.periodic_lower_bound = periods[:, 0]
 
     def kernel(
