@@ -72,14 +72,23 @@ class MALA(ProposalBase):
         dt: Union[float, Float[Array, " n_dim n_dim"]] = self.step_size
         dt2 = dt * dt
 
+        # Use scan to iterate twice: first to generate proposal from current position
+        # and compute its log_prob and gradient, then to compute log_prob and gradient
+        # at the proposed position. Note: proposal[1] from the second iteration is
+        # discarded; we only need logprob[1] and d_logprob[1] for the acceptance ratio.
+        # Using the same key twice is fine since proposal[1] is unused.
         _, (proposal, logprob, d_logprob) = jax.lax.scan(
             body, (position, dt, data), jnp.array([key1, key1])
         )
 
+        # Compute Metropolis-Hastings acceptance ratio for MALA
+        # ratio = log(p(proposal) / p(position)) + log(q(position|proposal) / q(proposal|position))
         ratio = logprob[1] - logprob[0]
+        # Subtract log of forward proposal density q(proposal|position)
         ratio -= multivariate_normal.logpdf(
             proposal[0], position + jnp.dot(dt2, d_logprob[0]) / 2, dt2
         )
+        # Add log of reverse proposal density q(position|proposal)
         ratio += multivariate_normal.logpdf(
             position, proposal[0] + jnp.dot(dt2, d_logprob[1]) / 2, dt2
         )
