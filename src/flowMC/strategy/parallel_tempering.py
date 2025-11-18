@@ -90,15 +90,16 @@ class ParallelTempering(Strategy):
         )
 
         # Take individual steps
-
-        rng_key, subkey = jax.random.split(rng_key)
-        subkey = jax.random.split(subkey, initial_position.shape[0])
-        positions, log_probs, do_accepts = eqx.filter_jit(
+        jitted_ensemble_step = eqx.filter_jit(
             eqx.filter_vmap(
                 jax.tree_util.Partial(self._ensemble_step, kernel),
                 in_axes=(0, 0, None, None, None),
             )
-        )(
+        )
+
+        rng_key, subkey = jax.random.split(rng_key)
+        subkey = jax.random.split(subkey, initial_position.shape[0])
+        positions, log_probs, do_accepts = jitted_ensemble_step(
             subkey, initial_position, tempered_logpdf, temperatures.data, data
         )  # vmapping over chains
 
@@ -108,12 +109,15 @@ class ParallelTempering(Strategy):
             # print(log_probs)
 
         # Exchange between temperatures
+        jitted_exchange = eqx.filter_jit(
+            eqx.filter_vmap(self._exchange, in_axes=(0, 0, None, None, None))
+        )
 
         rng_key, subkey = jax.random.split(rng_key)
         subkey = jax.random.split(subkey, initial_position.shape[0])
-        positions, log_probs, do_accepts = eqx.filter_jit(
-            eqx.filter_vmap(self._exchange, in_axes=(0, 0, None, None, None))
-        )(subkey, positions, tempered_logpdf, temperatures.data, data)
+        positions, log_probs, do_accepts = jitted_exchange(
+            subkey, positions, tempered_logpdf, temperatures.data, data
+        )
 
         if self.verbose:
             mean_accs = jnp.mean(do_accepts)
@@ -125,8 +129,9 @@ class ParallelTempering(Strategy):
             tempered_positions.update_buffer(positions[:, 1:], 0)
 
             # Adapt the temperatures
+            jitted_adapt_temp = eqx.filter_jit(self._adapt_temperature)
             temperatures.update_buffer(
-                eqx.filter_jit(self._adapt_temperature)(temperatures.data, do_accepts),
+                jitted_adapt_temp(temperatures.data, do_accepts),
                 0,
             )
 
