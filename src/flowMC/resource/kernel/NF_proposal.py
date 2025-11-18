@@ -47,8 +47,7 @@ class NFProposal(ProposalBase):
         )
         if n_steps > self.n_batch_size:
 
-            def logpdf_single(pos):
-                return logpdf(pos, data)
+            logpdf_single = jax.tree_util.Partial(logpdf, data=data)
 
             log_prob_proposed = jax.lax.map(
                 logpdf_single, proposed_position, batch_size=self.n_batch_size
