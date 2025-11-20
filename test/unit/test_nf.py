@@ -30,6 +30,8 @@ def test_realnvp():
     rng_key, rng_subkey = jax.random.split(jax.random.PRNGKey(0), 2)
     model = RealNVP(n_features, n_layers, n_hidden, rng_key)
 
+    assert model.n_features == n_features
+
     y, log_det = jax.vmap(model)(x)
 
     assert y.shape == x.shape
@@ -62,6 +64,8 @@ def test_rqspline():
     model = MaskedCouplingRQSpline(
         n_features, n_layers, hidden_layes, n_bins, jax.random.PRNGKey(10)
     )
+
+    assert model.n_features == n_features
 
     rng_key = jax.random.PRNGKey(0)
     samples = model.sample(rng_key, 2)
