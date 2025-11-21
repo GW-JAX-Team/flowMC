@@ -127,10 +127,7 @@ class HMC(ProposalBase):
 
         key1, key2 = jax.random.split(rng_key)
 
-        momentum: Float[Array, " n_dim"] = (
-            jax.random.normal(key1, shape=position.shape) * self.condition_matrix**-0.5
-        )
-        momentum = jnp.dot(
+        momentum: Float[Array, " n_dim"] = jnp.dot(
             jax.random.normal(key1, shape=position.shape),
             jnp.linalg.cholesky(jnp.linalg.inv(self.condition_matrix)).T,
         )
@@ -145,8 +142,8 @@ class HMC(ProposalBase):
 
         do_accept = log_uniform < log_acc
 
-        position = jnp.where(do_accept, proposed_position, position)  # type: ignore
-        log_prob = jnp.where(do_accept, -proposed_PE, log_prob)  # type: ignore
+        position = jnp.where(do_accept, proposed_position, position)
+        log_prob = jnp.where(do_accept, -proposed_PE, log_prob)
 
         return position, log_prob, do_accept
 
