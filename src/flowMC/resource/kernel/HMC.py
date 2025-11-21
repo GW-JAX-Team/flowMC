@@ -53,7 +53,7 @@ class HMC(ProposalBase):
         self,
         potential: Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
         kinetic: Callable[
-            [Float[Array, " n_dim"], Float[Array, " n_dim"]], Float[Array, "1"]
+            [Float[Array, " n_dim"], Float[Array, " n_dim n_dim"] | Float], Float[Array, "1"]
         ],
         rng_key: PRNGKeyArray,
         position: Float[Array, " n_dim"],
@@ -62,9 +62,10 @@ class HMC(ProposalBase):
         """Compute the value of the Hamiltonian from positions with initial momentum
         draw at random from the standard normal distribution."""
 
-        momentum = (
-            jax.random.normal(rng_key, shape=position.shape)
-            * self.condition_matrix**-0.5
+        # Sample momentum from N(0, M^-1) where M is the mass matrix
+        momentum = jnp.dot(
+            jax.random.normal(rng_key, shape=position.shape),
+            jnp.linalg.cholesky(jnp.linalg.inv(self.condition_matrix)).T,
         )
         return potential(position, data) + kinetic(momentum, self.condition_matrix)
 
@@ -116,9 +117,10 @@ class HMC(ProposalBase):
             return -logpdf(x, data)
 
         def kinetic(
-            p: Float[Array, " n_dim"], metric: Float[Array, " n_dim"]
+            p: Float[Array, " n_dim"], metric: Float[Array, " n_dim n_dim"] | Float
         ) -> Float[Array, "1"]:
-            return 0.5 * (p**2 * metric).sum()
+            # K(p) = 0.5 * p^T M p where M is the mass matrix
+            return 0.5 * jnp.dot(p, jnp.dot(metric, p))
 
         leapfrog_kernel = jax.tree_util.Partial(
             self.leapfrog_kernel, kinetic, potential
@@ -142,8 +144,8 @@ class HMC(ProposalBase):
 
         do_accept = log_uniform < log_acc
 
-        position = jnp.where(do_accept, proposed_position, position)
-        log_prob = jnp.where(do_accept, -proposed_PE, log_prob)
+        position = jnp.where(do_accept, proposed_position, position)  # type: ignore
+        log_prob = jnp.where(do_accept, -proposed_PE, log_prob)  # type: ignore
 
         return position, log_prob, do_accept
 
