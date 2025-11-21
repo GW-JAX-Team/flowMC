@@ -11,20 +11,20 @@ from flowMC.resource.kernel.base import ProposalBase
 class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
-    step_size: Float
+    step_size: Float[Array, " n_dim"]
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
 
     def __init__(
         self,
-        step_size: Float | Float[Array, " n_dim"],
+        step_size: Float[Array, " n_dim"],
     ):
         """Initialize MALA sampler.
 
         Args:
-            step_size: Step size for the MALA sampler. Can be a scalar (isotropic)
-                      or a 1D array representing diagonal elements of the step size matrix.
+            step_size: Step size for the MALA sampler as a 1D array representing
+                      diagonal elements of the step size matrix.
         """
         super().__init__()
         self.step_size = step_size
@@ -53,10 +53,10 @@ class MALA(ProposalBase):
         """
 
         def body(
-            carry: tuple[Float[Array, " n_dim"], Float | Float[Array, " n_dim"], dict],
+            carry: tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             this_key: PRNGKeyArray,
         ) -> tuple[
-            tuple[Float[Array, " n_dim"], Float | Float[Array, " n_dim"], dict],
+            tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],
         ]:
             print("Compiling MALA body")
@@ -70,7 +70,7 @@ class MALA(ProposalBase):
 
         key1, key2 = jax.random.split(rng_key)
 
-        dt: Float | Float[Array, " n_dim"] = self.step_size
+        dt: Float[Array, " n_dim"] = self.step_size
         dt2 = dt * dt
 
         # Use scan to iterate twice: first to generate proposal from current position

@@ -100,6 +100,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
+        # Convert scalar step size to 1D array if needed
+        if isinstance(mala_step_size, (int, float)):
+            mala_step_size = jnp.full(n_dims, mala_step_size)
         local_sampler = MALA(step_size=mala_step_size)
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(

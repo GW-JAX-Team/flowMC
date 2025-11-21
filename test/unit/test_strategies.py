@@ -88,7 +88,7 @@ class TestLocalStep:
         test_position = Buffer("test_position", (n_chains, n_steps, n_dims), 1)
         test_log_prob = Buffer("test_log_prob", (n_chains, n_steps), 1)
         test_acceptance = Buffer("test_acceptance", (n_chains, n_steps), 1)
-        mala_kernel = MALA(1.0)
+        mala_kernel = MALA(jnp.ones(n_dims))
         grw_kernel = GaussianRandomWalk(1.0)
         hmc_kernel = HMC(jnp.eye(n_dims), 0.1, 10)
         logpdf = LogPDF(log_posterior, n_dims=n_dims)
@@ -341,7 +341,7 @@ class TestTemperingStrategies:
     n_steps = 4
 
     def initialize(self):
-        mala = MALA(1.0)
+        mala = MALA(jnp.ones(self.n_dims))
         logpdf = TemperedPDF(
             log_posterior,
             lambda x, data: jnp.array(0.0),

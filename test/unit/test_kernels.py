@@ -187,18 +187,19 @@ class TestHMC:
 class TestMALA:
 
     def test_repr(self):
-        MALA_obj = MALA(step_size=1)
-        assert repr(MALA_obj) == "MALA with step size 1"
+        MALA_obj = MALA(step_size=jnp.ones(n_dims))
+        assert repr(MALA_obj) == "MALA with step size " + str(jnp.ones(n_dims))
 
     def test_print_params(self, capsys):
-        MALA_obj = MALA(step_size=1)
+        MALA_obj = MALA(step_size=jnp.ones(n_dims))
         MALA_obj.print_parameters()
         captured = capsys.readouterr()
-        assert captured.out == "MALA parameters:\nstep_size: 1\n"
+        assert "MALA parameters:" in captured.out
+        assert "step_size:" in captured.out
 
     def test_MALA_deterministic(self):
         n_chains = 1
-        MALA_obj = MALA(step_size=1)
+        MALA_obj = MALA(step_size=jnp.ones(n_dims))
 
         rng_key = jax.random.PRNGKey(42)
         rng_key, subkey = jax.random.split(rng_key)
@@ -221,7 +222,7 @@ class TestMALA:
     def test_MALA_acceptance_rate(self):
         # Test acceptance rate goes to one when the step size is small
 
-        MALA_obj = MALA(step_size=0.00001)
+        MALA_obj = MALA(step_size=jnp.full(n_dims, 0.00001))
 
         n_chains = 100
         rng_key = jax.random.PRNGKey(42)
@@ -242,7 +243,7 @@ class TestMALA:
         n_dims = 2
         n_chains = 1
         n_local_steps = 50000
-        MALA_Sampler = MALA(step_size=1)
+        MALA_Sampler = MALA(step_size=jnp.ones(n_dims))
         positions = Buffer("positions", (n_chains, n_local_steps, n_dims), 1)
         log_prob = Buffer("log_prob", (n_chains, n_local_steps), 1)
         acceptance = Buffer("acceptance", (n_chains, n_local_steps), 1)
