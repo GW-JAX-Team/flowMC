@@ -35,7 +35,9 @@ class MALA(ProposalBase):
         self.step_size = step_size
         self.periodic_mask = periodic_mask
         self.period = periodic_bounds[:, 1] - periodic_bounds[:, 0]
-        self.period = jnp.where(self.periodic_mask, self.period, jnp.ones_like(self.period))
+        self.period = jnp.where(
+            self.periodic_mask, self.period, jnp.ones_like(self.period)
+        )
         self.periodic_lower_bound = periodic_bounds[:, 0]
 
     def kernel(
@@ -99,11 +101,9 @@ class MALA(ProposalBase):
 
         # Metropolis-Hastings ratio: log[p(proposal)/p(position)] + log[q(position|proposal)/q(proposal|position)]
         ratio = logprob[1] - logprob[0]
-        # Subtract log of forward proposal density q(proposal|position)
         ratio -= multivariate_normal.logpdf(
             proposal[0], position + dt2 * d_logprob[0] / 2, jnp.diag(dt2)
         )
-        # Add log of reverse proposal density q(position|proposal)
         ratio += multivariate_normal.logpdf(
             position, proposal[0] + dt2 * d_logprob[1] / 2, jnp.diag(dt2)
         )
