@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from typing import Callable
 
 import jax
 import jax.numpy as jnp
@@ -49,7 +49,7 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
         n_epochs: int,
         hmc_step_size: float = 0.1,
         hmc_n_leapfrog: int = 10,
-        condition_matrix: Union[float, Float[Array, " n_dim n_dim"]] = 1,
+        condition_matrix: Float | Float[Array, " n_dim n_dim"] = 1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
