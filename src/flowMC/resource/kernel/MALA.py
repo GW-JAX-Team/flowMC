@@ -2,7 +2,7 @@ import jax
 import jax.numpy as jnp
 from jax.scipy.stats import multivariate_normal
 from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
-from typing import Callable, Union
+from typing import Callable
 
 from flowMC.resource.logPDF import LogPDF
 from flowMC.resource.kernel.base import ProposalBase
@@ -11,7 +11,7 @@ from flowMC.resource.kernel.base import ProposalBase
 class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
-    step_size: Float
+    step_size: Float[Array, " n_dim"]
     periodic_mask: Bool[Array, " n_dim"]
     period: Float[Array, " n_dim"]
     periodic_lower_bound: Float[Array, " n_dim"]
@@ -21,10 +21,16 @@ class MALA(ProposalBase):
 
     def __init__(
         self,
-        step_size: Union[float, Float[Array, " n_dim n_dim"]],
+        step_size: Float[Array, " n_dim"],
         periodic_mask: Bool[Array, " n_dim"],
         periodic_bounds: Float[Array, " n_dim 2"],
     ):
+        """Initialize MALA sampler.
+
+        Args:
+            step_size: Step size for the MALA sampler as a 1D array representing
+                      diagonal elements of the step size matrix.
+        """
         super().__init__()
         self.step_size = step_size
         self.periodic_mask = periodic_mask
@@ -40,40 +46,35 @@ class MALA(ProposalBase):
         logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
         data: PyTree,
     ) -> tuple[Float[Array, " n_dim"], Float[Array, "1"], Int[Array, "1"]]:
-        """Metropolis-adjusted Langevin algorithm kernel. This is a kernel that only
-        evolve a single chain.
+        """Metropolis-adjusted Langevin algorithm kernel for a single chain.
 
         Args:
-            rng_key (PRNGKeyArray): Jax PRNGKey
-            position (Float[Array, " n_dim"]): current position of the chain
-            log_prob (Float[Array, "1"]): current log-probability of the chain
-            data (PyTree): data to be passed to the logpdf function
-
+            rng_key (PRNGKeyArray): JAX PRNGKey for stochastic operations.
+            position (Float[Array, " n_dim"]): Current position of the chain.
+            log_prob (Float[Array, "1"]): Current log-probability of the chain.
+            logpdf: Log probability density function to evaluate.
+            data (PyTree): Additional data to pass to the logpdf function.
         Returns:
-            position (Float[Array, " n_dim"]): new position of the chain
-            log_prob (Float[Array, "1"]): new log-probability of the chain
-            do_accept (Int[Array, "1"]): whether the new position is accepted
+            Tuple of (new_position, new_log_prob, acceptance_flag):
+            - new_position: New position of the chain.
+            - new_log_prob: New log-probability of the chain.
+            - acceptance_flag: Whether the new position is accepted.
         """
 
         def body(
-            carry: tuple[
-                Float[Array, " n_dim"], Union[float, Float[Array, " n_dim n_dim"]], dict
-            ],
+            carry: tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             this_key: PRNGKeyArray,
         ) -> tuple[
-            tuple[
-                Float[Array, " n_dim"], Union[float, Float[Array, " n_dim n_dim"]], dict
-            ],
+            tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],
         ]:
             print("Compiling MALA body")
             this_position, dt, data = carry
             dt2 = dt * dt
             this_log_prob, this_d_log = jax.value_and_grad(logpdf)(this_position, data)
-            proposal = this_position + jnp.dot(dt2, this_d_log) / 2
-            proposal += jnp.dot(
-                dt, jax.random.normal(this_key, shape=this_position.shape)
-            )
+            # MALA proposal: x' = x + (dt²/2) * ∇log p(x) + dt * ε, where ε ~ N(0, I)
+            proposal = this_position + dt2 * this_d_log / 2
+            proposal += dt * jax.random.normal(this_key, shape=this_position.shape)
             proposal = jnp.where(
                 self.periodic_mask,
                 jnp.mod(proposal - self.periodic_lower_bound, self.period)
@@ -84,7 +85,7 @@ class MALA(ProposalBase):
 
         key1, key2 = jax.random.split(rng_key)
 
-        dt: Union[float, Float[Array, " n_dim n_dim"]] = self.step_size
+        dt: Float[Array, " n_dim"] = self.step_size
         dt2 = dt * dt
 
         # Use scan to iterate twice: first to generate proposal from current position
@@ -96,16 +97,15 @@ class MALA(ProposalBase):
             body, (position, dt, data), jnp.array([key1, key1])
         )
 
-        # Compute Metropolis-Hastings acceptance ratio for MALA
-        # ratio = log(p(proposal) / p(position)) + log(q(position|proposal) / q(proposal|position))
+        # Metropolis-Hastings ratio: log[p(proposal)/p(position)] + log[q(position|proposal)/q(proposal|position)]
         ratio = logprob[1] - logprob[0]
         # Subtract log of forward proposal density q(proposal|position)
         ratio -= multivariate_normal.logpdf(
-            proposal[0], position + jnp.dot(dt2, d_logprob[0]) / 2, dt2
+            proposal[0], position + dt2 * d_logprob[0] / 2, jnp.diag(dt2)
         )
         # Add log of reverse proposal density q(position|proposal)
         ratio += multivariate_normal.logpdf(
-            position, proposal[0] + jnp.dot(dt2, d_logprob[1]) / 2, dt2
+            position, proposal[0] + dt2 * d_logprob[1] / 2, jnp.diag(dt2)
         )
 
         log_uniform = jnp.log(jax.random.uniform(key2))

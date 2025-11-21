@@ -1,4 +1,4 @@
-from typing import Callable, Union
+from typing import Callable
 
 import jax
 import jax.numpy as jnp
@@ -47,7 +47,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: Union[float, Float[Array, " n_dim n_dim"]] = 1e-1,
+        mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
         periodic: dict[int, tuple[float, float]] = {},
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
@@ -106,7 +106,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         for dim_idx, (lower, upper) in periodic.items():
             periodic_mask = periodic_mask.at[dim_idx].set(True)
             periodic_bounds = periodic_bounds.at[dim_idx].set(jnp.array([lower, upper]))
-
+        # Convert scalar step size to 1D array if needed
+        if isinstance(mala_step_size, (int, float)):
+            mala_step_size = jnp.full(n_dims, mala_step_size)
         local_sampler = MALA(
             step_size=mala_step_size,
             periodic_mask=periodic_mask,
