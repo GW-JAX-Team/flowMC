@@ -18,7 +18,7 @@ class HMC(ProposalBase):
         params: dictionary of parameters for the sampler
     """
 
-    condition_matrix: Float[Array, " n_dim n_dim"]
+    condition_matrix: Float[Array, " n_dim"]
     step_size: Float
     leapfrog_coefs: Float[Array, " n_leapfrog n_dim"]
 
@@ -37,10 +37,17 @@ class HMC(ProposalBase):
 
     def __init__(
         self,
-        condition_matrix: Float[Array, " n_dim n_dim"] | Float = 1,
+        condition_matrix: Float[Array, " n_dim"],
         step_size: Float = 0.1,
         n_leapfrog: Int = 10,
     ):
+        """Initialize HMC sampler.
+
+        Args:
+            condition_matrix: Diagonal elements of the mass matrix as a 1D array.
+            step_size: Step size for leapfrog integration.
+            n_leapfrog: Number of leapfrog steps.
+        """
         self.condition_matrix = condition_matrix
         self.step_size = step_size
 
@@ -53,7 +60,7 @@ class HMC(ProposalBase):
         self,
         potential: Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
         kinetic: Callable[
-            [Float[Array, " n_dim"], Float[Array, " n_dim n_dim"] | Float], Float[Array, "1"]
+            [Float[Array, " n_dim"], Float[Array, " n_dim"]], Float[Array, "1"]
         ],
         rng_key: PRNGKeyArray,
         position: Float[Array, " n_dim"],
@@ -62,10 +69,9 @@ class HMC(ProposalBase):
         """Compute the value of the Hamiltonian from positions with initial momentum
         draw at random from the standard normal distribution."""
 
-        # Sample momentum from N(0, M^-1) where M is the mass matrix
-        momentum = jnp.dot(
-            jax.random.normal(rng_key, shape=position.shape),
-            jnp.linalg.cholesky(jnp.linalg.inv(self.condition_matrix)).T,
+        # Sample momentum from N(0, M^-1) where M is diagonal mass matrix
+        momentum = jax.random.normal(rng_key, shape=position.shape) / jnp.sqrt(
+            self.condition_matrix
         )
         return potential(position, data) + kinetic(momentum, self.condition_matrix)
 
@@ -86,7 +92,7 @@ class HMC(ProposalBase):
         position: Float[Array, " n_dim"],
         momentum: Float[Array, " n_dim"],
         data: PyTree,
-        metric: Float[Array, " n_dim n_dim"],
+        metric: Float[Array, " n_dim"],
     ) -> tuple[Float[Array, " n_dim"], Float[Array, " n_dim"]]:
         print("Compiling leapfrog step")
         (position, momentum, data, metric, index), _ = jax.lax.scan(
@@ -117,10 +123,10 @@ class HMC(ProposalBase):
             return -logpdf(x, data)
 
         def kinetic(
-            p: Float[Array, " n_dim"], metric: Float[Array, " n_dim n_dim"] | Float
+            p: Float[Array, " n_dim"], metric: Float[Array, " n_dim"]
         ) -> Float[Array, "1"]:
-            # K(p) = 0.5 * p^T M p where M is the mass matrix
-            return 0.5 * jnp.dot(p, jnp.dot(metric, p))
+            # Kinetic energy: K(p) = (1/2) * p^T * M * p where M is diagonal
+            return 0.5 * jnp.sum(p**2 * metric)
 
         leapfrog_kernel = jax.tree_util.Partial(
             self.leapfrog_kernel, kinetic, potential
@@ -129,10 +135,10 @@ class HMC(ProposalBase):
 
         key1, key2 = jax.random.split(rng_key)
 
-        momentum: Float[Array, " n_dim"] = jnp.dot(
-            jax.random.normal(key1, shape=position.shape),
-            jnp.linalg.cholesky(jnp.linalg.inv(self.condition_matrix)).T,
-        )
+        # Sample momentum from N(0, M^-1) where M is diagonal mass matrix
+        momentum: Float[Array, " n_dim"] = jax.random.normal(
+            key1, shape=position.shape
+        ) / jnp.sqrt(self.condition_matrix)
         H = -log_prob + kinetic(momentum, self.condition_matrix)
         proposed_position, proposed_momentum = leapfrog_step(
             position, momentum, data, self.condition_matrix

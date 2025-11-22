@@ -1,6 +1,7 @@
 from typing import Callable
 
 import jax
+import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
 import equinox as eqx
 
@@ -28,7 +29,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
     """
 
     def __repr__(self):
-        return "RQSpline_HMC Bundle"
+        return "RQSpline HMC Bundle"
 
     def __init__(
         self,
@@ -43,7 +44,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
         n_epochs: int,
         hmc_step_size: float = 0.1,
         hmc_n_leapfrog: int = 10,
-        condition_matrix: Float | Float[Array, " n_dim n_dim"] = 1,
+        condition_matrix: Float | Float[Array, " n_dim"] = 1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -91,6 +92,9 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
+        # Convert scalar condition matrix to 1D array if needed
+        if isinstance(condition_matrix, (int, float)):
+            condition_matrix = jnp.full(n_dims, condition_matrix)
         local_sampler = HMC(
             step_size=hmc_step_size,
             n_leapfrog=hmc_n_leapfrog,
