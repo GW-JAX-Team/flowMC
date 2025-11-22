@@ -29,7 +29,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
     """
 
     def __repr__(self):
-        return "RQSpline_MALA Bundle"
+        return "RQSpline MALA Bundle"
 
     def __init__(
         self,
