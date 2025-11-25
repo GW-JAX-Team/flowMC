@@ -90,7 +90,7 @@ class TestLocalStep:
         test_acceptance = Buffer("test_acceptance", (n_chains, n_steps), 1)
         mala_kernel = MALA(jnp.ones(n_dims))
         grw_kernel = GaussianRandomWalk(1.0)
-        hmc_kernel = HMC(jnp.eye(n_dims), 0.1, 10)
+        hmc_kernel = HMC(jnp.ones(n_dims), 0.1, 10)
         logpdf = LogPDF(log_posterior, n_dims=n_dims)
         sampler_state = State(
             {

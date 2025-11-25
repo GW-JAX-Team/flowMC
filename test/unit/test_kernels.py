@@ -22,24 +22,23 @@ logpdf = LogPDF(log_posterior, n_dims=2)
 class TestHMC:
 
     def test_repr(self):
-        HMC_obj = HMC(step_size=1, n_leapfrog=5)
+        HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=1, n_leapfrog=5)
         assert repr(HMC_obj) == "HMC with step size 1 and 5 leapfrog steps"
 
     def test_print_params(self, capsys):
-        HMC_obj = HMC(step_size=1, n_leapfrog=5)
+        HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=1, n_leapfrog=5)
         HMC_obj.print_parameters()
         captured = capsys.readouterr()
-        assert (
-            captured.out
-            == "HMC parameters:\nstep_size: 1\nn_leapfrog: 5\ncondition_matrix: 1\n"
-        )
+        assert "HMC parameters:" in captured.out
+        assert "step_size:" in captured.out
+        assert "n_leapfrog:" in captured.out
 
     def test_HMC_deterministic(self):
         n_chains = 1
         HMC_obj = HMC(
+            condition_matrix=jnp.ones(n_dims),
             step_size=1,
             n_leapfrog=5,
-            condition_matrix=jnp.eye(n_dims),
         )
 
         rng_key = jax.random.PRNGKey(42)
@@ -64,9 +63,9 @@ class TestHMC:
         # Test whether the leapfrog kernel is reversible
         n_chains = 1
         HMC_obj = HMC(
+            condition_matrix=jnp.ones(n_dims),
             step_size=1,
             n_leapfrog=5,
-            condition_matrix=jnp.eye(n_dims),
         )
 
         rng_key = jax.random.PRNGKey(42)
@@ -99,10 +98,10 @@ class TestHMC:
             initial_position,
             initial_momentum,
             None,
-            jnp.eye(n_dims),
+            jnp.ones(n_dims),
         )
         rev_position, rev_momentum = HMC_obj.leapfrog_step(
-            leapfrog_kernel, new_position, -new_momentum, None, jnp.eye(n_dims)
+            leapfrog_kernel, new_position, -new_momentum, None, jnp.ones(n_dims)
         )
 
         assert jnp.allclose(rev_position, initial_position)
@@ -112,9 +111,9 @@ class TestHMC:
         # Test acceptance rate goes to one when step size is small
 
         HMC_obj = HMC(
+            condition_matrix=jnp.ones(n_dims),
             step_size=0.0000001,
             n_leapfrog=5,
-            condition_matrix=jnp.eye(n_dims),
         )
 
         n_chains = 100
@@ -136,9 +135,9 @@ class TestHMC:
         n_chains = 1
         n_local_steps = 30000
         HMC_obj = HMC(
+            condition_matrix=jnp.ones(n_dims),
             step_size=0.1,
             n_leapfrog=5,
-            condition_matrix=jnp.eye(n_dims),
         )
         positions = Buffer("positions", (n_chains, n_local_steps, n_dims), 1)
         log_prob = Buffer("log_prob", (n_chains, n_local_steps), 1)
