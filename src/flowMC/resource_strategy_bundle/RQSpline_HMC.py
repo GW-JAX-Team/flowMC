@@ -55,6 +55,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
         local_thinning: int = 1,
         global_thinning: int = 1,
         n_NFproposal_batch_size: int = 10000,
+        history_window: int = 100,
         verbose: bool = False,
     ):
         n_training_steps = (
@@ -169,6 +170,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
             n_epochs=n_epochs,
             batch_size=batch_size,
             n_max_examples=n_max_examples,
+            history_window=history_window,
             verbose=verbose,
         )
 
