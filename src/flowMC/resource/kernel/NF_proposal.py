@@ -32,7 +32,6 @@ class NFProposal(ProposalBase):
     ) -> tuple[
         Float[Array, "n_step n_dim"], Float[Array, "n_step 1"], Int[Array, "n_step 1"]
     ]:
-
         print("Compiling NF proposal kernel")
         n_steps = data["n_steps"]
 
@@ -44,7 +43,6 @@ class NFProposal(ProposalBase):
         # All these are size (n_steps, n_dim)
         proposed_position, log_prob_nf_proposed = self.sample_flow(subkey, n_steps)
         if n_steps > self.n_batch_size:
-
             logpdf_single = jax.tree_util.Partial(logpdf, data=data)
 
             log_prob_proposed = jax.lax.map(
