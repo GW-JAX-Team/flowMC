@@ -9,7 +9,7 @@
 <img src="https://badgen.net/badge/License/MIT/blue" alt="license"/>
 </a>
 <a href='https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main'>
-<img src='https://badgen.net/coveralls/c/github/GW-JAX-Team/flowMC/main' alt='Coverage Status' />
+<img src='https://badgen.net/coveralls/c/github/GW-JAX-Team/flowMC/main' alt='coverage' />
 </a>
 
 > [!WARNING]
