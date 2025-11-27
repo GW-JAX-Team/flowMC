@@ -1,18 +1,32 @@
-*.pyc
-flowMC/nfmodel/__pycache__/maf.cpython-37.pyc
-log_dir/
-*.pkl
-flowMC/nfmodel/realNVP_white.py
-example/kepler/kepler_white.py
-example/kepler/kepler_analyse.py
-dist
-*egg-info*
-docs/build/*
-*_autosummary
-README.md
-*settings.json
-*build*
-test_docs/test_quickstart.ipynb
-node_modules
-package.json
-yarn.lock
+# Python
+__pycache__/
+*.py[cod]
+
+*.egg-info/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE / Editor
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Python environment
+.python-version
+
+# Documentation
+docs/_build/
+/site
+
+# Jupyter
+.ipynb_checkpoints/
