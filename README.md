@@ -13,30 +13,31 @@
 </a>
 
 > [!WARNING]
-> Note that `flowMC` has not reached v1.0.0, meaning the API could subject to changes. In general, the higher level the API, the less likely it is going to change. However, intermediate level API such as the resource strategy interface could subject to major revision for performance concerns.
+> flowMC has not yet reached v1.0.0, and the API may change. Higher-level APIs are more stable, while intermediate-level APIs (such as the resource strategy interface) may undergo major revisions for performance improvements.
 
 ![flowMC_logo](./docs/logo_0810.png)
 
-flowMC is a Jax-based python package for normalizing-flow enhanced Markov chain Monte Carlo (MCMC) sampling.
-The code is open source under MIT license, and it is under active development.
+flowMC is a JAX-based Python package for normalizing-flow enhanced Markov chain Monte Carlo (MCMC) sampling. The code is open source under the MIT license and is under active development.
 
-- Just-in-time compilation is supported.
-- Native support for GPU acceleration.
-- Suit for problems with multi-modality.
-- Minimal tuning.
+flowMC implements methods described in [Gabrié et al. (2021)](https://openreview.net/pdf?id=mvtooHbjOwx) and [Gabrié et al. (2022)](https://www.pnas.org/doi/10.1073/pnas.2109420119). See the accompanying paper, [Wong, Gabrié, Foreman-Mackey (2023)](https://joss.theoj.org/papers/10.21105/joss.05021), for more details.
 
-# Installation 
+- Just-in-time compilation support
+- Native GPU acceleration
+- Effective for multi-modal problems
+- Minimal hyperparameter tuning required
 
-The simplest way to install the package is to do it through pip
+# Installation
+
+The simplest way to install flowMC is through pip:
 
 ```
 pip install flowMC
 ```
 
 This will install the latest stable release and its dependencies.
-flowMC is based on [Jax](https://github.com/google/jax) and [Equinox](https://github.com/patrick-kidger/equinox).
-By default, installing flowMC will automatically install Jax and Equinox available on [PyPI](https://pypi.org).
-By default this install the CPU version of Jax. If you have a GPU and want to use it, you can install the GPU version of Jax by running:
+flowMC is built on [JAX](https://github.com/google/jax) and [Equinox](https://github.com/patrick-kidger/equinox).
+By default, this installs the CPU version of JAX from [PyPI](https://pypi.org).
+If you have a GPU and want to leverage hardware acceleration, install the CUDA-enabled version:
 
 ```
 pip install flowMC[cuda]
@@ -50,15 +51,15 @@ cd flowMC
 pip install -e .
 ```
 
-There are a couple more extras that you can install with flowMC, including:
-- `flowMC[docs]`: Install the documentation dependencies.
-- `flowMC[codeqa]`: Install the code quality dependencies.
-- `flowMC[visualize]`: Install the visualization dependencies.
+Additional optional dependencies are available:
+- `flowMC[docs]`: Documentation dependencies
+- `flowMC[codeqa]`: Code quality tools
+- `flowMC[visualize]`: Visualization dependencies
 
-On top of `pip` installation, we highly encourage you to use [uv](https://docs.astral.sh/uv/) to manage your python environment. Once you clone the repo, you can run `uv sync` to create a virtual environment with all the dependencies installed.
+We recommend using [uv](https://docs.astral.sh/uv/) to manage your Python environment. After cloning the repository, run `uv sync` to create a virtual environment with all dependencies installed.
 # Attribution
 
-If you used `flowMC` in your research, we would really appreciate it if you could at least cite the following papers:
+If you use flowMC in your research, please cite the following papers:
 
 ```
 @article{Wong:2022xvh,
@@ -89,12 +90,3 @@ If you used `flowMC` in your research, we would really appreciate it if you coul
     year = "2022"
 }
 ```
-
-This will help `flowMC` getting more recognition, and the main benefit *for you* is this means the `flowMC` community will grow and it will be continuously improved. If you believe in the magic of open-source software, please support us by attributing our software in your work.
-
-
-`flowMC` is a Jax implementation of methods described in: 
-> *Efficient Bayesian Sampling Using Normalizing Flows to Assist Markov Chain Monte Carlo Methods* Gabrié M., Rotskoff G. M., Vanden-Eijnden E. - ICML INNF+ workshop 2021 - [pdf](https://openreview.net/pdf?id=mvtooHbjOwx)
-
-> *Adaptive Monte Carlo augmented with normalizing flows.*
-Gabrié M., Rotskoff G. M., Vanden-Eijnden E. - PNAS 2022 - [doi](https://www.pnas.org/doi/10.1073/pnas.2109420119), [arxiv](https://arxiv.org/abs/2105.12603)
