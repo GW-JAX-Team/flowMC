@@ -83,7 +83,6 @@ class LogPDF(Resource):
 
 @jax.tree_util.register_pytree_node_class
 class TemperedPDF(LogPDF):
-
     log_prior: Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]]
 
     def __init__(

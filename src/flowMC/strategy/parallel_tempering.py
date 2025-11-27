@@ -121,7 +121,6 @@ class ParallelTempering(Strategy):
 
         # Update the buffers
         if state.data["training"]:
-
             tempered_positions.update_buffer(positions[:, 1:], 0)
 
             # Adapt the temperatures
@@ -236,10 +235,13 @@ class ParallelTempering(Strategy):
             positions, data
         )
 
-        (key, position, log_prob, logpdf, temperatures, data), (
-            positions,
-            log_probs,
-            do_accept,
+        (
+            (key, position, log_prob, logpdf, temperatures, data),
+            (
+                positions,
+                log_probs,
+                do_accept,
+            ),
         ) = jax.lax.scan(
             jax.tree_util.Partial(self._individual_step_body, kernel),
             ((rng_key, positions, log_probs, logpdf, temperatures, data)),
@@ -312,7 +314,6 @@ class ParallelTempering(Strategy):
         ],
         Int[Array, "1"],
     ]:
-
         key, positions, log_probs, idx, logpdf, temperatures, data = carry
 
         key, subkey = jax.random.split(key)

@@ -60,9 +60,9 @@ class TrainModel(Strategy):
         data_resource = resources[self.data_resource]
         assert isinstance(data_resource, Buffer), "Data resource must be a buffer"
         optimizer = resources[self.optimizer_resource]
-        assert isinstance(
-            optimizer, Optimizer
-        ), "Optimizer resource must be an optimizer"
+        assert isinstance(optimizer, Optimizer), (
+            "Optimizer resource must be an optimizer"
+        )
         n_chains = data_resource.data.shape[0]
         n_dims = data_resource.data.shape[-1]
         training_data = data_resource.data[
@@ -98,9 +98,9 @@ class TrainModel(Strategy):
 
         if self.loss_buffer_name != "":
             loss_buffer = resources[self.loss_buffer_name]
-            assert isinstance(
-                loss_buffer, Buffer
-            ), "Loss buffer resource must be a buffer"
+            assert isinstance(loss_buffer, Buffer), (
+                "Loss buffer resource must be a buffer"
+            )
             loss_buffer.update_buffer(loss_values, start=loss_buffer.cursor)
             loss_buffer.cursor += len(loss_values)
             resources[self.loss_buffer_name] = loss_buffer

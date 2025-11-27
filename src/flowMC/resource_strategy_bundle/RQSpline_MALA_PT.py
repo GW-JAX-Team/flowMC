@@ -236,14 +236,16 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         update_global_step = Lambda(
-            lambda rng_key, resources, initial_position, data: global_stepper.set_current_position(
-                local_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: global_stepper.set_current_position(local_stepper.current_position)
         )
         update_local_step = Lambda(
-            lambda rng_key, resources, initial_position, data: local_stepper.set_current_position(
-                global_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: local_stepper.set_current_position(global_stepper.current_position)
         )
 
         def update_model(
@@ -301,7 +303,10 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             return rng_key, resources, initial_position
 
         initialize_tempered_positions_lambda = Lambda(
-            lambda rng_key, resources, initial_position, data: initialize_tempered_positions(
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: initialize_tempered_positions(
                 rng_key, resources, initial_position, data
             )
         )

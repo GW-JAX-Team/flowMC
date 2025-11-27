@@ -39,9 +39,9 @@ class UpdateState(Strategy):
         Float[Array, "n_chains n_dim"],
     ]:
         """Update the state resource in place."""
-        assert isinstance(
-            state := resources[self.state_name], State
-        ), f"Resource {self.state_name} is not a State resource."
+        assert isinstance(state := resources[self.state_name], State), (
+            f"Resource {self.state_name} is not a State resource."
+        )
 
         state.update(self.keys, self.values)
         return rng_key, resources, initial_position
