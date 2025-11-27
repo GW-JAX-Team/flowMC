@@ -3,12 +3,14 @@
 **Normalizing-flow enhanced sampling package for probabilistic inference**
 
 <a href="https://flowmc.readthedocs.io/en/main/">
-<img src="https://readthedocs.org/projects/flowmc/badge/?version=main&style=flat-square" alt="doc"/>
+<img src="https://badgen.net/badge/Read/the doc/blue" alt="doc"/>
 </a>
 <a href="https://github.com/GW-JAX-Team/flowMC/blob/main/LICENSE">
-<img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="doc"/>
+<img src="https://badgen.net/badge/License/MIT/blue" alt="license"/>
 </a>
-<a href='https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main'><img src='https://img.shields.io/coverallsCoverage/github/GW-JAX-Team/flowMC?style=flat-square' alt='Coverage Status' /></a>
+<a href='https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main'>
+<img src='https://badgen.net/coveralls/c/github/GW-JAX-Team/flowMC/main' alt='Coverage Status' />
+</a>
 
 > [!WARNING]
 > Note that `flowMC` has not reached v1.0.0, meaning the API could subject to changes. In general, the higher level the API, the less likely it is going to change. However, intermediate level API such as the resource strategy interface could subject to major revision for performance concerns.
