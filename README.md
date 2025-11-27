@@ -56,7 +56,7 @@ There are a couple more extras that you can install with flowMC, including:
 On top of `pip` installation, we highly encourage you to use [uv](https://docs.astral.sh/uv/) to manage your python environment. Once you clone the repo, you can run `uv sync` to create a virtual environment with all the dependencies installed.
 # Attribution
 
-If you used `flowMC` in your research, we would really appericiate it if you could at least cite the following papers:
+If you used `flowMC` in your research, we would really appreciate it if you could at least cite the following papers:
 
 ```
 @article{Wong:2022xvh,
