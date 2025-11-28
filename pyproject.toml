@@ -81,7 +81,6 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 include = ["src"]
-exclude = ["test", "docs"]
 
 [tool.ruff.lint]
 ignore = ["F722"]
@@ -90,9 +89,6 @@ ignore = ["F722"]
 include = [
     "src",
     "tests",
-]
-exclude = [
-    "docs"
 ]
 
 [tool.coverage.report]
