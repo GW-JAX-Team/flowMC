@@ -58,6 +58,19 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
         history_window: int = 100,
         verbose: bool = False,
     ):
+        if local_thinning > n_local_steps:
+            raise ValueError(
+                f"local_thinning ({local_thinning}) must not exceed n_local_steps "
+                f"({n_local_steps}). This would result in zero samples being stored. "
+                f"Either increase n_local_steps or decrease local_thinning."
+            )
+        if global_thinning > n_global_steps:
+            raise ValueError(
+                f"global_thinning ({global_thinning}) must not exceed n_global_steps "
+                f"({n_global_steps}). This would result in zero samples being stored. "
+                f"Either increase n_global_steps or decrease global_thinning."
+            )
+
         n_training_steps = (
             n_local_steps // local_thinning * n_training_loops
             + n_global_steps // global_thinning * n_training_loops
