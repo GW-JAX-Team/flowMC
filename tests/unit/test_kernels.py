@@ -291,18 +291,19 @@ class TestMALA:
 class TestGRW:
 
     def test_repr(self):
-        GRW_obj = GaussianRandomWalk(step_size=1)
-        assert repr(GRW_obj) == "Gaussian Random Walk with step size 1"
+        GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims))
+        assert repr(GRW_obj) == "Gaussian Random Walk with step size " + str(jnp.ones(n_dims))
 
     def test_print_params(self, capsys):
-        GRW_obj = GaussianRandomWalk(step_size=1)
+        GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims))
         GRW_obj.print_parameters()
         captured = capsys.readouterr()
-        assert captured.out == "Gaussian Random Walk parameters:\nstep_size: 1\n"
+        assert "Gaussian Random Walk parameters:" in captured.out
+        assert "step_size:" in captured.out
 
     def test_Gaussian_random_walk_deterministic(self):
         n_chains = 1
-        GRW_obj = GaussianRandomWalk(step_size=1)
+        GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims))
         rng_key = jax.random.PRNGKey(42)
         rng_key, subkey = jax.random.split(rng_key)
 
@@ -325,7 +326,7 @@ class TestGRW:
         # Test acceptance rate goes to one when the step size is small
 
         n_dim = 2
-        GRW_obj = GaussianRandomWalk(step_size=0.00001)
+        GRW_obj = GaussianRandomWalk(step_size=jnp.full(n_dim, 0.00001))
 
         n_chains = 100
         rng_key = jax.random.PRNGKey(42)
@@ -344,7 +345,7 @@ class TestGRW:
     def test_Gaussian_random_walk_close_gaussian(self):
         n_chains = 1
         n_local_steps = 50000
-        GRW_Sampler = GaussianRandomWalk(step_size=1)
+        GRW_Sampler = GaussianRandomWalk(step_size=jnp.ones(n_dims))
 
         positions = Buffer("positions", (n_chains, n_local_steps, n_dims), 1)
         log_prob = Buffer("log_prob", (n_chains, n_local_steps), 1)

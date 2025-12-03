@@ -4,6 +4,8 @@ from flowMC.resource_strategy_bundle.RQSpline_MALA import RQSpline_MALA_Bundle
 from flowMC.resource_strategy_bundle.RQSpline_MALA_PT import RQSpline_MALA_PT_Bundle
 from flowMC.resource_strategy_bundle.RQSpline_HMC import RQSpline_HMC_Bundle
 from flowMC.resource_strategy_bundle.RQSpline_HMC_PT import RQSpline_HMC_PT_Bundle
+from flowMC.resource_strategy_bundle.RQSpline_GRW import RQSpline_GRW_Bundle
+from flowMC.resource_strategy_bundle.RQSpline_GRW_PT import RQSpline_GRW_PT_Bundle
 
 
 def logpdf(x, _):
@@ -189,6 +191,102 @@ class TestRQSplineHMCPTBundle:
     def test_global_thinning_exceeds_steps(self):
         with pytest.raises(ValueError, match="global_thinning.*must not exceed n_global_steps"):
             RQSpline_HMC_PT_Bundle(
+                rng_key=jax.random.PRNGKey(0),
+                n_chains=2,
+                n_dims=3,
+                logpdf=logpdf,
+                n_local_steps=10,
+                n_global_steps=5,
+                n_training_loops=1,
+                n_production_loops=1,
+                n_epochs=1,
+                global_thinning=10,
+            )
+
+
+class TestRQSplineGRWBundle:
+    """Tests for RQSpline_GRW_Bundle."""
+
+    def test_initialization(self):
+        bundle = RQSpline_GRW_Bundle(
+            rng_key=jax.random.PRNGKey(0),
+            n_chains=2,
+            n_dims=3,
+            logpdf=logpdf,
+            n_local_steps=10,
+            n_global_steps=5,
+            n_training_loops=2,
+            n_production_loops=1,
+            n_epochs=3,
+        )
+        assert repr(bundle) == "RQSpline GRW Bundle"
+
+    def test_local_thinning_exceeds_steps(self):
+        with pytest.raises(ValueError, match="local_thinning.*must not exceed n_local_steps"):
+            RQSpline_GRW_Bundle(
+                rng_key=jax.random.PRNGKey(0),
+                n_chains=2,
+                n_dims=3,
+                logpdf=logpdf,
+                n_local_steps=5,
+                n_global_steps=10,
+                n_training_loops=1,
+                n_production_loops=1,
+                n_epochs=1,
+                local_thinning=10,
+            )
+
+    def test_global_thinning_exceeds_steps(self):
+        with pytest.raises(ValueError, match="global_thinning.*must not exceed n_global_steps"):
+            RQSpline_GRW_Bundle(
+                rng_key=jax.random.PRNGKey(0),
+                n_chains=2,
+                n_dims=3,
+                logpdf=logpdf,
+                n_local_steps=10,
+                n_global_steps=5,
+                n_training_loops=1,
+                n_production_loops=1,
+                n_epochs=1,
+                global_thinning=10,
+            )
+
+
+class TestRQSplineGRWPTBundle:
+    """Tests for RQSpline_GRW_PT_Bundle."""
+
+    def test_initialization(self):
+        bundle = RQSpline_GRW_PT_Bundle(
+            rng_key=jax.random.PRNGKey(0),
+            n_chains=2,
+            n_dims=3,
+            logpdf=logpdf,
+            n_local_steps=10,
+            n_global_steps=5,
+            n_training_loops=2,
+            n_production_loops=1,
+            n_epochs=3,
+        )
+        assert repr(bundle) == "RQSpline GRW PT Bundle"
+
+    def test_local_thinning_exceeds_steps(self):
+        with pytest.raises(ValueError, match="local_thinning.*must not exceed n_local_steps"):
+            RQSpline_GRW_PT_Bundle(
+                rng_key=jax.random.PRNGKey(0),
+                n_chains=2,
+                n_dims=3,
+                logpdf=logpdf,
+                n_local_steps=5,
+                n_global_steps=10,
+                n_training_loops=1,
+                n_production_loops=1,
+                n_epochs=1,
+                local_thinning=10,
+            )
+
+    def test_global_thinning_exceeds_steps(self):
+        with pytest.raises(ValueError, match="global_thinning.*must not exceed n_global_steps"):
+            RQSpline_GRW_PT_Bundle(
                 rng_key=jax.random.PRNGKey(0),
                 n_chains=2,
                 n_dims=3,

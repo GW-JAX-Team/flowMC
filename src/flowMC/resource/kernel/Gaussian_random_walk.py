@@ -10,15 +10,21 @@ from flowMC.resource.logPDF import LogPDF
 class GaussianRandomWalk(ProposalBase):
     """Gaussian random walk sampler class."""
 
-    step_size: Float
+    step_size: Float[Array, " n_dim"]
 
     def __repr__(self):
         return "Gaussian Random Walk with step size " + str(self.step_size)
 
     def __init__(
         self,
-        step_size: Float,
+        step_size: Float[Array, " n_dim"],
     ):
+        """Initialize Gaussian Random Walk sampler.
+
+        Args:
+            step_size: Step size for the random walk as a 1D array representing
+                      diagonal elements of the proposal covariance matrix.
+        """
         super().__init__()
         self.step_size = step_size
 
