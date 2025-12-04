@@ -23,9 +23,6 @@ classifiers = [
 ]
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
 
-[project.urls]
-Documentation = "https://github.com/GW-JAX-Team/flowMC"
-
 dependencies = [
     "chex>=0.1.87",
     "diffrax>=0.7.0",
@@ -36,6 +33,9 @@ dependencies = [
     "scikit-learn>=1.6.0",
     "tqdm>=4.67.1",
 ]
+
+[project.urls]
+Documentation = "https://github.com/GW-JAX-Team/flowMC"
 
 [project.optional-dependencies]
 docs = [
