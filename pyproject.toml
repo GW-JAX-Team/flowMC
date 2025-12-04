@@ -2,12 +2,14 @@
 name = "flowMC"
 version = "0.4.5"
 description = "Normalizing flow exhanced sampler in jax"
+readme = "README.md"
+requires-python = ">=3.11"
 authors = [
     { name = "Kaze Wong", email = "kazewong.physics@gmail.com"},
     { name = "Marylou Gabrié"},
     { name = "Dan Foreman-Mackey"}
 ]
-
+license = { file = "LICENSE" }
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -17,11 +19,13 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Information Analysis",
+    "Operating System :: OS Independent",
 ]
-
-readme = "README.md"
-requires-python = ">=3.11"
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
+
+[project.urls]
+Documentation = "https://github.com/GW-JAX-Team/flowMC"
+
 dependencies = [
     "chex>=0.1.87",
     "diffrax>=0.7.0",
@@ -32,11 +36,6 @@ dependencies = [
     "scikit-learn>=1.6.0",
     "tqdm>=4.67.1",
 ]
-license = { file = "LICENSE" }
-
-[project.urls]
-Documentation = "https://github.com/GW-JAX-Team/flowMC"
-
 
 [project.optional-dependencies]
 docs = [
@@ -73,11 +72,9 @@ dev = [
 [tool.uv.sources]
 flowMC = { workspace = true }
 
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
 
 [tool.ruff.lint]
 ignore = ["F722"]
