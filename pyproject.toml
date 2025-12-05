@@ -41,7 +41,7 @@ Documentation = "https://github.com/GW-JAX-Team/flowMC"
 docs = [
     "mkdocs-gen-files==0.6.0",
     "mkdocs-jupyter==0.25.1",
-    "mkdocs-literate-nav==0.6.1",
+    "mkdocs-literate-nav==0.6.2",
     "mkdocs-material==9.7.0",
     "mkdocs==1.6.1",
     "mkdocstrings[python]==1.0.0",
