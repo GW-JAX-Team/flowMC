@@ -1,17 +1,17 @@
 
 ### Expectations
 
-flowMC is developed and maintained in my spare time and, while I try to be
-responsive, I don't always get to every issue immediately. If it has been more
-than a week or two, feel free to ping me (@kazewong) to try to get my attention. This is
-subject to changes as the community grows.
+flowMC is developed and maintained by the GW-JAX-Team and community contributors.
+While we try to be responsive, we don't always get to every issue immediately. 
+If it has been more than a week or two, feel free to ping the maintainers on the issue 
+to get attention. This is subject to changes as the community grows.
 
 ### Did you find a bug?
 
 **Ensure the bug was not already reported** by searching on GitHub under
-[Issues](https://github.com/kazewong/flowMC/issues). If you're unable to find an
+[Issues](https://github.com/GW-JAX-Team/flowMC/issues). If you're unable to find an
 open issue addressing the problem, [open a new
-one](https://github.com/kazewong/flowMC/issues/new). Be sure to include a **title
+one](https://github.com/GW-JAX-Team/flowMC/issues/new). Be sure to include a **title
 and clear description**, as much relevant information as possible, and the
 simplest possible **code sample** demonstrating the expected behavior that is
 not occurring. Also label the issue with the bug label.
@@ -33,11 +33,6 @@ feature or changing an existing feature:
    involves a complete analysis such as plotting and models, see the next
    contribution guide.
 
-Suggestions for new features are welcome on [flowMC support
-group](https://groups.google.com/u/1/g/flowmc). Note that features related to the
-core algorithm are unlikely to be accepted since that may include a lot of
-breaking changes.
-
 ### Do you intend to introduce an example or tutorial?
 
 Open a new GitHub pull request with the example or tutorial. The example should
@@ -45,9 +40,3 @@ be self-contained and keep import from other packages to minimal. Leave the
 case-specific analysis detail out. For more extensive tutorial, we encourage the
 community to link the minimal example hosted on the flowMC documentation to
 documentation from other packages.
-
-### Do you have question about the code?
-
-Do not open an issue. Instead, find whether there are already existing threads
-on the [flowMC support group](https://groups.google.com/u/1/g/flowmc). If not,
-please open a new conversation there.

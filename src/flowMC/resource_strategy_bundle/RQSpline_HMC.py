@@ -9,7 +9,7 @@ from flowMC.resource.base import Resource
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.states import State
 from flowMC.resource.logPDF import LogPDF
-from flowMC.resource.kernel.MALA import MALA
+from flowMC.resource.kernel.HMC import HMC
 from flowMC.resource.kernel.NF_proposal import NFProposal
 from flowMC.resource.model.nf_model.rqSpline import MaskedCouplingRQSpline
 from flowMC.resource.optimizer import Optimizer
@@ -20,16 +20,16 @@ from flowMC.strategy.update_state import UpdateState
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
 
-class RQSpline_MALA_Bundle(ResourceStrategyBundle):
+class RQSpline_HMC_Bundle(ResourceStrategyBundle):
     """A bundle that uses a Rational Quadratic Spline as a normalizing flow model and
-    the Metropolis Adjusted Langevin Algorithm as a local sampler.
+    Hamiltonian Monte Carlo as a local sampler.
 
-    This is the base algorithm described in https://www.pnas.org/doi/full/10.1073/pnas.2109420119
+    This is similar to the RQSpline_MALA_Bundle but uses HMC instead of MALA for local sampling.
 
     """
 
     def __repr__(self):
-        return "RQSpline MALA Bundle"
+        return "RQSpline HMC Bundle"
 
     def __init__(
         self,
@@ -42,7 +42,9 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
+        hmc_step_size: float = 0.1,
+        hmc_n_leapfrog: int = 10,
+        condition_matrix: Float | Float[Array, " n_dim"] = 1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -53,6 +55,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         local_thinning: int = 1,
         global_thinning: int = 1,
         n_NFproposal_batch_size: int = 10000,
+        history_window: int = 100,
         verbose: bool = False,
     ):
         if local_thinning > n_local_steps:
@@ -103,10 +106,14 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
-        # Convert scalar step size to 1D array if needed
-        if isinstance(mala_step_size, (int, float)):
-            mala_step_size = jnp.full(n_dims, mala_step_size)
-        local_sampler = MALA(step_size=mala_step_size)
+        # Convert scalar condition matrix to 1D array if needed
+        if isinstance(condition_matrix, (int, float)):
+            condition_matrix = jnp.full(n_dims, condition_matrix)
+        local_sampler = HMC(
+            step_size=hmc_step_size,
+            n_leapfrog=hmc_n_leapfrog,
+            condition_matrix=condition_matrix,
+        )
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
@@ -176,6 +183,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             n_epochs=n_epochs,
             batch_size=batch_size,
             n_max_examples=n_max_examples,
+            history_window=history_window,
             verbose=verbose,
         )
 

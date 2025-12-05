@@ -47,7 +47,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: float = 1e-1,
+        mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -65,6 +65,19 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         logprior: Callable[[Float[Array, " n_dim"], dict], Float] = lambda x, _: 0.0,
         verbose: bool = False,
     ):
+        if local_thinning > n_local_steps:
+            raise ValueError(
+                f"local_thinning ({local_thinning}) must not exceed n_local_steps "
+                f"({n_local_steps}). This would result in zero samples being stored. "
+                f"Either increase n_local_steps or decrease local_thinning."
+            )
+        if global_thinning > n_global_steps:
+            raise ValueError(
+                f"global_thinning ({global_thinning}) must not exceed n_global_steps "
+                f"({n_global_steps}). This would result in zero samples being stored. "
+                f"Either increase n_global_steps or decrease global_thinning."
+            )
+
         n_training_steps = (
             n_local_steps // local_thinning * n_training_loops
             + n_global_steps // global_thinning * n_training_loops
@@ -100,6 +113,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
+        # Convert scalar step size to 1D array if needed
+        if isinstance(mala_step_size, (int, float)):
+            mala_step_size = jnp.full(n_dims, mala_step_size)
         local_sampler = MALA(step_size=mala_step_size)
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
@@ -233,14 +249,16 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         update_global_step = Lambda(
-            lambda rng_key, resources, initial_position, data: global_stepper.set_current_position(
-                local_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: global_stepper.set_current_position(local_stepper.current_position)
         )
         update_local_step = Lambda(
-            lambda rng_key, resources, initial_position, data: local_stepper.set_current_position(
-                global_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: local_stepper.set_current_position(global_stepper.current_position)
         )
 
         def update_model(
@@ -298,7 +316,10 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             return rng_key, resources, initial_position
 
         initialize_tempered_positions_lambda = Lambda(
-            lambda rng_key, resources, initial_position, data: initialize_tempered_positions(
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: initialize_tempered_positions(
                 rng_key, resources, initial_position, data
             )
         )

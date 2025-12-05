@@ -24,12 +24,14 @@ class TestLogPDF:
         assert values == self.posterior(inputs, data)
 
     def test_resource(self):
-        mala = MALA(1.0)
+        mala = MALA(jnp.ones(self.n_dims))
         logpdf = LogPDF(
             self.posterior, [Variable("x_" + str(i), True) for i in range(self.n_dims)]
         )
         rng_key = jax.random.PRNGKey(0)
-        initial_position = jnp.zeros(self.n_dims)
+        n_chains = 1
+        n_steps = 1
+        initial_position = jnp.zeros((n_chains, self.n_dims))
         data = {"data": jnp.ones(self.n_dims)}
         sampler_state = State(
             {
@@ -40,9 +42,11 @@ class TestLogPDF:
             name="sampler_state",
         )
         resources = {
-            "test_positions": Buffer("test_positions", (self.n_dims, 1), 1),
-            "test_log_probs": Buffer("test_log_probs", (self.n_dims, 1), 1),
-            "test_acceptances": Buffer("test_acceptances", (self.n_dims, 1), 1),
+            "test_positions": Buffer(
+                "test_positions", (n_chains, n_steps, self.n_dims), 1
+            ),
+            "test_log_probs": Buffer("test_log_probs", (n_chains, n_steps), 1),
+            "test_acceptances": Buffer("test_acceptances", (n_chains, n_steps), 1),
             "MALA": mala,
             "logpdf": logpdf,
             "sampler_state": sampler_state,
@@ -52,7 +56,7 @@ class TestLogPDF:
             "MALA",
             "sampler_state",
             ["target_positions", "target_log_probs", "target_acceptances"],
-            1,
+            n_steps,
         )
         key, resources, positions = stepper(rng_key, resources, initial_position, data)
 

@@ -71,9 +71,9 @@ class TakeSteps(Strategy):
         rng_key, subkey = jax.random.split(rng_key)
         subkey = jax.random.split(subkey, initial_position.shape[0])
 
-        assert isinstance(
-            state_resource := resources[self.state_name], State
-        ), "State resource must be a State"
+        assert isinstance(state_resource := resources[self.state_name], State), (
+            "State resource must be a State"
+        )
 
         assert isinstance(
             position_buffer_name := state_resource.data[self.buffer_names[0]], str
@@ -87,12 +87,12 @@ class TakeSteps(Strategy):
             acceptance_buffer_name := state_resource.data[self.buffer_names[2]], str
         ), "Acceptance buffer resource name must be a string"
 
-        assert isinstance(
-            position_buffer := resources[position_buffer_name], Buffer
-        ), "Position buffer resource must be a Buffer"
-        assert isinstance(
-            log_prob_buffer := resources[log_prob_buffer_name], Buffer
-        ), "Log probability buffer resource must be a Buffer"
+        assert isinstance(position_buffer := resources[position_buffer_name], Buffer), (
+            "Position buffer resource must be a Buffer"
+        )
+        assert isinstance(log_prob_buffer := resources[log_prob_buffer_name], Buffer), (
+            "Log probability buffer resource must be a Buffer"
+        )
         assert isinstance(
             acceptance_buffer := resources[acceptance_buffer_name], Buffer
         ), "Acceptance buffer resource must be a Buffer"
@@ -100,8 +100,13 @@ class TakeSteps(Strategy):
         kernel = resources[self.kernel_name]
         logpdf = resources[self.logpdf_name]
 
-        # Filter jit will bypass the compilation of
-        # the function if not clearing the cache
+        jitted_sample = eqx.filter_jit(
+            eqx.filter_vmap(
+                jax.tree_util.Partial(self.sample, kernel),
+                in_axes=(0, 0, None, None),
+            )
+        )
+
         n_chains = initial_position.shape[0]
         if self.chain_batch_size > 1 and n_chains > self.chain_batch_size:
             positions_list = []
@@ -111,12 +116,9 @@ class TakeSteps(Strategy):
                 batch_slice = slice(i, min(i + self.chain_batch_size, n_chains))
                 subkey_batch = subkey[batch_slice]
                 initial_position_batch = initial_position[batch_slice]
-                positions_batch, log_probs_batch, do_accepts_batch = eqx.filter_jit(
-                    eqx.filter_vmap(
-                        jax.tree_util.Partial(self.sample, kernel),
-                        in_axes=(0, 0, None, None),
-                    )
-                )(subkey_batch, initial_position_batch, logpdf, data)
+                positions_batch, log_probs_batch, do_accepts_batch = jitted_sample(
+                    subkey_batch, initial_position_batch, logpdf, data
+                )
                 positions_list.append(positions_batch)
                 log_probs_list.append(log_probs_batch)
                 do_accepts_list.append(do_accepts_batch)
@@ -124,12 +126,9 @@ class TakeSteps(Strategy):
             log_probs = jnp.concatenate(log_probs_list, axis=0)
             do_accepts = jnp.concatenate(do_accepts_list, axis=0)
         else:
-            positions, log_probs, do_accepts = eqx.filter_jit(
-                eqx.filter_vmap(
-                    jax.tree_util.Partial(self.sample, kernel),
-                    in_axes=(0, 0, None, None),
-                )
-            )(subkey, initial_position, logpdf, data)
+            positions, log_probs, do_accepts = jitted_sample(
+                subkey, initial_position, logpdf, data
+            )
 
         positions = positions[:, :: self.thinning]
         log_probs = log_probs[:, :: self.thinning]

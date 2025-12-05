@@ -8,8 +8,8 @@ import equinox as eqx
 from flowMC.resource.base import Resource
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.states import State
-from flowMC.resource.logPDF import LogPDF
-from flowMC.resource.kernel.MALA import MALA
+from flowMC.resource.logPDF import LogPDF, TemperedPDF
+from flowMC.resource.kernel.Gaussian_random_walk import GaussianRandomWalk
 from flowMC.resource.kernel.NF_proposal import NFProposal
 from flowMC.resource.model.nf_model.rqSpline import MaskedCouplingRQSpline
 from flowMC.resource.optimizer import Optimizer
@@ -17,19 +17,24 @@ from flowMC.strategy.lambda_function import Lambda
 from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
+from flowMC.strategy.parallel_tempering import ParallelTempering
+
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
 
-class RQSpline_MALA_Bundle(ResourceStrategyBundle):
+class RQSpline_GRW_PT_Bundle(ResourceStrategyBundle):
     """A bundle that uses a Rational Quadratic Spline as a normalizing flow model and
-    the Metropolis Adjusted Langevin Algorithm as a local sampler.
+    Gaussian Random Walk as a local sampler.
 
-    This is the base algorithm described in https://www.pnas.org/doi/full/10.1073/pnas.2109420119
+    The main difference between this and the RQSpline_GRW_Bundle is that this bundle
+    uses an additional parallel tempering step to sample from the target distribution.
 
+    In this bundle, the sampler requires an additional logpdf function that is the prior
+    distribution. If the log prior is not provided, it will be set to 0.
     """
 
     def __repr__(self):
-        return "RQSpline MALA Bundle"
+        return "RQSpline GRW PT Bundle"
 
     def __init__(
         self,
@@ -42,7 +47,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
+        grw_step_size: Float | Float[Array, " n_dim"] = 1e-1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -53,6 +58,11 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         local_thinning: int = 1,
         global_thinning: int = 1,
         n_NFproposal_batch_size: int = 10000,
+        history_window: int = 100,
+        n_temperatures: int = 5,
+        max_temperature: float = 5.0,
+        n_tempered_steps: int = -1,
+        logprior: Callable[[Float[Array, " n_dim"], dict], Float] = lambda x, _: 0.0,
         verbose: bool = False,
     ):
         if local_thinning > n_local_steps:
@@ -104,9 +114,9 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         )
 
         # Convert scalar step size to 1D array if needed
-        if isinstance(mala_step_size, (int, float)):
-            mala_step_size = jnp.full(n_dims, mala_step_size)
-        local_sampler = MALA(step_size=mala_step_size)
+        if isinstance(grw_step_size, (int, float)):
+            grw_step_size = jnp.full(n_dims, grw_step_size)
+        local_sampler = GaussianRandomWalk(step_size=grw_step_size)
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
@@ -116,6 +126,22 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         )
         optimizer = Optimizer(model=model, learning_rate=learning_rate)
         logpdf = LogPDF(logpdf, n_dims=n_dims)
+
+        # Here are the resources for the parallel tempering
+        tempered_logpdf = TemperedPDF(
+            logpdf,
+            logprior,
+            n_dims=n_dims,
+            n_temps=n_temperatures,
+        )
+        tempered_positions = Buffer(
+            "tempered_positions", (n_chains, n_temperatures - 1, n_dims), 2
+        )
+
+        temperatures = Buffer("temperature", (n_temperatures,), 0)
+        temperatures.update_buffer(
+            jax.numpy.linspace(1.0, max_temperature, n_temperatures)
+        )
 
         sampler_state = State(
             {
@@ -144,6 +170,9 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "model": model,
             "optimizer": optimizer,
             "sampler_state": sampler_state,
+            "tempered_logpdf": tempered_logpdf,
+            "tempered_positions": tempered_positions,
+            "temperatures": temperatures,
         }
 
         local_stepper = TakeSerialSteps(
@@ -176,6 +205,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             n_epochs=n_epochs,
             batch_size=batch_size,
             n_max_examples=n_max_examples,
+            history_window=history_window,
             verbose=verbose,
         )
 
@@ -256,6 +286,44 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             )
         )
 
+        if n_tempered_steps <= 0:
+            print("n_tempered_steps value is not valid. Setting to n_local_steps")
+            n_tempered_steps = n_local_steps
+
+        parallel_tempering_strat = ParallelTempering(
+            n_steps=n_tempered_steps,
+            tempered_logpdf_name="tempered_logpdf",
+            kernel_name="local_sampler",
+            tempered_buffer_names=["tempered_positions", "temperatures"],
+            state_name="sampler_state",
+            verbose=verbose,
+        )
+
+        def initialize_tempered_positions(
+            rng_key: PRNGKeyArray,
+            resources: dict[str, Resource],
+            initial_position: Float[Array, "n_chains n_dim"],
+            data: dict,
+        ) -> tuple[
+            PRNGKeyArray,
+            dict[str, Resource],
+            Float[Array, "n_chains n_dim"],
+        ]:
+            """Initialize the tempered positions."""
+            tempered_positions.update_buffer(
+                jnp.repeat(initial_position[:, None], n_temperatures - 1, axis=1)
+            )
+            return rng_key, resources, initial_position
+
+        initialize_tempered_positions_lambda = Lambda(
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: initialize_tempered_positions(
+                rng_key, resources, initial_position, data
+            )
+        )
+
         self.strategies = {
             "local_stepper": local_stepper,
             "global_stepper": global_stepper,
@@ -265,9 +333,12 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "update_local_step": update_local_step,
             "reset_steppers": reset_steppers_lambda,
             "update_model": update_model_lambda,
+            "parallel_tempering": parallel_tempering_strat,
+            "initialize_tempered_positions": initialize_tempered_positions_lambda,
         }
 
         training_phase = [
+            "parallel_tempering",
             "local_stepper",
             "update_global_step",
             "model_trainer",
@@ -276,12 +347,13 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "update_local_step",
         ]
         production_phase = [
+            "parallel_tempering",
             "local_stepper",
             "update_global_step",
             "global_stepper",
             "update_local_step",
         ]
-        strategy_order = []
+        strategy_order = ["initialize_tempered_positions"]
         for _ in range(n_training_loops):
             strategy_order.extend(training_phase)
 

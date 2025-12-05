@@ -13,7 +13,6 @@ from tqdm import trange, tqdm
 
 
 class Solver(eqx.Module):
-
     model: MLP  # Shape should be [input_dim + t_dim, hiddens, output_dim]
     method: AbstractSolver
 
@@ -99,7 +98,6 @@ class Solver(eqx.Module):
 
 
 class Scheduler:
-
     def __call__(self, t: Float) -> tuple[Float, Float, Float, Float]:
         """Return the parameters of the scheduler at time t."""
         raise NotImplementedError
@@ -115,7 +113,6 @@ class CondOTScheduler(Scheduler):
 
 
 class Path:
-
     scheduler: Scheduler
 
     def __init__(self, scheduler: Scheduler):
@@ -130,7 +127,6 @@ class Path:
 
 
 class FlowMatchingModel(eqx.Module, Resource):
-
     solver: Solver
     path: Path
     _data_mean: Float[Array, " n_dim"]
