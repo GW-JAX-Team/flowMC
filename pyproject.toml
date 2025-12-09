@@ -53,7 +53,7 @@ visualize = [
     "matplotlib>=3.10.7",
 ]
 cuda = [
-    "jax[cuda12]>=0.8.1",
+    "jax[cuda]>=0.8.1",
 ]
 
 [dependency-groups]
