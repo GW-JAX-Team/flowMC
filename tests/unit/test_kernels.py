@@ -25,13 +25,14 @@ class TestHMC:
         HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=1, n_leapfrog=5)
         assert repr(HMC_obj) == "HMC with step size 1 and 5 leapfrog steps"
 
-    def test_print_params(self, capsys):
+    def test_print_params(self, caplog):
+        import logging
+        caplog.set_level(logging.DEBUG)
         HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=1, n_leapfrog=5)
         HMC_obj.print_parameters()
-        captured = capsys.readouterr()
-        assert "HMC parameters:" in captured.out
-        assert "step_size:" in captured.out
-        assert "n_leapfrog:" in captured.out
+        assert "HMC parameters:" in caplog.text
+        assert "step_size:" in caplog.text
+        assert "n_leapfrog:" in caplog.text
 
     def test_HMC_deterministic(self):
         n_chains = 1
@@ -189,12 +190,13 @@ class TestMALA:
         MALA_obj = MALA(step_size=jnp.ones(n_dims))
         assert repr(MALA_obj) == "MALA with step size " + str(jnp.ones(n_dims))
 
-    def test_print_params(self, capsys):
+    def test_print_params(self, caplog):
+        import logging
+        caplog.set_level(logging.DEBUG)
         MALA_obj = MALA(step_size=jnp.ones(n_dims))
         MALA_obj.print_parameters()
-        captured = capsys.readouterr()
-        assert "MALA parameters:" in captured.out
-        assert "step_size:" in captured.out
+        assert "MALA parameters:" in caplog.text
+        assert "step_size:" in caplog.text
 
     def test_MALA_deterministic(self):
         n_chains = 1
@@ -294,12 +296,13 @@ class TestGRW:
         GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims))
         assert repr(GRW_obj) == "Gaussian Random Walk with step size " + str(jnp.ones(n_dims))
 
-    def test_print_params(self, capsys):
+    def test_print_params(self, caplog):
+        import logging
+        caplog.set_level(logging.DEBUG)
         GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims))
         GRW_obj.print_parameters()
-        captured = capsys.readouterr()
-        assert "Gaussian Random Walk parameters:" in captured.out
-        assert "step_size:" in captured.out
+        assert "Gaussian Random Walk parameters:" in caplog.text
+        assert "step_size:" in caplog.text
 
     def test_Gaussian_random_walk_deterministic(self):
         n_chains = 1
