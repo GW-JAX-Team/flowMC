@@ -41,10 +41,10 @@ class Sampler:
         n_dim: int,
         n_chains: int,
         rng_key: PRNGKeyArray,
-        resources: None | dict[str, Resource] = None,
-        strategies: None | dict[str, Strategy] = None,
-        strategy_order: None | list[str] = None,
-        resource_strategy_bundles: None | ResourceStrategyBundle = None,
+        resources: Optional[dict[str, Resource]] = None,
+        strategies: Optional[dict[str, Strategy]] = None,
+        strategy_order: Optional[list[str]] = None,
+        resource_strategy_bundles: Optional[ResourceStrategyBundle] = None,
         **kwargs,
     ):
         # Copying input into the model
