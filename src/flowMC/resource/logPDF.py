@@ -1,8 +1,11 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
+import logging
 from flowMC.resource.base import Resource
 from jaxtyping import Array, Float, PyTree
 import jax
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -61,9 +64,9 @@ class LogPDF(Resource):
         return self.log_pdf(x, data)
 
     def print_parameters(self):
-        print("LogPDF with variables:")
+        logger.debug("LogPDF with variables:")
         for var in self.variables:
-            print(var.name, var.continuous)
+            logger.debug(f"{var.name} {var.continuous}")
 
     def save_resource(self, path):
         raise NotImplementedError

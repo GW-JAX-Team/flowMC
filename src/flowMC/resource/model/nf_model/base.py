@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from typing import Optional
+import logging
 
 import equinox as eqx
 import jax
@@ -9,6 +10,8 @@ from jaxtyping import Array, Float, PRNGKeyArray
 from tqdm import tqdm, trange
 from typing_extensions import Self
 from flowMC.resource.base import Resource
+
+logger = logging.getLogger(__name__)
 
 
 class NFModel(eqx.Module, Resource):
@@ -118,7 +121,7 @@ class NFModel(eqx.Module, Resource):
             model (eqx.Model): Updated model.
             opt_state (optax.OptState): Updated optimizer state.
         """
-        print("Compiling training step")
+        logger.debug("Compiling training step")
         loss, grads = model.loss_fn(x)
         updates, state = optim.update(grads, state, model)  # type: ignore
         model = eqx.apply_updates(model, updates)

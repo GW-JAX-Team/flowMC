@@ -1,10 +1,13 @@
 import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
 from typing import Optional
+import logging
 
 from flowMC.strategy.base import Strategy
 from flowMC.resource.base import Resource
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
+
+logger = logging.getLogger(__name__)
 
 
 class Sampler:
@@ -54,7 +57,7 @@ class Sampler:
         self.rng_key = rng_key
 
         if resources is not None and strategies is not None:
-            print(
+            logger.info(
                 "Resources and strategies provided. Ignoring resource strategy bundles."
             )
             self.resources = resources
@@ -62,7 +65,7 @@ class Sampler:
             self.strategy_order = strategy_order
 
         else:
-            print(
+            logger.info(
                 "Resources or strategies not provided. Using resource strategy bundles."
             )
             if resource_strategy_bundles is None:

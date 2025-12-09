@@ -1,5 +1,6 @@
 from functools import partial
 from typing import Optional
+import logging
 
 import equinox as eqx
 import jax
@@ -15,6 +16,8 @@ from flowMC.resource.model.common import (
     MaskedCouplingLayer,
     ScalarAffine,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @partial(jax.vmap, in_axes=(0, None, None))
@@ -504,4 +507,8 @@ class MaskedCouplingRQSpline(NFModel):
         return log_det
 
     def print_parameters(self):
-        print("RQSpline parameters:")
+        logger.debug("RQSpline parameters:")
+        logger.debug(f"  - n_features: {self.n_features}")
+        logger.debug(f"  - n_layers: {len(self.layers)}")
+        logger.debug(f"  - Data mean: {self.data_mean}")
+        logger.debug(f"  - Data covariance: {self.data_cov}")

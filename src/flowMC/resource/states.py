@@ -1,6 +1,9 @@
 from flowMC.resource.base import Resource
 from typing import TypeVar
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 TState = TypeVar("TState", bound="State")
 
@@ -45,10 +48,12 @@ class State(Resource):
         """
         for k, v in zip(key, value):
             self.data[k] = v
-            print(f"Updated state {k} to {v}")
+            logger.debug(f"Updated state {k} to {v}")
 
     def print_parameters(self):
-        print(f"State: {self.name} with shape {len(self.data)} and data {self.data}")
+        logger.debug(
+            f"State: {self.name} with shape {len(self.data)} and data {self.data}"
+        )
 
     def save_resource(self, path: str):
         np.savez(

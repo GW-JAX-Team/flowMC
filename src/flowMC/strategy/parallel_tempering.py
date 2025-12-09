@@ -5,9 +5,12 @@ from flowMC.resource.states import State
 from flowMC.resource.logPDF import TemperedPDF
 from flowMC.strategy.base import Strategy
 from jaxtyping import Array, Float, PRNGKeyArray, Int, Bool
+import logging
 import jax
 import jax.numpy as jnp
 import equinox as eqx
+
+logger = logging.getLogger(__name__)
 
 
 class ParallelTempering(Strategy):
@@ -104,8 +107,7 @@ class ParallelTempering(Strategy):
 
         if self.verbose:
             mean_accs = jnp.mean(do_accepts)
-            print("Mean acceptance of individual steps in PT: " + str(mean_accs))
-            # print(log_probs)
+            logger.debug("Mean acceptance of individual steps in PT: " + str(mean_accs))
 
         # Exchange between temperatures
 
@@ -117,7 +119,7 @@ class ParallelTempering(Strategy):
 
         if self.verbose:
             mean_accs = jnp.mean(do_accepts)
-            print("Mean acceptance of exchange steps in PT: " + str(mean_accs))
+            logger.debug("Mean acceptance of exchange steps in PT: " + str(mean_accs))
 
         # Update the buffers
         if state.data["training"]:
@@ -281,7 +283,7 @@ class ParallelTempering(Strategy):
         """
 
         if self.verbose:
-            print("Taking individual steps")
+            logger.debug("Taking individual steps")
         rng_key = jax.random.split(rng_key, positions.shape[0])
 
         positions, log_probs, do_accept = jax.vmap(
@@ -386,7 +388,7 @@ class ParallelTempering(Strategy):
         """
 
         if self.verbose:
-            print("Exchanging walkers")
+            logger.debug("Exchanging walkers")
 
         log_probs = jax.vmap(logpdf, in_axes=(0, None))(positions, data)
         (key, positions, log_probs, idx, logpdf, temperatures, data), do_accept = (
@@ -419,7 +421,7 @@ class ParallelTempering(Strategy):
         # Adapt the temperature based on the acceptance rate
 
         if self.verbose:
-            print("Adapting temperatures")
+            logger.debug("Adapting temperatures")
 
         acceptance_rate = jnp.mean(do_accept, axis=0)
         damping_factor = (100.0 / do_accept.shape[0]) * (

@@ -8,6 +8,9 @@ import equinox as eqx
 from flowMC.resource.model.nf_model.base import NFModel
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NFProposal(ProposalBase):
@@ -32,7 +35,7 @@ class NFProposal(ProposalBase):
     ) -> tuple[
         Float[Array, "n_step n_dim"], Float[Array, "n_step 1"], Int[Array, "n_step 1"]
     ]:
-        print("Compiling NF proposal kernel")
+        logger.debug("Compiling NF proposal kernel")
         n_steps = data["n_steps"]
 
         rng_key, subkey = random.split(rng_key)

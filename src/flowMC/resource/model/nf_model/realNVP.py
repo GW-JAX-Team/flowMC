@@ -1,4 +1,5 @@
 from typing import List, Optional, Tuple
+import logging
 
 import equinox as eqx
 import jax
@@ -13,6 +14,8 @@ from flowMC.resource.model.common import (
     MaskedCouplingLayer,
     MLPAffine,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AffineCoupling(eqx.Module):
@@ -223,6 +226,6 @@ class RealNVP(NFModel):
         return log_det
 
     def print_parameters(self):
-        print("RealNVP parameters:")
-        print(f"Data mean: {self.data_mean}")
-        print(f"Data covariance: {self.data_cov}")
+        logger.debug("RealNVP parameters:")
+        logger.debug(f"  - Data mean: {self.data_mean}")
+        logger.debug(f"  - Data covariance: {self.data_cov}")
