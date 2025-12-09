@@ -24,13 +24,11 @@ classifiers = [
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
 
 dependencies = [
-    "chex>=0.1.87",
     "diffrax>=0.7.0",
-    "equinox>=0.11.9",
-    "jax[cpu]>=0.5.0",
-    "jaxtyping>=0.2.36",
-    "optax>=0.2.4",
-    "scikit-learn>=1.6.0",
+    "equinox>=0.13.2",
+    "jax[cpu]>=0.8.1",
+    "jaxtyping>=0.3.3",
+    "optax>=0.2.6",
     "tqdm>=4.67.1",
 ]
 
@@ -50,10 +48,10 @@ docs = [
 visualize = [
     "arviz>=0.21.0",
     "corner>=2.2.3",
-    "matplotlib>=3.9.3",
+    "matplotlib>=3.10.7",
 ]
 cuda = [
-    "jax[cuda12]>=0.5.0",
+    "jax[cuda]>=0.8.1",
 ]
 
 [dependency-groups]
