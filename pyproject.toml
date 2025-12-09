@@ -24,13 +24,11 @@ classifiers = [
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
 
 dependencies = [
-    "chex>=0.1.91",
     "diffrax>=0.7.0",
     "equinox>=0.13.2",
     "jax[cpu]>=0.8.1",
     "jaxtyping>=0.3.3",
     "optax>=0.2.6",
-    "scikit-learn>=1.7.0",
     "tqdm>=4.67.1",
 ]
 
