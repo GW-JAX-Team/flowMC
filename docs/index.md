@@ -7,7 +7,7 @@ flowMC
 ![](logo_0810.png)
 
 [![](https://badgen.net/badge/Read/the doc/blue)](https://flowMC.readthedocs.io/en/latest/)
-[![](https://badgen.net/badge/License/MIT/blue)](https//github.com/GW-JAX-Team/flowMC/blob/Packaging/LICENSE)
+[![](https://badgen.net/badge/License/MIT/blue)](https://github.com/GW-JAX-Team/flowMC/blob/Packaging/LICENSE)
 
 
 

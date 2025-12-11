@@ -9,7 +9,7 @@ from flowMC.resource.base import Resource
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.states import State
 from flowMC.resource.logPDF import LogPDF
-from flowMC.resource.kernel.MALA import MALA
+from flowMC.resource.kernel.Gaussian_random_walk import GaussianRandomWalk
 from flowMC.resource.kernel.NF_proposal import NFProposal
 from flowMC.resource.model.nf_model.rqSpline import MaskedCouplingRQSpline
 from flowMC.resource.optimizer import Optimizer
@@ -20,16 +20,17 @@ from flowMC.strategy.update_state import UpdateState
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
 
-class RQSpline_MALA_Bundle(ResourceStrategyBundle):
+class RQSpline_GRW_Bundle(ResourceStrategyBundle):
     """A bundle that uses a Rational Quadratic Spline as a normalizing flow model and
-    the Metropolis Adjusted Langevin Algorithm as a local sampler.
+    Gaussian Random Walk as a local sampler.
 
-    This is the base algorithm described in https://www.pnas.org/doi/full/10.1073/pnas.2109420119
+    This is similar to the RQSpline_MALA_Bundle but uses GRW instead of MALA for local sampling.
+    GRW is a simpler sampler that does not use gradients.
 
     """
 
     def __repr__(self):
-        return "RQSpline MALA Bundle"
+        return "RQSpline GRW Bundle"
 
     def __init__(
         self,
@@ -42,8 +43,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         n_training_loops: int,
         n_production_loops: int,
         n_epochs: int,
-        mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
-        periodic: dict[int, tuple[float, float]] = {},
+        grw_step_size: Float | Float[Array, " n_dim"] = 1e-1,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -104,19 +104,10 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
-        periodic_mask = jnp.zeros(n_dims, dtype=bool)
-        periodic_bounds = jnp.zeros((n_dims, 2))
-        for dim_idx, (lower, upper) in periodic.items():
-            periodic_mask = periodic_mask.at[dim_idx].set(True)
-            periodic_bounds = periodic_bounds.at[dim_idx].set(jnp.array([lower, upper]))
         # Convert scalar step size to 1D array if needed
-        if isinstance(mala_step_size, (int, float)):
-            mala_step_size = jnp.full(n_dims, mala_step_size)
-        local_sampler = MALA(
-            step_size=mala_step_size,
-            periodic_mask=periodic_mask,
-            periodic_bounds=periodic_bounds,
-        )
+        if isinstance(grw_step_size, (int, float)):
+            grw_step_size = jnp.full(n_dims, grw_step_size)
+        local_sampler = GaussianRandomWalk(step_size=grw_step_size)
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey

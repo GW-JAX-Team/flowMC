@@ -1,11 +1,14 @@
 from flowMC.strategy.base import Strategy
 from flowMC.resource.base import Resource
+import logging
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.model.nf_model.base import NFModel
 from flowMC.resource.optimizer import Optimizer
 from jaxtyping import Array, Float, PRNGKeyArray
 import jax
 import jax.numpy as jnp
+
+logger = logging.getLogger(__name__)
 
 
 class TrainModel(Strategy):
@@ -60,9 +63,9 @@ class TrainModel(Strategy):
         data_resource = resources[self.data_resource]
         assert isinstance(data_resource, Buffer), "Data resource must be a buffer"
         optimizer = resources[self.optimizer_resource]
-        assert isinstance(
-            optimizer, Optimizer
-        ), "Optimizer resource must be an optimizer"
+        assert isinstance(optimizer, Optimizer), (
+            "Optimizer resource must be an optimizer"
+        )
         n_chains = data_resource.data.shape[0]
         n_dims = data_resource.data.shape[-1]
         training_data = data_resource.data[
@@ -81,10 +84,10 @@ class TrainModel(Strategy):
         rng_key, subkey = jax.random.split(rng_key)
 
         if self.verbose:
-            print("Training model")
-            print(f"Training data shape: {training_data.shape}")
-            print(f"n_epochs: {self.n_epochs}")
-            print(f"batch_size: {self.batch_size}")
+            logger.debug("Training model")
+            logger.debug(f"Training data shape: {training_data.shape}")
+            logger.debug(f"n_epochs: {self.n_epochs}")
+            logger.debug(f"batch_size: {self.batch_size}")
 
         (rng_key, model, optim_state, loss_values) = model.train(
             rng=subkey,
@@ -98,9 +101,9 @@ class TrainModel(Strategy):
 
         if self.loss_buffer_name != "":
             loss_buffer = resources[self.loss_buffer_name]
-            assert isinstance(
-                loss_buffer, Buffer
-            ), "Loss buffer resource must be a buffer"
+            assert isinstance(loss_buffer, Buffer), (
+                "Loss buffer resource must be a buffer"
+            )
             loss_buffer.update_buffer(loss_values, start=loss_buffer.cursor)
             loss_buffer.cursor += len(loss_values)
             resources[self.loss_buffer_name] = loss_buffer

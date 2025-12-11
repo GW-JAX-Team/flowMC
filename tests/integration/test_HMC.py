@@ -39,9 +39,9 @@ initial_position = jax.random.normal(subkey, shape=(n_chains, n_dims)) * 1
 
 # Define resources
 HMC_sampler = HMC(
+    condition_matrix=jnp.ones(n_dims),
     step_size=step_size,
     n_leapfrog=n_leapfrog,
-    condition_matrix=jnp.eye(n_dims),
 )
 
 positions = Buffer("positions", (n_chains, n_local_steps, n_dims), 1)

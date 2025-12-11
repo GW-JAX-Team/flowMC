@@ -2,12 +2,14 @@
 name = "flowMC"
 version = "0.4.5"
 description = "Normalizing flow exhanced sampler in jax"
+readme = "README.md"
+requires-python = ">=3.11"
 authors = [
     { name = "Kaze Wong", email = "kazewong.physics@gmail.com"},
     { name = "Marylou Gabrié"},
     { name = "Dan Foreman-Mackey"}
 ]
-
+license = { file = "LICENSE" }
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -17,44 +19,39 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Information Analysis",
+    "Operating System :: OS Independent",
 ]
-
-readme = "README.md"
-requires-python = ">=3.11"
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
+
 dependencies = [
-    "chex>=0.1.87",
     "diffrax>=0.7.0",
-    "equinox>=0.11.9",
-    "jax[cpu]>=0.5.0",
-    "jaxtyping>=0.2.36",
-    "optax>=0.2.4",
-    "scikit-learn>=1.6.0",
+    "equinox>=0.13.2",
+    "jax[cpu]>=0.8.1",
+    "jaxtyping>=0.3.3",
+    "optax>=0.2.6",
     "tqdm>=4.67.1",
 ]
-license = { file = "LICENSE" }
 
 [project.urls]
 Documentation = "https://github.com/GW-JAX-Team/flowMC"
 
-
 [project.optional-dependencies]
 docs = [
-    "mkdocs-gen-files==0.5.0",
+    "mkdocs-gen-files==0.6.0",
     "mkdocs-jupyter==0.25.1",
-    "mkdocs-literate-nav==0.6.1",
-    "mkdocs-material==9.5.47",
+    "mkdocs-literate-nav==0.6.2",
+    "mkdocs-material==9.7.0",
     "mkdocs==1.6.1",
-    "mkdocstrings[python]==0.27.0",
-    "pymdown-extensions==10.12",
+    "mkdocstrings[python]==1.0.0",
+    "pymdown-extensions==10.18",
 ]
 visualize = [
     "arviz>=0.21.0",
     "corner>=2.2.3",
-    "matplotlib>=3.9.3",
+    "matplotlib>=3.10.7",
 ]
 cuda = [
-    "jax[cuda12]>=0.5.0",
+    "jax[cuda]>=0.8.1",
 ]
 
 [dependency-groups]
@@ -63,28 +60,27 @@ dev = [
     "ipykernel>=6.29.5",
     "coveralls>=4.0.1",
     "pre-commit>=4.0.1",
-    "pyright>=1.1.389",
+    "pyright>=1.1.402",
     "pytest>=8.3.3",
-    "ruff>=0.8.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.12.2",
     "ipython>=8.30.0",
 ]
 
 [tool.uv.sources]
 flowMC = { workspace = true }
 
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.ruff.lint]
+ignore = ["F722"]
 
 [tool.pyright]
 include = [
     "src",
     "tests",
-]
-exclude = [
-    "docs"
 ]
 
 [tool.coverage.report]
@@ -93,6 +89,4 @@ exclude_also = [
     "raise AssertionError",
     "raise NotImplementedError",
     "@(abc\\. )?abstractmethod",
-    "def tree_flatten",
-    "def tree_unflatten",
 ]

@@ -3,9 +3,12 @@ import jax.numpy as jnp
 from jax.scipy.stats import multivariate_normal
 from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
+import logging
 
 from flowMC.resource.logPDF import LogPDF
 from flowMC.resource.kernel.base import ProposalBase
+
+logger = logging.getLogger(__name__)
 
 
 class MALA(ProposalBase):
@@ -70,7 +73,7 @@ class MALA(ProposalBase):
             tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],
         ]:
-            print("Compiling MALA body")
+            logger.debug("Compiling MALA body")
             this_position, dt, data = carry
             dt2 = dt * dt
             this_log_prob, this_d_log = jax.value_and_grad(logpdf)(this_position, data)
@@ -117,8 +120,8 @@ class MALA(ProposalBase):
         return position, log_prob, do_accept
 
     def print_parameters(self):
-        print("MALA parameters:")
-        print(f"step_size: {self.step_size}")
+        logger.debug("MALA parameters:")
+        logger.debug(f"  - step_size: {self.step_size}")
 
     def save_resource(self, path):
         raise NotImplementedError

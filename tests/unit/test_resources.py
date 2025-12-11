@@ -93,3 +93,7 @@ class TestBuffer:
         buffer = Buffer("test", (10, 10), cursor_dim=0)
         buffer.update_buffer(jnp.ones((10, 10)))
         assert (buffer.data == jnp.ones((10, 10))).all()
+
+    def test_buffer_shape_property(self):
+        buffer = Buffer("test", (5, 8, 3), cursor_dim=1)
+        assert buffer.shape == (5, 8, 3)

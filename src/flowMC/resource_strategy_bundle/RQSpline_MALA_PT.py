@@ -20,6 +20,9 @@ from flowMC.strategy.update_state import UpdateState
 from flowMC.strategy.parallel_tempering import ParallelTempering
 
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
@@ -66,6 +69,19 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         logprior: Callable[[Float[Array, " n_dim"], dict], Float] = lambda x, _: 0.0,
         verbose: bool = False,
     ):
+        if local_thinning > n_local_steps:
+            raise ValueError(
+                f"local_thinning ({local_thinning}) must not exceed n_local_steps "
+                f"({n_local_steps}). This would result in zero samples being stored. "
+                f"Either increase n_local_steps or decrease local_thinning."
+            )
+        if global_thinning > n_global_steps:
+            raise ValueError(
+                f"global_thinning ({global_thinning}) must not exceed n_global_steps "
+                f"({n_global_steps}). This would result in zero samples being stored. "
+                f"Either increase n_global_steps or decrease global_thinning."
+            )
+
         n_training_steps = (
             n_local_steps // local_thinning * n_training_loops
             + n_global_steps // global_thinning * n_training_loops
@@ -246,14 +262,16 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         update_global_step = Lambda(
-            lambda rng_key, resources, initial_position, data: global_stepper.set_current_position(
-                local_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: global_stepper.set_current_position(local_stepper.current_position)
         )
         update_local_step = Lambda(
-            lambda rng_key, resources, initial_position, data: local_stepper.set_current_position(
-                global_stepper.current_position
-            )
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: local_stepper.set_current_position(global_stepper.current_position)
         )
 
         def update_model(
@@ -282,7 +300,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         if n_tempered_steps <= 0:
-            print("n_tempered_steps value is not valid. Setting to n_local_steps")
+            logger.warning(
+                "n_tempered_steps value is not valid. Setting to n_local_steps"
+            )
             n_tempered_steps = n_local_steps
 
         parallel_tempering_strat = ParallelTempering(
@@ -311,7 +331,10 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             return rng_key, resources, initial_position
 
         initialize_tempered_positions_lambda = Lambda(
-            lambda rng_key, resources, initial_position, data: initialize_tempered_positions(
+            lambda rng_key,
+            resources,
+            initial_position,
+            data: initialize_tempered_positions(
                 rng_key, resources, initial_position, data
             )
         )

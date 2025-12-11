@@ -71,9 +71,9 @@ class TakeSteps(Strategy):
         rng_key, subkey = jax.random.split(rng_key)
         subkey = jax.random.split(subkey, initial_position.shape[0])
 
-        assert isinstance(
-            state_resource := resources[self.state_name], State
-        ), "State resource must be a State"
+        assert isinstance(state_resource := resources[self.state_name], State), (
+            "State resource must be a State"
+        )
 
         assert isinstance(
             position_buffer_name := state_resource.data[self.buffer_names[0]], str
@@ -87,12 +87,12 @@ class TakeSteps(Strategy):
             acceptance_buffer_name := state_resource.data[self.buffer_names[2]], str
         ), "Acceptance buffer resource name must be a string"
 
-        assert isinstance(
-            position_buffer := resources[position_buffer_name], Buffer
-        ), "Position buffer resource must be a Buffer"
-        assert isinstance(
-            log_prob_buffer := resources[log_prob_buffer_name], Buffer
-        ), "Log probability buffer resource must be a Buffer"
+        assert isinstance(position_buffer := resources[position_buffer_name], Buffer), (
+            "Position buffer resource must be a Buffer"
+        )
+        assert isinstance(log_prob_buffer := resources[log_prob_buffer_name], Buffer), (
+            "Log probability buffer resource must be a Buffer"
+        )
         assert isinstance(
             acceptance_buffer := resources[acceptance_buffer_name], Buffer
         ), "Acceptance buffer resource must be a Buffer"

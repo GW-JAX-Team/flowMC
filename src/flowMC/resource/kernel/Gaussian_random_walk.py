@@ -2,23 +2,32 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
+import logging
 
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
+
+logger = logging.getLogger(__name__)
 
 
 class GaussianRandomWalk(ProposalBase):
     """Gaussian random walk sampler class."""
 
-    step_size: Float
+    step_size: Float[Array, " n_dim"]
 
     def __repr__(self):
         return "Gaussian Random Walk with step size " + str(self.step_size)
 
     def __init__(
         self,
-        step_size: Float,
+        step_size: Float[Array, " n_dim"],
     ):
+        """Initialize Gaussian Random Walk sampler.
+
+        Args:
+            step_size: Step size for the random walk as a 1D array representing
+                      diagonal elements of the proposal covariance matrix.
+        """
         super().__init__()
         self.step_size = step_size
 
@@ -61,8 +70,8 @@ class GaussianRandomWalk(ProposalBase):
         return position, log_prob, do_accept
 
     def print_parameters(self):
-        print("Gaussian Random Walk parameters:")
-        print(f"step_size: {self.step_size}")
+        logger.debug("Gaussian Random Walk parameters:")
+        logger.debug(f"  - step_size: {self.step_size}")
 
     def save_resource(self, path):
         raise NotImplementedError
