@@ -44,6 +44,7 @@ class RQSpline_GRW_Bundle(ResourceStrategyBundle):
         n_production_loops: int,
         n_epochs: int,
         grw_step_size: Float | Float[Array, " n_dim"] = 1e-1,
+        periodic: dict[int, tuple[float, float]] = {},
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -104,10 +105,19 @@ class RQSpline_GRW_Bundle(ResourceStrategyBundle):
             "global_accs_production", (n_chains, n_production_steps), 1
         )
 
+        periodic_mask = jnp.zeros(n_dims, dtype=bool)
+        periodic_bounds = jnp.zeros((n_dims, 2))
+        for dim_idx, (lower, upper) in periodic.items():
+            periodic_mask = periodic_mask.at[dim_idx].set(True)
+            periodic_bounds = periodic_bounds.at[dim_idx].set(jnp.array([lower, upper]))
         # Convert scalar step size to 1D array if needed
         if isinstance(grw_step_size, (int, float)):
             grw_step_size = jnp.full(n_dims, grw_step_size)
-        local_sampler = GaussianRandomWalk(step_size=grw_step_size)
+        local_sampler = GaussianRandomWalk(
+            step_size=grw_step_size,
+            periodic_mask=periodic_mask,
+            periodic_bounds=periodic_bounds,
+        )
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
