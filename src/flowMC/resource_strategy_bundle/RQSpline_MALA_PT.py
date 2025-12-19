@@ -20,6 +20,9 @@ from flowMC.strategy.update_state import UpdateState
 from flowMC.strategy.parallel_tempering import ParallelTempering
 
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
@@ -287,7 +290,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         )
 
         if n_tempered_steps <= 0:
-            print("n_tempered_steps value is not valid. Setting to n_local_steps")
+            logger.warning(
+                "n_tempered_steps value is not valid. Setting to n_local_steps"
+            )
             n_tempered_steps = n_local_steps
 
         parallel_tempering_strat = ParallelTempering(

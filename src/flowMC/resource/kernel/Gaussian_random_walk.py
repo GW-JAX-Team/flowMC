@@ -2,9 +2,12 @@ import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
+import logging
 
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
+
+logger = logging.getLogger(__name__)
 
 
 class GaussianRandomWalk(ProposalBase):
@@ -67,8 +70,8 @@ class GaussianRandomWalk(ProposalBase):
         return position, log_prob, do_accept
 
     def print_parameters(self):
-        print("Gaussian Random Walk parameters:")
-        print(f"step_size: {self.step_size}")
+        logger.debug("Gaussian Random Walk parameters:")
+        logger.debug(f"  - step_size: {self.step_size}")
 
     def save_resource(self, path):
         raise NotImplementedError

@@ -53,7 +53,6 @@ pip install -e .
 
 Additional optional dependencies are available:
 - `flowMC[docs]`: Documentation dependencies
-- `flowMC[codeqa]`: Code quality tools
 - `flowMC[visualize]`: Visualization dependencies
 
 We recommend using [uv](https://docs.astral.sh/uv/) to manage your Python environment. After cloning the repository, run `uv sync` to create a virtual environment with all dependencies installed.

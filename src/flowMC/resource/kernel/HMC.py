@@ -1,4 +1,5 @@
 from typing import Callable
+import logging
 
 import jax
 import jax.numpy as jnp
@@ -6,6 +7,8 @@ from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
 
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
+
+logger = logging.getLogger(__name__)
 
 
 class HMC(ProposalBase):
@@ -94,7 +97,7 @@ class HMC(ProposalBase):
         data: PyTree,
         metric: Float[Array, " n_dim"],
     ) -> tuple[Float[Array, " n_dim"], Float[Array, " n_dim"]]:
-        print("Compiling leapfrog step")
+        logger.debug("Compiling leapfrog step")
         (position, momentum, data, metric, index), _ = jax.lax.scan(
             leapfrog_kernel,
             (position, momentum, data, metric, 0),
@@ -156,10 +159,10 @@ class HMC(ProposalBase):
         return position, log_prob, do_accept
 
     def print_parameters(self):
-        print("HMC parameters:")
-        print(f"step_size: {self.step_size}")
-        print(f"n_leapfrog: {self.n_leapfrog}")
-        print(f"condition_matrix: {self.condition_matrix}")
+        logger.debug("HMC parameters:")
+        logger.debug(f"  - step_size: {self.step_size}")
+        logger.debug(f"  - n_leapfrog: {self.n_leapfrog}")
+        logger.debug(f"  - condition_matrix: {self.condition_matrix}")
 
     def save_resource(self, path):
         raise NotImplementedError

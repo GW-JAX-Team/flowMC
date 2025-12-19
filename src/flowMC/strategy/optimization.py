@@ -7,6 +7,9 @@ from jaxtyping import Array, Float, PRNGKeyArray
 
 from flowMC.strategy.base import Strategy
 from flowMC.resource.base import Resource
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AdamOptimization(Strategy):
@@ -147,7 +150,7 @@ class AdamOptimization(Strategy):
 
             return params  # type: ignore
 
-        print("Using Adam optimization")
+        logger.info("Using Adam optimization")
         rng_key, subkey = jax.random.split(rng_key)
         keys = jax.random.split(subkey, initial_position.shape[0])
         optimized_positions = jax.vmap(_single_optimize, in_axes=(0, 0))(
@@ -159,6 +162,6 @@ class AdamOptimization(Strategy):
         )
 
         if jnp.isinf(final_log_prob).any() or jnp.isnan(final_log_prob).any():
-            print("Warning: Optimization accessed infinite or NaN log-probabilities.")
+            logger.warning("Optimization accessed infinite or NaN log-probabilities.")
 
         return rng_key, optimized_positions, final_log_prob

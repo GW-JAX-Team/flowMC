@@ -4,6 +4,9 @@ import numpy as np
 from jaxtyping import Array, Float
 import jax.numpy as jnp
 import jax
+import logging
+
+logger = logging.getLogger(__name__)
 
 TBuffer = TypeVar("TBuffer", bound="Buffer")
 
@@ -41,7 +44,7 @@ class Buffer(Resource):
         )
 
     def print_parameters(self):
-        print(
+        logger.debug(
             f"Buffer: {self.name} with shape {self.data.shape} and cursor"
             f" {self.cursor} at dimension {self.cursor_dim}"
         )

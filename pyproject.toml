@@ -24,13 +24,11 @@ classifiers = [
 keywords = ["sampling", "inference", "machine learning", "normalizing", "autodiff", "jax"]
 
 dependencies = [
-    "chex>=0.1.87",
     "diffrax>=0.7.0",
-    "equinox>=0.11.9",
-    "jax[cpu]>=0.5.0",
-    "jaxtyping>=0.2.36",
-    "optax>=0.2.4",
-    "scikit-learn>=1.6.0",
+    "equinox>=0.13.2",
+    "jax[cpu]>=0.8.1",
+    "jaxtyping>=0.3.3",
+    "optax>=0.2.6",
     "tqdm>=4.67.1",
 ]
 
@@ -39,21 +37,21 @@ Documentation = "https://github.com/GW-JAX-Team/flowMC"
 
 [project.optional-dependencies]
 docs = [
-    "mkdocs-gen-files==0.5.0",
+    "mkdocs-gen-files==0.6.0",
     "mkdocs-jupyter==0.25.1",
-    "mkdocs-literate-nav==0.6.1",
-    "mkdocs-material==9.5.47",
+    "mkdocs-literate-nav==0.6.2",
+    "mkdocs-material==9.7.0",
     "mkdocs==1.6.1",
-    "mkdocstrings[python]==0.27.0",
-    "pymdown-extensions==10.12",
+    "mkdocstrings[python]==1.0.0",
+    "pymdown-extensions==10.19.1",
 ]
 visualize = [
     "arviz>=0.21.0",
     "corner>=2.2.3",
-    "matplotlib>=3.9.3",
+    "matplotlib>=3.10.7",
 ]
 cuda = [
-    "jax[cuda12]>=0.5.0",
+    "jax[cuda]>=0.8.1",
 ]
 
 [dependency-groups]

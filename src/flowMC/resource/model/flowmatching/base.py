@@ -2,6 +2,7 @@ import equinox as eqx
 from jaxtyping import PRNGKeyArray, Float, Array, PyTree
 import optax
 from flowMC.resource.base import Resource
+import logging
 from flowMC.resource.model.common import MLP
 from typing_extensions import Self
 from typing import Optional
@@ -10,6 +11,8 @@ import jax
 from jax.scipy.stats.multivariate_normal import logpdf
 from diffrax import diffeqsolve, ODETerm, Dopri5, AbstractSolver
 from tqdm import trange, tqdm
+
+logger = logging.getLogger(__name__)
 
 
 class Solver(eqx.Module):
@@ -206,7 +209,7 @@ class FlowMatchingModel(eqx.Module, Resource):
         optim: optax.GradientTransformation,
         state: optax.OptState,
     ) -> tuple[Float[Array, " 1"], Self, optax.OptState]:
-        print("Compiling training step")
+        logger.debug("Compiling training step")
         loss, grads = model.loss_fn(x_t, t, dx_t)
         updates, state = optim.update(grads, state, model)  # type: ignore
         model = eqx.apply_updates(model, updates)
