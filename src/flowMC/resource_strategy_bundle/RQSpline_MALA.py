@@ -271,28 +271,29 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
         ]:
             """Adapt the local sampler's step size based on recent acceptance rates."""
             assert isinstance(sampler_state := resources["sampler_state"], State)
-            if sampler_state.data["training"]:
-                # Get recent local acceptances from the buffer
-                buffer_name = str(sampler_state.data["target_local_accs"])
-                assert isinstance(local_accs_buffer := resources[buffer_name], Buffer)
 
-                # Filter out -inf values (from global steps) and get last valid acceptance per chain
-                all_accs = local_accs_buffer.data
+            # Get recent local acceptances from the buffer
+            buffer_name = str(sampler_state.data["target_local_accs"])
+            assert isinstance(local_accs_buffer := resources[buffer_name], Buffer)
 
-                # For each chain, get the last finite acceptance value
-                last_valid_accs = jnp.array(
-                    [
-                        all_accs[i, jnp.where(jnp.isfinite(all_accs)[i])[0][-1]]
-                        for i in range(all_accs.shape[0])
-                    ]
-                )
-                acceptance_rate = float(jnp.mean(last_valid_accs))
+            # Filter out -inf values (from global steps) and get last valid acceptance per chain
+            all_accs = local_accs_buffer.data
 
-                # Update the local sampler
-                assert isinstance(local_sampler := resources["local_sampler"], MALA)
-                resources["local_sampler"] = local_sampler.adapt_step_size(
-                    acceptance_rate
-                )
+            # For each chain, get the last finite acceptance value
+            last_valid_accs = jnp.array(
+                [
+                    all_accs[i, jnp.where(jnp.isfinite(all_accs)[i])[0][-1]]
+                    for i in range(all_accs.shape[0])
+                ]
+            )
+            acceptance_rate = float(jnp.mean(last_valid_accs))
+
+            # Update the local sampler with different targets for training vs production
+            target_rate = 0.3 if sampler_state.data["training"] else 0.7
+            assert isinstance(local_sampler := resources["local_sampler"], MALA)
+            resources["local_sampler"] = local_sampler.adapt_step_size(
+                acceptance_rate, target_rate=target_rate
+            )
             return rng_key, resources, initial_position
 
         adapt_local_sampler_lambda = Lambda(

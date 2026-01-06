@@ -106,7 +106,7 @@ class MALA(ProposalBase):
 
         return position, log_prob, do_accept
 
-    def adapt_step_size(self, acceptance_rate: float):
+    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.3):
         """Adapt step size based on acceptance rate.
 
         Target acceptance rate for MALA is 0.3 (relatively low for better exploration).
@@ -117,7 +117,7 @@ class MALA(ProposalBase):
         Returns:
             A new MALA instance with updated step_size.
         """
-        diff = acceptance_rate - 0.3
+        diff = acceptance_rate - target_rate
         new_step_size = self.step_size * jnp.exp(self.adaptation_rate * diff)
         logger.debug("Adapting MALA step size:")
         logger.debug(f"  - acceptance_rate: {acceptance_rate}")
