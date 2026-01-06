@@ -332,6 +332,41 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
+        def adapt_local_sampler(
+            rng_key: PRNGKeyArray,
+            resources: dict[str, Resource],
+            initial_position: Float[Array, "n_chains n_dim"],
+            data: dict,
+        ) -> tuple[
+            PRNGKeyArray,
+            dict[str, Resource],
+            Float[Array, "n_chains n_dim"],
+        ]:
+            """Adapt the local sampler's step size based on recent acceptance rates."""
+            assert isinstance(sampler_state := resources["sampler_state"], State)
+            if sampler_state.data["training"]:
+                # Get recent local acceptances from the buffer
+                buffer_name = str(sampler_state.data["target_local_accs"])
+                assert isinstance(local_accs_buffer := resources[buffer_name], Buffer)
+                # Calculate mean acceptance rate from the most recent steps
+                recent_accs = local_accs_buffer.data[
+                    :, -min(100, local_accs_buffer.data.shape[1]) :
+                ]
+                acceptance_rate = float(jnp.mean(recent_accs))
+
+                # Update the local sampler
+                assert isinstance(local_sampler := resources["local_sampler"], MALA)
+                resources["local_sampler"] = local_sampler.adapt_step_size(
+                    acceptance_rate
+                )
+            return rng_key, resources, initial_position
+
+        adapt_local_sampler_lambda = Lambda(
+            lambda rng_key, resources, initial_position, data: adapt_local_sampler(
+                rng_key, resources, initial_position, data
+            )
+        )
+
         self.strategies = {
             "local_stepper": local_stepper,
             "global_stepper": global_stepper,
@@ -343,11 +378,13 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "update_model": update_model_lambda,
             "parallel_tempering": parallel_tempering_strat,
             "initialize_tempered_positions": initialize_tempered_positions_lambda,
+            "adapt_local_sampler": adapt_local_sampler_lambda,
         }
 
         training_phase = [
             "parallel_tempering",
             "local_stepper",
+            "adapt_local_sampler",
             "update_global_step",
             "model_trainer",
             "update_model",

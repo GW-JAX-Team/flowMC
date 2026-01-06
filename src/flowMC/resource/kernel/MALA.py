@@ -4,6 +4,7 @@ from jax.scipy.stats import multivariate_normal
 from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
 import logging
+from equinox import tree_at
 
 from flowMC.resource.logPDF import LogPDF
 from flowMC.resource.kernel.base import ProposalBase
@@ -103,14 +104,22 @@ class MALA(ProposalBase):
         position = jnp.where(do_accept, proposal[0], position)
         log_prob = jnp.where(do_accept, logprob[1], logprob[0])
 
-        # Update step size
-        diff = (
-            jnp.mean(do_accept.astype(jnp.float32))
-            - 0.574  # Target acceptance rate for MALA
-        )
-        self.step_size *= jnp.exp(self.adaptation_rate * diff)
-
         return position, log_prob, do_accept
+
+    def adapt_step_size(self, acceptance_rate: float):
+        """Adapt step size based on acceptance rate.
+
+        Target acceptance rate for MALA is 0.574.
+
+        Args:
+            acceptance_rate: The current acceptance rate.
+
+        Returns:
+            A new MALA instance with updated step_size.
+        """
+        diff = acceptance_rate - 0.574
+        new_step_size = self.step_size * jnp.exp(self.adaptation_rate * diff)
+        return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
         logger.debug("MALA parameters:")
