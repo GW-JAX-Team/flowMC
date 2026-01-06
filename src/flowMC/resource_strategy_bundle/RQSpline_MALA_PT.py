@@ -351,14 +351,11 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
 
                 # Filter out -inf values (from global steps) and get last valid acceptance per chain
                 all_accs = local_accs_buffer.data
-                finite_mask = jnp.isfinite(all_accs)
 
                 # For each chain, get the last finite acceptance value
                 last_valid_accs = jnp.array(
                     [
-                        all_accs[i, jnp.where(finite_mask[i])[0][-1]]
-                        if jnp.any(finite_mask[i])
-                        else 0.574
+                        all_accs[i, jnp.where(jnp.isfinite(all_accs)[i])[0][-1]]
                         for i in range(all_accs.shape[0])
                     ]
                 )
