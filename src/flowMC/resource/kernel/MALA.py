@@ -15,6 +15,7 @@ class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
     step_size: Float[Array, " n_dim"]
+    adaptation_rate: float
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
@@ -22,6 +23,7 @@ class MALA(ProposalBase):
     def __init__(
         self,
         step_size: Float[Array, " n_dim"],
+        adaptation_rate: float = 0.4,
     ):
         """Initialize MALA sampler.
 
@@ -31,6 +33,7 @@ class MALA(ProposalBase):
         """
         super().__init__()
         self.step_size = step_size
+        self.adaptation_rate = adaptation_rate
 
     def kernel(
         self,
@@ -100,11 +103,19 @@ class MALA(ProposalBase):
         position = jnp.where(do_accept, proposal[0], position)
         log_prob = jnp.where(do_accept, logprob[1], logprob[0])
 
+        # Update step size
+        diff = (
+            jnp.mean(do_accept.astype(jnp.float32))
+            - 0.574  # Target acceptance rate for MALA
+        )
+        self.step_size *= jnp.exp(self.adaptation_rate * diff)
+
         return position, log_prob, do_accept
 
     def print_parameters(self):
         logger.debug("MALA parameters:")
         logger.debug(f"  - step_size: {self.step_size}")
+        logger.debug(f"  - adaptation_rate: {self.adaptation_rate}")
 
     def save_resource(self, path):
         raise NotImplementedError
