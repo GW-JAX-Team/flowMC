@@ -24,7 +24,7 @@ class MALA(ProposalBase):
     def __init__(
         self,
         step_size: Float[Array, " n_dim"],
-        adaptation_rate: float = 0.4,
+        adaptation_rate: float = 0.1,
     ):
         """Initialize MALA sampler.
 
@@ -119,6 +119,10 @@ class MALA(ProposalBase):
         """
         diff = acceptance_rate - 0.574
         new_step_size = self.step_size * jnp.exp(self.adaptation_rate * diff)
+        logger.debug("Adapting MALA step size:")
+        logger.debug(f"  - acceptance_rate: {acceptance_rate}")
+        logger.debug(f"  - old step_size: {self.step_size}")
+        logger.debug(f"  - new step_size: {new_step_size}")
         return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):

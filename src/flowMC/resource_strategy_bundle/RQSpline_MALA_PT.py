@@ -348,11 +348,18 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
                 # Get recent local acceptances from the buffer
                 buffer_name = str(sampler_state.data["target_local_accs"])
                 assert isinstance(local_accs_buffer := resources[buffer_name], Buffer)
-                # Calculate mean acceptance rate from the most recent steps
-                recent_accs = local_accs_buffer.data[
-                    :, -min(100, local_accs_buffer.data.shape[1]) :
-                ]
-                acceptance_rate = float(jnp.mean(recent_accs))
+                
+                # Filter out -inf values (from global steps) and get last valid acceptance per chain
+                all_accs = local_accs_buffer.data
+                finite_mask = jnp.isfinite(all_accs)
+                
+                # For each chain, get the last finite acceptance value
+                last_valid_accs = jnp.array([
+                    all_accs[i, jnp.where(finite_mask[i])[0][-1]] 
+                    if jnp.any(finite_mask[i]) else 0.574
+                    for i in range(all_accs.shape[0])
+                ])
+                acceptance_rate = float(jnp.mean(last_valid_accs))
 
                 # Update the local sampler
                 assert isinstance(local_sampler := resources["local_sampler"], MALA)
