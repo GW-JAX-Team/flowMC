@@ -402,6 +402,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         production_phase = [
             "parallel_tempering",
             "local_stepper",
+            "adapt_local_sampler",
             "update_global_step",
             "global_stepper",
             "update_local_step",
