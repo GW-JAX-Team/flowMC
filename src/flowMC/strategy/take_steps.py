@@ -132,8 +132,13 @@ class TakeSteps(Strategy):
 
         positions = positions[:, :: self.thinning]
         log_probs = log_probs[:, :: self.thinning]
-        do_accepts = do_accepts[:, :: self.thinning].astype(
-            acceptance_buffer.data.dtype
+        # Compute mean acceptance rate over each thinning window
+        n_thinned_steps = self.n_steps // self.thinning
+        n_used_steps = n_thinned_steps * self.thinning
+        do_accepts = (
+            do_accepts[:, :n_used_steps]
+            .reshape(do_accepts.shape[0], n_thinned_steps, self.thinning)
+            .mean(axis=2)
         )
 
         position_buffer.update_buffer(positions, self.current_position)
