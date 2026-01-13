@@ -56,7 +56,6 @@ cuda = [
 
 [dependency-groups]
 dev = [
-    "flowMC",
     "ipykernel>=6.29.5",
     "coveralls>=4.0.1",
     "pre-commit>=4.0.1",
