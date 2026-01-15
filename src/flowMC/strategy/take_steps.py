@@ -139,6 +139,7 @@ class TakeSteps(Strategy):
             do_accepts[:, :n_used_steps]
             .reshape(do_accepts.shape[0], n_thinned_steps, self.thinning)
             .mean(axis=2)
+            .astype(positions.dtype)
         )
 
         position_buffer.update_buffer(positions, self.current_position)
