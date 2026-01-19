@@ -569,7 +569,7 @@ class TestThinning:
         key = jax.random.PRNGKey(42)
         initial_position = jax.random.normal(key, shape=(self.n_chains, self.n_dims))
 
-        _, resources, final_position = strategy(
+        _, resources, _ = strategy(
             rng_key=key,
             resources=resources,
             initial_position=initial_position,
