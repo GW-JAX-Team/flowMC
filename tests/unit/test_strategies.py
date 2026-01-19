@@ -735,7 +735,6 @@ class TestThinning:
         # Simulate what TakeSerialSteps produces internally
         n_steps = 11
         thinning = 3
-        n_chains = 1  # Simpler with 1 chain
         
         # Acceptance pattern: [1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 999]
         # Positions stored at indices: 0, 3, 6, 9
