@@ -703,34 +703,8 @@ class TestThinning:
         # Check the shape is as expected
         assert acceptance_data.shape == (self.n_chains, n_stored)
 
-    def test_acceptance_values_with_mock_kernel(self):
-        """Test exact acceptance averaging values using a mock kernel with deterministic acceptances."""
-        from flowMC.resource.kernel.base import ProposalBase
-
-        # Create a mock kernel that returns deterministic acceptance pattern
-        class MockKernel(ProposalBase):
-            accept_pattern: list
-
-            def __init__(self, accept_pattern):
-                self.accept_pattern = accept_pattern
-
-            def kernel(self, rng_key, position, log_prob, logpdf, data):
-                # Use static counter approach compatible with JAX
-                # We'll use scan which calls kernel repeatedly
-                return position, log_prob, 1.0  # Placeholder, won't actually be used
-
-            def print_parameters(self):
-                pass
-
-            def save_resource(self, path):
-                pass
-
-            def load_resource(self, path):
-                return self
-
-        # Actually, let's use a simpler approach - manually construct the acceptance array
-        # since mocking with stateful counters doesn't work well with JAX
-        
+    def test_acceptance_averaging_exact_values(self):
+        """Test exact acceptance averaging values with deterministic pattern."""
         # Test case: 11 steps with thinning=3
         # Simulate what TakeSerialSteps produces internally
         n_steps = 11
