@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
@@ -30,7 +29,6 @@ class AdaptStepSize(Strategy):
     target_acceptance_rate: float
     training_only: bool
     acceptance_window: int
-    verbose: bool
 
     def __init__(
         self,
@@ -63,7 +61,8 @@ class AdaptStepSize(Strategy):
         self.target_acceptance_rate = target_acceptance_rate
         self.training_only = training_only
         self.acceptance_window = acceptance_window
-        self.verbose = verbose
+        if verbose:
+            logger.setLevel(logging.DEBUG)
 
     def __call__(
         self,
@@ -93,11 +92,10 @@ class AdaptStepSize(Strategy):
 
         # Check if we should skip adaptation (training_only mode + not in training)
         if self.training_only and not state.data.get("training", False):
-            if self.verbose:
-                logger.debug(
-                    f"Skipping step size adaptation (training_only=True, "
-                    f"training={state.data.get('training', False)})"
-                )
+            logger.debug(
+                f"Skipping step size adaptation for {self.kernel_name} "
+                f"(training_only=True, training={state.data.get('training', False)})"
+            )
             return rng_key, resources, initial_position
 
         # Get the acceptance buffer name from state
@@ -129,11 +127,10 @@ class AdaptStepSize(Strategy):
         n_finite = jnp.sum(finite_mask)
         acceptance_rate = float(jnp.sum(finite_accs) / jnp.maximum(n_finite, 1))
 
-        if self.verbose:
-            logger.debug(f"Adapting {self.kernel_name} step size:")
-            logger.debug(f"  - Current acceptance rate: {acceptance_rate:.4f}")
-            logger.debug(f"  - Target acceptance rate: {self.target_acceptance_rate:.4f}")
-            logger.debug(f"  - Number of finite samples: {n_finite}")
+        logger.debug(f"Adapting {self.kernel_name} step size:")
+        logger.debug(f"  Current acceptance rate: {acceptance_rate:.4f}")
+        logger.debug(f"  Target acceptance rate: {self.target_acceptance_rate:.4f}")
+        logger.debug(f"  Number of finite samples: {n_finite}")
 
         # Get kernel and adapt
         kernel = resources[self.kernel_name]
