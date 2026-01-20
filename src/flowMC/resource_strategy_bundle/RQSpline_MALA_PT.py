@@ -336,7 +336,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.574,
-            acceptance_window=100,
+            acceptance_window=n_local_steps,
             verbose=verbose,
         )
 
