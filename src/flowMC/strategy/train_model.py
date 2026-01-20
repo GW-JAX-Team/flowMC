@@ -46,6 +46,8 @@ class TrainModel(Strategy):
         self.n_max_examples = n_max_examples
         self.verbose = verbose
         self.history_window = history_window
+        if verbose:
+            logger.setLevel(logging.DEBUG)
 
     def __call__(
         self,
@@ -83,11 +85,10 @@ class TrainModel(Strategy):
         ]
         rng_key, subkey = jax.random.split(rng_key)
 
-        if self.verbose:
-            logger.debug("Training model")
-            logger.debug(f"Training data shape: {training_data.shape}")
-            logger.debug(f"n_epochs: {self.n_epochs}")
-            logger.debug(f"batch_size: {self.batch_size}")
+        logger.info(f"Training {self.model_resource} model")
+        logger.debug(f"  Training data shape: {training_data.shape}")
+        logger.debug(f"  Number of epochs: {self.n_epochs}")
+        logger.debug(f"  Batch size: {self.batch_size}")
 
         (rng_key, model, optim_state, loss_values) = model.train(
             rng=subkey,
@@ -111,5 +112,12 @@ class TrainModel(Strategy):
         optimizer.optim_state = optim_state
         resources[self.model_resource] = model
         resources[self.optimizer_resource] = optimizer
-        # print(f"Training loss: {loss_values}")
+
+        logger.info(
+            f"Completed training {self.model_resource} - Final loss: {loss_values[-1]:.6f}"
+        )
+        logger.debug(
+            f"  Loss values: min={jnp.min(loss_values):.6f}, max={jnp.max(loss_values):.6f}"
+        )
+
         return rng_key, resources, initial_position
