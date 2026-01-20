@@ -102,10 +102,10 @@ class AdaptStepSize(Strategy):
 
         # Filter out steps (columns) where all chains have -inf (global steps)
         finite_steps_accs = all_accs[:, jnp.all(jnp.isfinite(all_accs), axis=0)]
-        
+
         # Window the last N steps
         windowed_accs = finite_steps_accs[:, -self.acceptance_window :]
-        
+
         acceptance_rate = float(jnp.mean(windowed_accs))
 
         logger.debug(f"Adapting {self.kernel_name} step size:")
@@ -126,7 +126,7 @@ class AdaptStepSize(Strategy):
         assert hasattr(local_sampler, "adapt_step_size"), (
             f"Local sampler '{self.kernel_name}' must implement adapt_step_size() method"
         )
-        
+
         resources[self.kernel_name] = local_sampler.adapt_step_size(
             acceptance_rate, target_rate=self.target_acceptance_rate
         )
