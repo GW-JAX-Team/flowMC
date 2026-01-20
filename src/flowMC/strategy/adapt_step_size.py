@@ -17,8 +17,7 @@ class AdaptStepSize(Strategy):
     """Strategy to adapt the step size of a local sampler based on acceptance rates.
 
     This strategy computes the acceptance rate from a specified buffer and calls
-    the kernel's adapt_step_size method. It can optionally only run during the
-    training phase by checking a State resource.
+    the kernel's adapt_step_size method.
 
     The strategy is generic and works with any kernel that implements the
     adapt_step_size(acceptance_rate, target_rate) method.
@@ -28,7 +27,6 @@ class AdaptStepSize(Strategy):
     state_name: str
     acceptance_buffer_key: str
     target_acceptance_rate: float
-    training_only: bool
     acceptance_window: int
 
     def __init__(
@@ -37,8 +35,7 @@ class AdaptStepSize(Strategy):
         state_name: str,
         acceptance_buffer_key: str,
         target_acceptance_rate: float,
-        training_only: bool = True,
-        acceptance_window: int = -1,
+        acceptance_window: int = 0,
         verbose: bool = False,
     ):
         """Initialize the AdaptStepSize strategy.
@@ -50,17 +47,14 @@ class AdaptStepSize(Strategy):
                 acceptance buffer name (e.g., "target_local_accs").
             target_acceptance_rate: Target acceptance rate for adaptation.
                 Common values: 0.234 (Random Walk), 0.574 (MALA), 0.65 (HMC).
-            training_only: If True, only adapt during training phase (when
-                State["training"] is True). If False, adapt in all phases.
             acceptance_window: Number of recent samples to use for computing
-                acceptance rate. If -1, uses all available samples.
+                acceptance rate. If 0, uses all available samples.
             verbose: Whether to log adaptation information.
         """
         self.kernel_name = kernel_name
         self.state_name = state_name
         self.acceptance_buffer_key = acceptance_buffer_key
         self.target_acceptance_rate = target_acceptance_rate
-        self.training_only = training_only
         self.acceptance_window = acceptance_window
         if verbose:
             enable_verbose_logging(logger)
@@ -91,14 +85,6 @@ class AdaptStepSize(Strategy):
             f"Resource {self.state_name} must be a State"
         )
 
-        # Check if we should skip adaptation (training_only mode + not in training)
-        if self.training_only and not state.data.get("training", False):
-            logger.debug(
-                f"Skipping step size adaptation for {self.kernel_name} "
-                f"(training_only=True, training={state.data.get('training', False)})"
-            )
-            return rng_key, resources, initial_position
-
         # Get the acceptance buffer name from state
         assert isinstance(
             buffer_name := state.data.get(self.acceptance_buffer_key), str
@@ -114,41 +100,35 @@ class AdaptStepSize(Strategy):
         # Compute acceptance rate from buffer
         all_accs = acceptance_buffer.data
 
-        # Filter out non-finite values (e.g., -inf from global steps) and compute mean
-        if self.acceptance_window > 0:
-            # Use only the most recent window of samples
-            window_accs = all_accs[:, -self.acceptance_window :]
-            finite_mask = jnp.isfinite(window_accs)
-            finite_accs = jnp.where(finite_mask, window_accs, 0.0)
-        else:
-            # Use all available samples
-            finite_mask = jnp.isfinite(all_accs)
-            finite_accs = jnp.where(finite_mask, all_accs, 0.0)
-
-        # Compute mean acceptance rate across all chains and samples
-        n_finite = jnp.sum(finite_mask)
-        acceptance_rate = float(jnp.sum(finite_accs) / jnp.maximum(n_finite, 1))
+        # Filter out steps (columns) where all chains have -inf (global steps)
+        finite_steps_accs = all_accs[:, jnp.all(jnp.isfinite(all_accs), axis=0)]
+        
+        # Window the last N steps
+        windowed_accs = finite_steps_accs[:, -self.acceptance_window :]
+        
+        acceptance_rate = float(jnp.mean(windowed_accs))
 
         logger.debug(f"Adapting {self.kernel_name} step size:")
         logger.debug(f"  Current acceptance rate: {acceptance_rate:.4f}")
         logger.debug(f"  Target acceptance rate: {self.target_acceptance_rate:.4f}")
-        logger.debug(f"  Number of finite samples: {n_finite}")
 
-        # Get kernel and adapt
-        kernel = resources[self.kernel_name]
-        assert isinstance(kernel, ProposalBase), (
-            f"Resource {self.kernel_name} must be a ProposalBase"
+        # Get and validate the local sampler
+        assert self.kernel_name in resources, (
+            f"Local sampler '{self.kernel_name}' not found in resources"
+        )
+        local_sampler = resources[self.kernel_name]
+        assert isinstance(local_sampler, ProposalBase), (
+            f"Resource '{self.kernel_name}' must be a ProposalBase (local sampler kernel), "
+            f"got {type(local_sampler)}"
         )
 
-        # Call the kernel's adapt_step_size method
-        if hasattr(kernel, "adapt_step_size"):
-            resources[self.kernel_name] = kernel.adapt_step_size(
-                acceptance_rate, target_rate=self.target_acceptance_rate
-            )
-        else:
-            logger.warning(
-                f"Kernel {self.kernel_name} does not implement adapt_step_size. "
-                f"Skipping adaptation."
-            )
+        # Call the local sampler's adapt_step_size method
+        assert hasattr(local_sampler, "adapt_step_size"), (
+            f"Local sampler '{self.kernel_name}' must implement adapt_step_size() method"
+        )
+        
+        resources[self.kernel_name] = local_sampler.adapt_step_size(
+            acceptance_rate, target_rate=self.target_acceptance_rate
+        )
 
         return rng_key, resources, initial_position

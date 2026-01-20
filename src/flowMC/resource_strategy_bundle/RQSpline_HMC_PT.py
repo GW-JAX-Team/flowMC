@@ -342,7 +342,6 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.65,
-            training_only=True,
             acceptance_window=100,
             verbose=verbose,
         )
