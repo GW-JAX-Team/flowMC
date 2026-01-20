@@ -115,7 +115,7 @@ class MALA(ProposalBase):
             A new MALA instance with updated step_size.
         """
         diff = acceptance_rate - target_rate
-        new_step_size = self.step_size * jnp.exp(self.ADAPTATION_RATE * diff)
+        new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
         return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
