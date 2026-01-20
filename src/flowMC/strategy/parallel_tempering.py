@@ -44,7 +44,8 @@ class ParallelTempering(Strategy):
         self.kernel_name = kernel_name
         self.tempered_buffer_names = tempered_buffer_names
         self.state_name = state_name
-        if verbose:
+        if verbose and logger.level != logging.DEBUG:
+            logger.info("Verbose mode enabled - setting logger level to DEBUG")
             logger.setLevel(logging.DEBUG)
 
     def __call__(
