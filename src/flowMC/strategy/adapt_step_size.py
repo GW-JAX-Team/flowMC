@@ -8,6 +8,7 @@ from flowMC.resource.buffers import Buffer
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.states import State
 from flowMC.strategy.base import Strategy
+from flowMC.utils.logging import enable_verbose_logging
 
 logger = logging.getLogger(__name__)
 
@@ -61,9 +62,8 @@ class AdaptStepSize(Strategy):
         self.target_acceptance_rate = target_acceptance_rate
         self.training_only = training_only
         self.acceptance_window = acceptance_window
-        if verbose and logger.level != logging.DEBUG:
-            logger.info("Verbose mode enabled - setting logger level to DEBUG")
-            logger.setLevel(logging.DEBUG)
+        if verbose:
+            enable_verbose_logging(logger)
 
     def __call__(
         self,
