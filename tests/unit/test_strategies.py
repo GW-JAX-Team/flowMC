@@ -939,4 +939,3 @@ class TestAdaptStepSize:
         assert jnp.all(jnp.isfinite(new_step_size)), (
             "Step size should remain finite even with non-finite acceptance values"
         )
-

@@ -119,12 +119,13 @@ class AdaptStepSize(Strategy):
             # Use only the most recent window of samples
             window_accs = all_accs[:, -self.acceptance_window :]
             finite_mask = jnp.isfinite(window_accs)
+            finite_accs = jnp.where(finite_mask, window_accs, 0.0)
         else:
             # Use all available samples
             finite_mask = jnp.isfinite(all_accs)
+            finite_accs = jnp.where(finite_mask, all_accs, 0.0)
 
         # Compute mean acceptance rate across all chains and samples
-        finite_accs = jnp.where(finite_mask, all_accs, 0.0)
         n_finite = jnp.sum(finite_mask)
         acceptance_rate = float(jnp.sum(finite_accs) / jnp.maximum(n_finite, 1))
 
