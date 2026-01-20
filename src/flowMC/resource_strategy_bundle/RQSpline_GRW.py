@@ -17,6 +17,7 @@ from flowMC.strategy.lambda_function import Lambda
 from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
+from flowMC.strategy.adapt_step_size import AdaptStepSize
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
 
@@ -257,6 +258,18 @@ class RQSpline_GRW_Bundle(ResourceStrategyBundle):
             )
         )
 
+        # Adapt local sampler step size during training only
+        # Random Walk Metropolis target acceptance rate: 0.234 (Roberts et al., 1997)
+        adapt_local_sampler = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.234,
+            training_only=True,
+            acceptance_window=100,
+            verbose=verbose,
+        )
+
         self.strategies = {
             "local_stepper": local_stepper,
             "global_stepper": global_stepper,
@@ -266,10 +279,12 @@ class RQSpline_GRW_Bundle(ResourceStrategyBundle):
             "update_local_step": update_local_step,
             "reset_steppers": reset_steppers_lambda,
             "update_model": update_model_lambda,
+            "adapt_local_sampler": adapt_local_sampler,
         }
 
         training_phase = [
             "local_stepper",
+            "adapt_local_sampler",
             "update_global_step",
             "model_trainer",
             "update_model",

@@ -18,6 +18,7 @@ from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
 from flowMC.strategy.parallel_tempering import ParallelTempering
+from flowMC.strategy.adapt_step_size import AdaptStepSize
 
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 import logging
@@ -51,7 +52,6 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         n_production_loops: int,
         n_epochs: int,
         mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
-        mala_adaptation_rate: float = 0.4,
         chain_batch_size: int = 0,
         rq_spline_hidden_units: list[int] = [32, 32],
         rq_spline_n_bins: int = 8,
@@ -120,9 +120,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         # Convert scalar step size to 1D array if needed
         if isinstance(mala_step_size, (int, float)):
             mala_step_size = jnp.full(n_dims, mala_step_size)
-        local_sampler = MALA(
-            step_size=mala_step_size, adaptation_rate=mala_adaptation_rate
-        )
+        local_sampler = MALA(step_size=mala_step_size)
         rng_key, subkey = jax.random.split(rng_key)
         model = MaskedCouplingRQSpline(
             n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
@@ -332,47 +330,16 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
-        def adapt_local_sampler(
-            rng_key: PRNGKeyArray,
-            resources: dict[str, Resource],
-            initial_position: Float[Array, "n_chains n_dim"],
-            data: dict,
-        ) -> tuple[
-            PRNGKeyArray,
-            dict[str, Resource],
-            Float[Array, "n_chains n_dim"],
-        ]:
-            """Adapt the local sampler's step size based on recent acceptance rates."""
-            assert isinstance(sampler_state := resources["sampler_state"], State)
-
-            # Get recent local acceptances from the buffer
-            buffer_name = str(sampler_state.data["target_local_accs"])
-            assert isinstance(local_accs_buffer := resources[buffer_name], Buffer)
-
-            # Filter out -inf values (from global steps) and get last valid acceptance per chain
-            all_accs = local_accs_buffer.data
-
-            # For each chain, get the last finite acceptance value
-            last_valid_accs = jnp.array(
-                [
-                    all_accs[i, jnp.where(jnp.isfinite(all_accs)[i])[0][-1]]
-                    for i in range(all_accs.shape[0])
-                ]
-            )
-            acceptance_rate = float(jnp.mean(last_valid_accs))
-
-            # Update the local sampler with different targets for training vs production
-            target_rate = 0.3 if sampler_state.data["training"] else 0.7
-            assert isinstance(local_sampler := resources["local_sampler"], MALA)
-            resources["local_sampler"] = local_sampler.adapt_step_size(
-                acceptance_rate, target_rate=target_rate
-            )
-            return rng_key, resources, initial_position
-
-        adapt_local_sampler_lambda = Lambda(
-            lambda rng_key, resources, initial_position, data: adapt_local_sampler(
-                rng_key, resources, initial_position, data
-            )
+        # Adapt local sampler step size during training only
+        # MALA target acceptance rate: 0.574 (Roberts & Rosenthal, 1998)
+        adapt_local_sampler = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.574,
+            training_only=True,
+            acceptance_window=100,
+            verbose=verbose,
         )
 
         self.strategies = {
@@ -386,7 +353,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "update_model": update_model_lambda,
             "parallel_tempering": parallel_tempering_strat,
             "initialize_tempered_positions": initialize_tempered_positions_lambda,
-            "adapt_local_sampler": adapt_local_sampler_lambda,
+            "adapt_local_sampler": adapt_local_sampler,
         }
 
         training_phase = [
@@ -402,7 +369,6 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         production_phase = [
             "parallel_tempering",
             "local_stepper",
-            "adapt_local_sampler",
             "update_global_step",
             "global_stepper",
             "update_local_step",

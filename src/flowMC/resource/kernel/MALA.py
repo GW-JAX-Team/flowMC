@@ -16,7 +16,7 @@ class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
     step_size: Float[Array, " n_dim"]
-    adaptation_rate: float
+    ADAPTATION_RATE: float = 0.15
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
@@ -24,7 +24,6 @@ class MALA(ProposalBase):
     def __init__(
         self,
         step_size: Float[Array, " n_dim"],
-        adaptation_rate: float = 0.1,
     ):
         """Initialize MALA sampler.
 
@@ -34,7 +33,6 @@ class MALA(ProposalBase):
         """
         super().__init__()
         self.step_size = step_size
-        self.adaptation_rate = adaptation_rate
 
     def kernel(
         self,
@@ -106,29 +104,23 @@ class MALA(ProposalBase):
 
         return position, log_prob, do_accept
 
-    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.3):
+    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.574):
         """Adapt step size based on acceptance rate.
-
-        Target acceptance rate for MALA is 0.3 (relatively low for better exploration).
 
         Args:
             acceptance_rate: The current acceptance rate.
+            target_rate: The target acceptance rate (default: 0.574 for MALA).
 
         Returns:
             A new MALA instance with updated step_size.
         """
         diff = acceptance_rate - target_rate
-        new_step_size = self.step_size * jnp.exp(self.adaptation_rate * diff)
-        logger.debug("Adapting MALA step size:")
-        logger.debug(f"  - acceptance_rate: {acceptance_rate}")
-        logger.debug(f"  - old step_size: {self.step_size}")
-        logger.debug(f"  - new step_size: {new_step_size}")
+        new_step_size = self.step_size * jnp.exp(self.ADAPTATION_RATE * diff)
         return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
         logger.debug("MALA parameters:")
         logger.debug(f"  - step_size: {self.step_size}")
-        logger.debug(f"  - adaptation_rate: {self.adaptation_rate}")
 
     def save_resource(self, path):
         raise NotImplementedError
