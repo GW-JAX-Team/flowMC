@@ -336,8 +336,7 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
-        # Adapt local sampler step size during training only
-        # HMC target acceptance rate: 0.65 for optimal mixing
+        # Adapt local sampler step size during training
         adapt_local_sampler = AdaptStepSize(
             kernel_name="local_sampler",
             state_name="sampler_state",

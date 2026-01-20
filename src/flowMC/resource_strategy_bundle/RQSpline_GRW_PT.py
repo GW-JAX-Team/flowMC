@@ -330,8 +330,8 @@ class RQSpline_GRW_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
-        # Adapt local sampler step size during training only
-        # Random Walk Metropolis target acceptance rate: 0.234 (Roberts et al., 1997)
+        # Adapt local sampler step size during training
+        # Random Walk Metropolis target acceptance rate: 0.234
         adapt_local_sampler = AdaptStepSize(
             kernel_name="local_sampler",
             state_name="sampler_state",

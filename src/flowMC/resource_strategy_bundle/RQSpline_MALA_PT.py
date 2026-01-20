@@ -330,8 +330,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
-        # Adapt local sampler step size during training only
-        # MALA target acceptance rate: 0.574 (Roberts & Rosenthal, 1998)
+        # Adapt local sampler step size during training
         adapt_local_sampler = AdaptStepSize(
             kernel_name="local_sampler",
             state_name="sampler_state",
