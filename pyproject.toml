@@ -26,7 +26,7 @@ keywords = ["sampling", "inference", "machine learning", "normalizing", "autodif
 dependencies = [
     "diffrax>=0.7.0",
     "equinox>=0.13.2",
-    "jax[cpu]>=0.8.1",
+    "jax>=0.8.2",
     "jaxtyping>=0.3.3",
     "optax>=0.2.6",
     "tqdm>=4.67.1",
@@ -40,10 +40,10 @@ docs = [
     "mkdocs-gen-files==0.6.0",
     "mkdocs-jupyter==0.25.1",
     "mkdocs-literate-nav==0.6.2",
-    "mkdocs-material==9.7.0",
+    "mkdocs-material==9.7.1",
     "mkdocs==1.6.1",
-    "mkdocstrings[python]==1.0.0",
-    "pymdown-extensions==10.19.1",
+    "mkdocstrings[python]==1.0.1",
+    "pymdown-extensions==10.20",
 ]
 visualize = [
     "arviz>=0.21.0",
@@ -51,12 +51,11 @@ visualize = [
     "matplotlib>=3.10.7",
 ]
 cuda = [
-    "jax[cuda]>=0.8.1",
+    "jax[cuda]>=0.8.2",
 ]
 
 [dependency-groups]
 dev = [
-    "flowMC",
     "ipykernel>=6.29.5",
     "coveralls>=4.0.1",
     "pre-commit>=4.0.1",
@@ -73,6 +72,9 @@ flowMC = { workspace = true }
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.ruff.lint]
 ignore = ["F722"]
