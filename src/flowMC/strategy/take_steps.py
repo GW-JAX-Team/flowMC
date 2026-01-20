@@ -43,7 +43,8 @@ class TakeSteps(Strategy):
         self.current_position = 0
         self.thinning = thinning
         self.chain_batch_size = chain_batch_size
-        if verbose:
+        if verbose and logger.level != logging.DEBUG:
+            logger.info("Verbose mode enabled - setting logger level to DEBUG")
             logger.setLevel(logging.DEBUG)
 
     @abstractmethod

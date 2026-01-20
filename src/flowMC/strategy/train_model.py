@@ -46,7 +46,8 @@ class TrainModel(Strategy):
         self.n_max_examples = n_max_examples
         self.verbose = verbose
         self.history_window = history_window
-        if verbose:
+        if verbose and logger.level != logging.DEBUG:
+            logger.info("Verbose mode enabled - setting logger level to DEBUG")
             logger.setLevel(logging.DEBUG)
 
     def __call__(
