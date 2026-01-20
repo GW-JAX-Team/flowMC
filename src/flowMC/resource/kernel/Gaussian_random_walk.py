@@ -15,7 +15,7 @@ class GaussianRandomWalk(ProposalBase):
     """Gaussian random walk sampler class."""
 
     step_size: Float[Array, " n_dim"]
-    ADAPTATION_RATE: float = 0.15
+    ADAPTATION_RATE: float = 0.1
 
     def __repr__(self):
         return "Gaussian Random Walk with step size " + str(self.step_size)
