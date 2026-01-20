@@ -132,9 +132,23 @@ class TakeSteps(Strategy):
 
         positions = positions[:, :: self.thinning]
         log_probs = log_probs[:, :: self.thinning]
-        do_accepts = do_accepts[:, :: self.thinning].astype(
-            acceptance_buffer.data.dtype
-        )
+
+        # Compute mean acceptance rate over each thinning window
+        # First acceptance is just index 0, subsequent are averages of thinning-sized windows
+        first_accept = do_accepts[:, 0:1]
+        # Remaining acceptances: reshape and mean
+        # do_accepts[1:1+n_remaining*thinning] -> (n_chains, n_remaining, thinning) -> mean
+        n_remaining = positions.shape[1] - 1
+        if n_remaining > 0:
+            remaining_accepts = (
+                do_accepts[:, 1 : 1 + n_remaining * self.thinning]
+                .reshape(do_accepts.shape[0], n_remaining, self.thinning)
+                .mean(axis=2)
+            )
+            do_accepts = jnp.concatenate([first_accept, remaining_accepts], axis=1)
+        else:
+            do_accepts = first_accept
+        do_accepts = do_accepts.astype(positions.dtype)
 
         position_buffer.update_buffer(positions, self.current_position)
         log_prob_buffer.update_buffer(log_probs, self.current_position)
