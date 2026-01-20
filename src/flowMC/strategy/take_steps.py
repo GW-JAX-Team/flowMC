@@ -5,10 +5,13 @@ from flowMC.resource.states import State
 from flowMC.resource.logPDF import LogPDF
 from flowMC.strategy.base import Strategy
 from jaxtyping import Array, Float, PRNGKeyArray
+import logging
 import jax
 import jax.numpy as jnp
 import equinox as eqx
 from abc import abstractmethod
+
+logger = logging.getLogger(__name__)
 
 
 class TakeSteps(Strategy):
@@ -20,7 +23,6 @@ class TakeSteps(Strategy):
     current_position: int
     thinning: int
     chain_batch_size: int  # If vmap over a large number of chains is memory bounded, this splits the computation
-    verbose: bool
 
     def __init__(
         self,
@@ -41,7 +43,8 @@ class TakeSteps(Strategy):
         self.current_position = 0
         self.thinning = thinning
         self.chain_batch_size = chain_batch_size
-        self.verbose = verbose
+        if verbose:
+            logger.setLevel(logging.DEBUG)
 
     @abstractmethod
     def sample(
