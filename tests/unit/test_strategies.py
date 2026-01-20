@@ -756,3 +756,187 @@ class TestThinning:
         assert do_accepts_thinned.shape == positions.shape[:2], (
             f"Shape mismatch: acceptances {do_accepts_thinned.shape} vs positions {positions.shape[:2]}"
         )
+
+
+class TestAdaptStepSize:
+    """Test the AdaptStepSize strategy for kernel step size adaptation."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.n_chains = 10
+        self.n_dims = 2
+        self.n_steps = 100
+        
+        # Create buffers for acceptances
+        self.local_accs_training = Buffer(
+            "local_accs_training", (self.n_chains, self.n_steps), 1
+        )
+        self.local_accs_production = Buffer(
+            "local_accs_production", (self.n_chains, self.n_steps), 1
+        )
+        
+        # Create sampler state
+        self.sampler_state = State(
+            {
+                "target_local_accs": "local_accs_training",
+                "training": True,
+            },
+            name="sampler_state",
+        )
+        
+        # Create kernels
+        self.mala_kernel = MALA(step_size=jnp.ones(self.n_dims) * 0.1)
+        self.hmc_kernel = HMC(
+            condition_matrix=jnp.ones(self.n_dims), step_size=0.1, n_leapfrog=5
+        )
+        self.grw_kernel = GaussianRandomWalk(step_size=jnp.ones(self.n_dims) * 0.1)
+        
+        # Fill acceptance buffer with some data (high acceptance)
+        high_acc_data = jnp.ones((self.n_chains, self.n_steps)) * 0.8
+        self.local_accs_training.update_buffer(high_acc_data)
+    
+    def test_adapt_step_size_increases_on_high_acceptance(self):
+        """Test that step size increases when acceptance is above target."""
+        from flowMC.strategy.adapt_step_size import AdaptStepSize
+        
+        adapt_strategy = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.574,  # MALA target
+            training_only=True,
+            verbose=False,
+        )
+        
+        resources = {
+            "local_sampler": self.mala_kernel,
+            "sampler_state": self.sampler_state,
+            "local_accs_training": self.local_accs_training,
+        }
+        
+        initial_step_size = self.mala_kernel.step_size
+        rng_key = jax.random.PRNGKey(42)
+        initial_position = jnp.zeros((self.n_chains, self.n_dims))
+        
+        # Apply adaptation
+        _, updated_resources, _ = adapt_strategy(
+            rng_key, resources, initial_position, {}
+        )
+        
+        new_step_size = updated_resources["local_sampler"].step_size
+        assert jnp.all(new_step_size > initial_step_size), (
+            "Step size should increase with high acceptance rate"
+        )
+    
+    def test_adapt_step_size_training_only_mode(self):
+        """Test that adaptation is skipped when training_only=True and training=False."""
+        from flowMC.strategy.adapt_step_size import AdaptStepSize
+        
+        # Set training to False
+        self.sampler_state.update(["training"], [False])
+        
+        adapt_strategy = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.574,
+            training_only=True,  # Should skip when training=False
+            verbose=False,
+        )
+        
+        resources = {
+            "local_sampler": self.mala_kernel,
+            "sampler_state": self.sampler_state,
+            "local_accs_training": self.local_accs_training,
+        }
+        
+        initial_step_size = self.mala_kernel.step_size
+        rng_key = jax.random.PRNGKey(42)
+        initial_position = jnp.zeros((self.n_chains, self.n_dims))
+        
+        # Apply adaptation (should be skipped)
+        _, updated_resources, _ = adapt_strategy(
+            rng_key, resources, initial_position, {}
+        )
+        
+        new_step_size = updated_resources["local_sampler"].step_size
+        assert jnp.allclose(new_step_size, initial_step_size), (
+            "Step size should not change when training_only=True and training=False"
+        )
+    
+    def test_adapt_step_size_works_with_different_kernels(self):
+        """Test that AdaptStepSize works with MALA, HMC, and GRW."""
+        from flowMC.strategy.adapt_step_size import AdaptStepSize
+        
+        # Reset training state
+        self.sampler_state.update(["training"], [True])
+        
+        # Test with each kernel type
+        for kernel, target_rate, kernel_name in [
+            (self.mala_kernel, 0.574, "MALA"),
+            (self.hmc_kernel, 0.65, "HMC"),
+            (self.grw_kernel, 0.234, "GRW"),
+        ]:
+            adapt_strategy = AdaptStepSize(
+                kernel_name="local_sampler",
+                state_name="sampler_state",
+                acceptance_buffer_key="target_local_accs",
+                target_acceptance_rate=target_rate,
+                training_only=True,
+                verbose=False,
+            )
+            
+            resources = {
+                "local_sampler": kernel,
+                "sampler_state": self.sampler_state,
+                "local_accs_training": self.local_accs_training,
+            }
+            
+            rng_key = jax.random.PRNGKey(42)
+            initial_position = jnp.zeros((self.n_chains, self.n_dims))
+            
+            # Should not raise any errors
+            _, updated_resources, _ = adapt_strategy(
+                rng_key, resources, initial_position, {}
+            )
+            
+            assert "local_sampler" in updated_resources
+    
+    def test_adapt_step_size_handles_non_finite_values(self):
+        """Test that adaptation correctly handles non-finite acceptance values."""
+        from flowMC.strategy.adapt_step_size import AdaptStepSize
+        
+        # Create buffer with some non-finite values
+        mixed_acc_data = jnp.ones((self.n_chains, self.n_steps)) * 0.5
+        # Add some -inf values (like from global steps)
+        mixed_acc_data = mixed_acc_data.at[:, ::2].set(-jnp.inf)
+        self.local_accs_training.update_buffer(mixed_acc_data)
+        
+        adapt_strategy = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.574,
+            training_only=True,
+            verbose=False,
+        )
+        
+        resources = {
+            "local_sampler": self.mala_kernel,
+            "sampler_state": self.sampler_state,
+            "local_accs_training": self.local_accs_training,
+        }
+        
+        rng_key = jax.random.PRNGKey(42)
+        initial_position = jnp.zeros((self.n_chains, self.n_dims))
+        
+        # Should not raise errors and should produce finite step sizes
+        _, updated_resources, _ = adapt_strategy(
+            rng_key, resources, initial_position, {}
+        )
+        
+        new_step_size = updated_resources["local_sampler"].step_size
+        assert jnp.all(jnp.isfinite(new_step_size)), (
+            "Step size should remain finite even with non-finite acceptance values"
+        )
+

@@ -61,7 +61,8 @@ class AdaptStepSize(Strategy):
         self.target_acceptance_rate = target_acceptance_rate
         self.training_only = training_only
         self.acceptance_window = acceptance_window
-        if verbose:
+        if verbose and logger.level != logging.DEBUG:
+            logger.info("Verbose mode enabled - setting logger level to DEBUG")
             logger.setLevel(logging.DEBUG)
 
     def __call__(
