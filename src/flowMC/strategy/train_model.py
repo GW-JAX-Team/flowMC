@@ -4,6 +4,7 @@ import logging
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.model.nf_model.base import NFModel
 from flowMC.resource.optimizer import Optimizer
+from flowMC.utils.logging import enable_verbose_logging
 from jaxtyping import Array, Float, PRNGKeyArray
 import jax
 import jax.numpy as jnp
@@ -46,9 +47,8 @@ class TrainModel(Strategy):
         self.n_max_examples = n_max_examples
         self.verbose = verbose
         self.history_window = history_window
-        if verbose and logger.level != logging.DEBUG:
-            logger.info("Verbose mode enabled - setting logger level to DEBUG")
-            logger.setLevel(logging.DEBUG)
+        if verbose:
+            enable_verbose_logging(logger)
 
     def __call__(
         self,

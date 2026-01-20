@@ -4,6 +4,7 @@ from flowMC.resource.buffers import Buffer
 from flowMC.resource.states import State
 from flowMC.resource.logPDF import LogPDF
 from flowMC.strategy.base import Strategy
+from flowMC.utils.logging import enable_verbose_logging
 from jaxtyping import Array, Float, PRNGKeyArray
 import logging
 import jax
@@ -43,9 +44,8 @@ class TakeSteps(Strategy):
         self.current_position = 0
         self.thinning = thinning
         self.chain_batch_size = chain_batch_size
-        if verbose and logger.level != logging.DEBUG:
-            logger.info("Verbose mode enabled - setting logger level to DEBUG")
-            logger.setLevel(logging.DEBUG)
+        if verbose:
+            enable_verbose_logging(logger)
 
     @abstractmethod
     def sample(

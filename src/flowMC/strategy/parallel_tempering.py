@@ -4,6 +4,7 @@ from flowMC.resource.buffers import Buffer
 from flowMC.resource.states import State
 from flowMC.resource.logPDF import TemperedPDF
 from flowMC.strategy.base import Strategy
+from flowMC.utils.logging import enable_verbose_logging
 from jaxtyping import Array, Float, PRNGKeyArray, Int, Bool
 import logging
 import jax
@@ -44,9 +45,8 @@ class ParallelTempering(Strategy):
         self.kernel_name = kernel_name
         self.tempered_buffer_names = tempered_buffer_names
         self.state_name = state_name
-        if verbose and logger.level != logging.DEBUG:
-            logger.info("Verbose mode enabled - setting logger level to DEBUG")
-            logger.setLevel(logging.DEBUG)
+        if verbose:
+            enable_verbose_logging(logger)
 
     def __call__(
         self,
