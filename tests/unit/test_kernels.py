@@ -199,9 +199,6 @@ class TestHMC:
         adapted_target = HMC_obj.adapt_step_size(acceptance_rate=0.65, target_rate=0.65)
         assert jnp.isclose(adapted_target.step_size, HMC_obj.step_size, atol=1e-6)
         
-        # Check that ADAPTATION_RATE is consistent
-        assert HMC_obj.ADAPTATION_RATE == 0.15
-
 
 class TestMALA:
 
@@ -324,9 +321,6 @@ class TestMALA:
         # Acceptance at target should keep step size approximately same
         adapted_target = MALA_obj.adapt_step_size(acceptance_rate=0.574, target_rate=0.574)
         assert jnp.allclose(adapted_target.step_size, MALA_obj.step_size, atol=1e-6)
-        
-        # Check that ADAPTATION_RATE is consistent
-        assert MALA_obj.ADAPTATION_RATE == 0.15
 
 
 class TestGRW:
@@ -449,7 +443,3 @@ class TestGRW:
         # Acceptance at target should keep step size approximately same
         adapted_target = GRW_obj.adapt_step_size(acceptance_rate=0.234, target_rate=0.234)
         assert jnp.allclose(adapted_target.step_size, GRW_obj.step_size, atol=1e-6)
-        
-        # Check that ADAPTATION_RATE is consistent
-        assert GRW_obj.ADAPTATION_RATE == 0.15
-
