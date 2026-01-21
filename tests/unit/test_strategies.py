@@ -828,7 +828,7 @@ class TestAdaptStepSize:
         )
     
     def test_adapt_step_size_warmup_period(self):
-        """Test that adaptation is skipped during warmup period (skip_first_n)."""
+        """Test that adaptation is skipped during warmup period (n_loops_skip)."""
         from flowMC.strategy.adapt_step_size import AdaptStepSize
         
         adapt_strategy = AdaptStepSize(
@@ -836,7 +836,7 @@ class TestAdaptStepSize:
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.574,
-            skip_first_n=3,  # Skip first 3 calls
+            n_loops_skip=3,  # Skip first 3 calls
             verbose=False,
         )
         
