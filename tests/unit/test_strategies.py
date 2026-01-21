@@ -804,7 +804,6 @@ class TestAdaptStepSize:
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.574,  # MALA target
-            training_only=True,
             verbose=False,
         )
         
@@ -828,19 +827,16 @@ class TestAdaptStepSize:
             "Step size should increase with high acceptance rate"
         )
     
-    def test_adapt_step_size_training_only_mode(self):
-        """Test that adaptation is skipped when training_only=True and training=False."""
+    def test_adapt_step_size_warmup_period(self):
+        """Test that adaptation is skipped during warmup period (skip_first_n)."""
         from flowMC.strategy.adapt_step_size import AdaptStepSize
-        
-        # Set training to False
-        self.sampler_state.update(["training"], [False])
         
         adapt_strategy = AdaptStepSize(
             kernel_name="local_sampler",
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.574,
-            training_only=True,  # Should skip when training=False
+            skip_first_n=3,  # Skip first 3 calls
             verbose=False,
         )
         
@@ -854,22 +850,29 @@ class TestAdaptStepSize:
         rng_key = jax.random.PRNGKey(42)
         initial_position = jnp.zeros((self.n_chains, self.n_dims))
         
-        # Apply adaptation (should be skipped)
+        # First 3 calls should skip adaptation
+        for i in range(3):
+            _, updated_resources, _ = adapt_strategy(
+                rng_key, resources, initial_position, {}
+            )
+            resources = updated_resources
+            new_step_size = resources["local_sampler"].step_size
+            assert jnp.allclose(new_step_size, initial_step_size), (
+                f"Step size should not change during warmup (call {i+1}/3)"
+            )
+        
+        # 4th call should apply adaptation (acceptance is high, step size should increase)
         _, updated_resources, _ = adapt_strategy(
             rng_key, resources, initial_position, {}
         )
-        
         new_step_size = updated_resources["local_sampler"].step_size
-        assert jnp.allclose(new_step_size, initial_step_size), (
-            "Step size should not change when training_only=True and training=False"
+        assert jnp.all(new_step_size > initial_step_size), (
+            "Step size should increase after warmup period"
         )
     
     def test_adapt_step_size_works_with_different_kernels(self):
         """Test that AdaptStepSize works with MALA, HMC, and GRW."""
         from flowMC.strategy.adapt_step_size import AdaptStepSize
-        
-        # Reset training state
-        self.sampler_state.update(["training"], [True])
         
         # Test with each kernel type
         for kernel, target_rate, kernel_name in [
@@ -882,7 +885,6 @@ class TestAdaptStepSize:
                 state_name="sampler_state",
                 acceptance_buffer_key="target_local_accs",
                 target_acceptance_rate=target_rate,
-                training_only=True,
                 verbose=False,
             )
             
@@ -917,7 +919,6 @@ class TestAdaptStepSize:
             state_name="sampler_state",
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.574,
-            training_only=True,
             verbose=False,
         )
         
