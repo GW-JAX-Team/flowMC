@@ -1,6 +1,6 @@
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
+from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
 import logging
 
@@ -14,6 +14,9 @@ class GaussianRandomWalk(ProposalBase):
     """Gaussian random walk sampler class."""
 
     step_size: Float[Array, " n_dim"]
+    periodic_mask: Bool[Array, " n_dim"]
+    period: Float[Array, " n_dim"]
+    periodic_lower_bound: Float[Array, " n_dim"]
 
     def __repr__(self):
         return "Gaussian Random Walk with step size " + str(self.step_size)
@@ -21,6 +24,8 @@ class GaussianRandomWalk(ProposalBase):
     def __init__(
         self,
         step_size: Float[Array, " n_dim"],
+        periodic_mask: Bool[Array, " n_dim"],
+        periodic_bounds: Float[Array, " n_dim 2"],
     ):
         """Initialize Gaussian Random Walk sampler.
 
@@ -30,6 +35,12 @@ class GaussianRandomWalk(ProposalBase):
         """
         super().__init__()
         self.step_size = step_size
+        self.periodic_mask = periodic_mask
+        self.period = periodic_bounds[:, 1] - periodic_bounds[:, 0]
+        self.period = jnp.where(
+            self.periodic_mask, self.period, jnp.ones_like(self.period)
+        )
+        self.periodic_lower_bound = periodic_bounds[:, 0]
 
     def kernel(
         self,
@@ -60,6 +71,12 @@ class GaussianRandomWalk(ProposalBase):
         )
 
         proposal = position + move_proposal
+        proposal = jnp.where(
+            self.periodic_mask,
+            jnp.mod(proposal - self.periodic_lower_bound, self.period)
+            + self.periodic_lower_bound,
+            proposal,
+        )
         proposal_log_prob: Float[Array, " n_dim"] = logpdf(proposal, data)
 
         log_uniform = jnp.log(jax.random.uniform(key2))
