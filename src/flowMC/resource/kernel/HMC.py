@@ -25,7 +25,7 @@ class HMC(ProposalBase):
     condition_matrix: Float[Array, " n_dim"]
     step_size: Float
     leapfrog_coefs: Float[Array, " n_leapfrog n_dim"]
-    ADAPTATION_RATE: float = 0.2
+    ADAPTATION_RATE: float = 0.5
 
     @property
     def n_leapfrog(self) -> Int:
