@@ -21,7 +21,6 @@ class Sampler:
             Log probability function.
         resources (dict[str, Resource]): Resources to be used by the sampler.
         strategies (dict[str, Strategy]): Strategies to be used by the sampler.
-        verbose (bool): Whether to print out progress. Defaults to False.
         logging (bool): Whether to log the progress. Defaults to True.
         outdir (str): Directory to save the logs. Defaults to "./outdir/".
     """
@@ -35,7 +34,6 @@ class Sampler:
     strategy_order: Optional[list[str]]
 
     # Logging hyperparameters
-    verbose: bool = False
     logging: bool = True
     outdir: str = "./outdir/"
 
