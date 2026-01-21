@@ -272,6 +272,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
             acceptance_buffer_key="target_local_accs",
             target_acceptance_rate=0.65,
             acceptance_window=n_local_steps,
+            n_loops_skip=int(0.15 * n_training_loops),
             verbose=verbose,
         )
 

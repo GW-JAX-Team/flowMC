@@ -28,6 +28,8 @@ class AdaptStepSize(Strategy):
     acceptance_buffer_key: str
     target_acceptance_rate: float
     acceptance_window: int
+    n_loops_skip: int
+    _call_count: int
 
     def __init__(
         self,
@@ -36,6 +38,7 @@ class AdaptStepSize(Strategy):
         acceptance_buffer_key: str,
         target_acceptance_rate: float,
         acceptance_window: int = 0,
+        n_loops_skip: int = 0,
         verbose: bool = False,
     ):
         """Initialize the AdaptStepSize strategy.
@@ -49,6 +52,8 @@ class AdaptStepSize(Strategy):
                 Common values: 0.234 (Random Walk), 0.574 (MALA), 0.65 (HMC).
             acceptance_window: Number of recent samples to use for computing
                 acceptance rate. If 0, uses all available samples.
+            n_loops_skip: Skip adaptation for the first N calls to allow chains
+                to reach a stable state before adapting (warmup period).
             verbose: Whether to log adaptation information.
         """
         self.kernel_name = kernel_name
@@ -56,6 +61,8 @@ class AdaptStepSize(Strategy):
         self.acceptance_buffer_key = acceptance_buffer_key
         self.target_acceptance_rate = target_acceptance_rate
         self.acceptance_window = acceptance_window
+        self.n_loops_skip = n_loops_skip
+        self._call_count = 0
         if verbose:
             enable_verbose_logging(logger)
 
@@ -81,6 +88,17 @@ class AdaptStepSize(Strategy):
         Returns:
             Tuple of (rng_key, resources, initial_position).
         """
+        # Skip adaptation during warmup period
+        if self._call_count < self.n_loops_skip:
+            self._call_count += 1
+            logger.debug(
+                f"Skipping adaptation for {self.kernel_name} "
+                f"(warmup {self._call_count}/{self.n_loops_skip})"
+            )
+            return rng_key, resources, initial_position
+
+        self._call_count += 1
+
         assert isinstance(state := resources[self.state_name], State), (
             f"Resource {self.state_name} must be a State"
         )
