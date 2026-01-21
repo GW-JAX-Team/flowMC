@@ -16,7 +16,7 @@ class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
     step_size: Float[Array, " n_dim"]
-    ADAPTATION_RATE: float = 0.1
+    ADAPTATION_RATE: float = 0.2
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
