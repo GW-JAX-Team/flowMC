@@ -183,6 +183,22 @@ class TestHMC:
         assert jnp.isclose(jnp.mean(result.data), 0, atol=3e-2)
         assert jnp.isclose(jnp.var(result.data), 1, atol=3e-2)
 
+    def test_HMC_adapt_step_size(self):
+        # Test that adapt_step_size increases step size when acceptance is high
+        HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=0.1, n_leapfrog=5)
+        
+        # High acceptance rate should increase step size
+        adapted_high = HMC_obj.adapt_step_size(acceptance_rate=0.85, target_rate=0.65)
+        assert adapted_high.step_size > HMC_obj.step_size
+        
+        # Low acceptance rate should decrease step size
+        adapted_low = HMC_obj.adapt_step_size(acceptance_rate=0.3, target_rate=0.65)
+        assert adapted_low.step_size < HMC_obj.step_size
+        
+        # Acceptance at target should keep step size approximately same
+        adapted_target = HMC_obj.adapt_step_size(acceptance_rate=0.65, target_rate=0.65)
+        assert jnp.isclose(adapted_target.step_size, HMC_obj.step_size, atol=1e-6)
+        
 
 class TestMALA:
 
@@ -290,6 +306,23 @@ class TestMALA:
         assert jnp.isclose(jnp.var(result.data), 1, atol=3e-2)
 
 
+    def test_MALA_adapt_step_size(self):
+        # Test that adapt_step_size increases step size when acceptance is high
+        MALA_obj = MALA(step_size=jnp.ones(n_dims) * 0.1)
+        
+        # High acceptance rate should increase step size
+        adapted_high = MALA_obj.adapt_step_size(acceptance_rate=0.8, target_rate=0.574)
+        assert jnp.all(adapted_high.step_size > MALA_obj.step_size)
+        
+        # Low acceptance rate should decrease step size
+        adapted_low = MALA_obj.adapt_step_size(acceptance_rate=0.2, target_rate=0.574)
+        assert jnp.all(adapted_low.step_size < MALA_obj.step_size)
+        
+        # Acceptance at target should keep step size approximately same
+        adapted_target = MALA_obj.adapt_step_size(acceptance_rate=0.574, target_rate=0.574)
+        assert jnp.allclose(adapted_target.step_size, MALA_obj.step_size, atol=1e-6)
+
+
 class TestGRW:
 
     def test_repr(self):
@@ -394,3 +427,19 @@ class TestGRW:
 
         assert jnp.isclose(jnp.mean(result.data), 0, atol=3e-2)
         assert jnp.isclose(jnp.var(result.data), 1, atol=3e-2)
+
+    def test_GRW_adapt_step_size(self):
+        # Test that adapt_step_size increases step size when acceptance is high
+        GRW_obj = GaussianRandomWalk(step_size=jnp.ones(n_dims) * 0.1)
+        
+        # High acceptance rate should increase step size
+        adapted_high = GRW_obj.adapt_step_size(acceptance_rate=0.5, target_rate=0.234)
+        assert jnp.all(adapted_high.step_size > GRW_obj.step_size)
+        
+        # Low acceptance rate should decrease step size
+        adapted_low = GRW_obj.adapt_step_size(acceptance_rate=0.1, target_rate=0.234)
+        assert jnp.all(adapted_low.step_size < GRW_obj.step_size)
+        
+        # Acceptance at target should keep step size approximately same
+        adapted_target = GRW_obj.adapt_step_size(acceptance_rate=0.234, target_rate=0.234)
+        assert jnp.allclose(adapted_target.step_size, GRW_obj.step_size, atol=1e-6)

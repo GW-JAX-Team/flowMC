@@ -18,6 +18,7 @@ from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
 from flowMC.strategy.parallel_tempering import ParallelTempering
+from flowMC.strategy.adapt_step_size import AdaptStepSize
 
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 import logging
@@ -335,6 +336,17 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
             )
         )
 
+        # Adapt local sampler step size during training
+        adapt_local_sampler = AdaptStepSize(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            acceptance_buffer_key="target_local_accs",
+            target_acceptance_rate=0.65,
+            acceptance_window=n_local_steps,
+            n_loops_skip=int(0.15 * n_training_loops),
+            verbose=verbose,
+        )
+
         self.strategies = {
             "local_stepper": local_stepper,
             "global_stepper": global_stepper,
@@ -346,11 +358,13 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
             "update_model": update_model_lambda,
             "parallel_tempering": parallel_tempering_strat,
             "initialize_tempered_positions": initialize_tempered_positions_lambda,
+            "adapt_local_sampler": adapt_local_sampler,
         }
 
         training_phase = [
             "parallel_tempering",
             "local_stepper",
+            "adapt_local_sampler",
             "update_global_step",
             "model_trainer",
             "update_model",

@@ -4,6 +4,7 @@ import logging
 import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
+from equinox import tree_at
 
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
@@ -24,6 +25,7 @@ class HMC(ProposalBase):
     condition_matrix: Float[Array, " n_dim"]
     step_size: Float
     leapfrog_coefs: Float[Array, " n_leapfrog n_dim"]
+    ADAPTATION_RATE: float = 0.5
 
     @property
     def n_leapfrog(self) -> Int:
@@ -157,6 +159,20 @@ class HMC(ProposalBase):
         log_prob = jnp.where(do_accept, -proposed_PE, log_prob)  # type: ignore
 
         return position, log_prob, do_accept
+
+    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.65):
+        """Adapt step size based on acceptance rate.
+
+        Args:
+            acceptance_rate: The current acceptance rate.
+            target_rate: The target acceptance rate (default: 0.65 for HMC).
+
+        Returns:
+            A new HMC instance with updated step_size.
+        """
+        diff = acceptance_rate - target_rate
+        new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
+        return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
         logger.debug("HMC parameters:")

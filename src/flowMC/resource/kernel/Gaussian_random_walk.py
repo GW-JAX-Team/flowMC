@@ -3,6 +3,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
 import logging
+from equinox import tree_at
 
 from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.logPDF import LogPDF
@@ -14,6 +15,7 @@ class GaussianRandomWalk(ProposalBase):
     """Gaussian random walk sampler class."""
 
     step_size: Float[Array, " n_dim"]
+    ADAPTATION_RATE: float = 0.5
 
     def __repr__(self):
         return "Gaussian Random Walk with step size " + str(self.step_size)
@@ -68,6 +70,20 @@ class GaussianRandomWalk(ProposalBase):
         position = jnp.where(do_accept, proposal, position)
         log_prob = jnp.where(do_accept, proposal_log_prob, log_prob)
         return position, log_prob, do_accept
+
+    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.234):
+        """Adapt step size based on acceptance rate.
+
+        Args:
+            acceptance_rate: The current acceptance rate.
+            target_rate: The target acceptance rate (default: 0.234 for RWM).
+
+        Returns:
+            A new GaussianRandomWalk instance with updated step_size.
+        """
+        diff = acceptance_rate - target_rate
+        new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
+        return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
         logger.debug("Gaussian Random Walk parameters:")
