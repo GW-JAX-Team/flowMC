@@ -875,10 +875,10 @@ class TestAdaptStepSize:
         from flowMC.strategy.adapt_step_size import AdaptStepSize
         
         # Test with each kernel type
-        for kernel, target_rate, kernel_name in [
-            (self.mala_kernel, 0.574, "MALA"),
-            (self.hmc_kernel, 0.65, "HMC"),
-            (self.grw_kernel, 0.234, "GRW"),
+        for kernel, target_rate in [
+            (self.mala_kernel, 0.574),
+            (self.hmc_kernel, 0.65),
+            (self.grw_kernel, 0.234),
         ]:
             adapt_strategy = AdaptStepSize(
                 kernel_name="local_sampler",
