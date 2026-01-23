@@ -67,6 +67,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         n_tempered_steps: int = -1,
         logprior: Callable[[Float[Array, " n_dim"], dict], Float] = lambda x, _: 0.0,
         verbose: bool = False,
+        pretrain_flow_path: str | None = None,
     ):
         if local_thinning > n_local_steps:
             raise ValueError(
@@ -121,9 +122,23 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             mala_step_size = jnp.full(n_dims, mala_step_size)
         local_sampler = MALA(step_size=mala_step_size)
         rng_key, subkey = jax.random.split(rng_key)
-        model = MaskedCouplingRQSpline(
-            n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
-        )
+
+        # Create or load the normalizing flow model
+        if pretrain_flow_path is not None:
+            logger.info(f"Loading pretrained flow from {pretrain_flow_path}")
+            # Create a template model with the correct architecture
+            template_model = MaskedCouplingRQSpline(
+                n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
+            )
+            # Load the pretrained weights
+            model = template_model.load_model(pretrain_flow_path)
+            logger.info("Successfully loaded pretrained flow")
+        else:
+            # Create a fresh model
+            model = MaskedCouplingRQSpline(
+                n_dims, rq_spline_n_layers, rq_spline_hidden_units, rq_spline_n_bins, subkey
+            )
+
         global_sampler = NFProposal(
             model, n_NFproposal_batch_size=n_NFproposal_batch_size
         )
