@@ -5,6 +5,7 @@ import logging
 
 from flowMC.strategy.base import Strategy
 from flowMC.resource.base import Resource
+from flowMC.resource.states import State
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
 logger = logging.getLogger(__name__)
@@ -107,6 +108,16 @@ class Sampler:
                 self.resources,
                 last_step,
             ) = self.strategies[strategy](rng_key, self.resources, last_step, data)
+
+            # Check for early stopping flag after each strategy execution
+            if "early_stopping_state" in self.resources:
+                early_stopping_resource = self.resources["early_stopping_state"]
+                if isinstance(early_stopping_resource, State):
+                    if early_stopping_resource.data.get("triggered", False):
+                        logger.info(
+                            "Early stopping triggered. Terminating training loop early."
+                        )
+                        break
 
     # TODO: Implement quick access and summary functions that operates on buffer
 
