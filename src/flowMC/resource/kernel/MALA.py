@@ -4,6 +4,7 @@ from jax.scipy.stats import multivariate_normal
 from jaxtyping import Array, Bool, Float, Int, PRNGKeyArray, PyTree
 from typing import Callable
 import logging
+from equinox import tree_at
 
 from flowMC.resource.logPDF import LogPDF
 from flowMC.resource.kernel.base import ProposalBase
@@ -15,6 +16,7 @@ class MALA(ProposalBase):
     """Metropolis-adjusted Langevin algorithm sampler class."""
 
     step_size: Float[Array, " n_dim"]
+    ADAPTATION_RATE: float = 0.5
 
     def __repr__(self):
         return "MALA with step size " + str(self.step_size)
@@ -101,6 +103,20 @@ class MALA(ProposalBase):
         log_prob = jnp.where(do_accept, logprob[1], logprob[0])
 
         return position, log_prob, do_accept
+
+    def adapt_step_size(self, acceptance_rate: float, target_rate: float = 0.574):
+        """Adapt step size based on acceptance rate.
+
+        Args:
+            acceptance_rate: The current acceptance rate.
+            target_rate: The target acceptance rate (default: 0.574 for MALA).
+
+        Returns:
+            A new MALA instance with updated step_size.
+        """
+        diff = acceptance_rate - target_rate
+        new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
+        return tree_at(lambda k: k.step_size, self, new_step_size)
 
     def print_parameters(self):
         logger.debug("MALA parameters:")
