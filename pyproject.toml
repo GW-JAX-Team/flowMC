@@ -57,14 +57,14 @@ cuda = [
 
 [dependency-groups]
 dev = [
-    "ipykernel>=6.29.5",
-    "coveralls>=4.0.1",
-    "pre-commit>=4.0.1",
-    "pyright>=1.1.402",
-    "pytest>=8.3.3",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.12.2",
-    "ipython>=8.30.0",
+    "ipykernel>=6.31.0",
+    "coveralls>=4.0.2",
+    "pre-commit>=4.5.1",
+    "pyright>=1.1.408",
+    "pytest>=8.4.2",
+    "pytest-cov>=6.3.0",
+    "ruff>=0.15.0",
+    "ipython>=8.38.0",
 ]
 
 [tool.uv.sources]
