@@ -10,18 +10,6 @@ The canonical flowMC example. Sample a 5-dimensional multi-modal "dual moon" dis
 
 ---
 
-## [Bundles](bundles.md)
-
-Reference guide for the built-in resource-strategy bundles (`RQSpline_MALA`, `RQSpline_HMC`, `RQSpline_GRW`, and their parallel-tempering variants). Explains what each bundle does, when to choose it, and the structure of the training and production sampling loops.
-
----
-
-## [Hyperparameter Reference](hyperparameters.md)
-
-Complete reference for every constructor parameter across all bundles, organised into categories (required, local sampler, normalising flow, training, execution, early stopping, parallel tempering). Each entry includes the default value and guidance on when and how to tune it.
-
----
-
 ## [Parallel Tempering](parallel_tempering)
 
 Demonstrates why standard local kernels struggle with well-separated modes and how parallel tempering (replica exchange MCMC) overcomes this. Builds a parallel tempering sampler from scratch using the low-level resource-strategy API, then contrasts it with the convenience `RQSpline_MALA_PT_Bundle`.
