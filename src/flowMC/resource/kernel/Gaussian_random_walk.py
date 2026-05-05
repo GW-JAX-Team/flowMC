@@ -64,7 +64,7 @@ class GaussianRandomWalk(ProposalBase):
         chain.
 
         Args:
-            rng_key (Key): Jax PRNGKey
+            rng_key (Key): JAX PRNGKey
             position (Float[Array, "n_dim"]): current position of the chain
             log_prob (Float[Array, "1"]): current log-probability of the chain
             data (PyTree): data to be passed to the logpdf function

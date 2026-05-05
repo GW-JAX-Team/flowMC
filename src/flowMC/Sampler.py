@@ -17,7 +17,7 @@ class Sampler:
     Args:
         n_dim (int): Dimension of the parameter space.
         n_chains (int): Number of chains to sample.
-        rng_key (Key): Jax PRNGKey.
+        rng_key (Key): JAX PRNGKey.
         resources (dict[str, Resource]): Resources to be used by the sampler.
         strategies (dict[str, Strategy]): Strategies to be used by the sampler.
         strategy_order (list[str]): Order of strategies to execute.
