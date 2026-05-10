@@ -4,7 +4,7 @@
 
 [![docs](https://img.shields.io/badge/docs-online-blue)](https://gw-jax-team.github.io/flowMC/) [![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/GW-JAX-Team/flowMC/blob/main/LICENSE) [![coverage](https://img.shields.io/coveralls/github/GW-JAX-Team/flowMC/main)](https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GW-JAX-Team/flowMC/main.svg)](https://results.pre-commit.ci/latest/github/GW-JAX-Team/flowMC/main)
 
-![flowMC_logo](./docs/logo.png)
+![flowMC_logo](https://raw.githubusercontent.com/GW-JAX-Team/flowMC/main/docs/logo.png)
 
 flowMC is a JAX-based package for normalizing-flow-enhanced Markov chain Monte Carlo (MCMC) sampling. By using normalizing flows as a global proposal, flowMC accelerates convergence for multi-modal and high-dimensional posteriors while running natively on GPU with minimal hyperparameter tuning.
 
