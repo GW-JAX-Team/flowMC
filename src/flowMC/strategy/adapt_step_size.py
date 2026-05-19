@@ -153,15 +153,19 @@ class AdaptStepSize(Strategy):
 
 
 class AdaptStepSizePerDim(Strategy):
-    """Strategy to adapt the per-dimension step size profile using empirical variance.
+    """Strategy to adapt the per-dimension step size profile using empirical scale estimates.
 
-    Computes the variance of chain positions and directly sets the per-dimension step size
-    profile so that each dimension's effective step is proportional to its posterior standard
-    deviation. The geometric mean of the step sizes is preserved, so this strategy controls
-    the *shape* of the step size vector while AdaptStepSize continues to control its
-    *global scale*.
+    Computes the central 68% range (Q84 - Q16) / 2 of chain positions per dimension and
+    directly sets the per-dimension step size profile so that each dimension's effective step
+    is proportional to its posterior scale. The geometric mean of the step sizes is preserved,
+    so this strategy controls the *shape* of the step size vector while AdaptStepSize continues
+    to control its *global scale*.
 
-    Each call drives the kernel's effective per-dim profile exactly to the current variance
+    Using the percentile range rather than the standard deviation makes the estimate robust to
+    early burn-in outliers, which sit in the tails and do not inflate the 16th–84th percentile
+    interval.
+
+    Each call drives the kernel's effective per-dim profile exactly to the current scale
     estimate in one step (no damping, no clipping). Adaptation starts from the first call.
 
     Run this after AdaptStepSize in the training phase.
@@ -207,7 +211,7 @@ class AdaptStepSizePerDim(Strategy):
         dict[str, Resource],
         Float[Array, "n_chains n_dim"],
     ]:
-        """Adapt per-dimension step sizes based on empirical posterior variance.
+        """Adapt per-dimension step sizes based on the empirical scale of chain positions.
 
         Args:
             rng_key: JAX PRNGKey.
@@ -235,22 +239,19 @@ class AdaptStepSizePerDim(Strategy):
         # positions: (n_chains, n_steps, n_dims) — use all buffered history
         positions = positions_buffer.data
 
-        # Mask out unfilled slots (initialised to -inf)
+        # Extract only finite (filled) positions; unfilled slots are initialised to -inf
         finite_mask = jnp.all(jnp.isfinite(positions), axis=-1)  # (n_chains, n_steps)
         flat = positions.reshape(-1, positions.shape[-1])  # (n_chains*n_steps, n_dims)
-        flat_mask = finite_mask.reshape(-1)  # (n_chains*n_steps,)
+        valid_flat = flat[finite_mask.reshape(-1)]  # (n_valid, n_dims)
 
-        # Masked mean then variance over finite samples
-        n_samples = jnp.sum(flat_mask)
-        safe_n = jnp.maximum(n_samples, 1.0)
-        masked_flat = jnp.where(flat_mask[:, None], flat, 0.0)
-        mean = jnp.sum(masked_flat, axis=0) / safe_n
-        sq_dev = jnp.where(flat_mask[:, None], (flat - mean) ** 2, 0.0)
-        var = jnp.sum(sq_dev, axis=0) / jnp.maximum(safe_n - 1.0, 1.0)  # (n_dims,)
+        if valid_flat.shape[0] < 2:
+            return rng_key, resources, initial_position
 
-        var = jnp.where(jnp.isfinite(var), var, 1.0)
-        var = jnp.maximum(var, jnp.finfo(positions.dtype).eps)
-        sigma = jnp.sqrt(var)
+        # Robust scale: half the central 68% range (equals sigma for a Gaussian).
+        # Percentile-based measure is insensitive to early burn-in outliers in the tails.
+        q_lo = jnp.percentile(valid_flat, 16, axis=0)
+        q_hi = jnp.percentile(valid_flat, 84, axis=0)
+        sigma = jnp.maximum(0.5 * (q_hi - q_lo), jnp.finfo(valid_flat.dtype).eps)
 
         # Target profile: normalised to geometric mean 1
         log_sigma = jnp.log(sigma)

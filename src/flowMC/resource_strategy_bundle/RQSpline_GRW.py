@@ -91,8 +91,8 @@ class RQSpline_GRW_Bundle(ResourceStrategyBundle):
             adapt_step_size (bool): Adapt the GRW step size during training.
                 Defaults to True.
             adapt_step_size_per_dim (bool): Also tune per-dimension step size
-                ratios using empirical posterior variance. Runs after adapt_step_size.
-                Defaults to True.
+                ratios using the empirical scale (central 68% range of chain positions).
+                Runs after adapt_step_size. Defaults to True.
             periodic (dict[int, tuple[float, float]] | None): Periodic boundary
                 conditions as ``{dim_index: (lower, upper)}``. Defaults to None.
 

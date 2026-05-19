@@ -949,7 +949,7 @@ class TestAdaptStepSize:
 
 
 class TestAdaptStepSizePerDim:
-    """Tests for AdaptStepSizePerDim variance-based per-dim step size tuning."""
+    """Tests for AdaptStepSizePerDim percentile-based per-dim step size tuning."""
 
     @pytest.fixture(autouse=True)
     def setup(self):
@@ -1038,16 +1038,18 @@ class TestAdaptStepSizePerDim:
         )
 
     def test_nan_and_zero_variance_safeguards(self):
-        """NaN positions and zero-variance dims must not produce NaN step sizes."""
+        """Zero-range and partially-NaN dims must not produce NaN step sizes."""
         buf = Buffer(
             "positions_training", (self.n_chains, self.n_steps, self.n_dims), 1
         )
         positions = jax.random.normal(
             self.key, (self.n_chains, self.n_steps, self.n_dims)
         )
-        # Zero variance in dim 1, NaN in dim 2
+        # Zero range in dim 1 (all identical), NaN only in the first 10 steps of dim 2.
+        # Remaining steps (10:) are valid, so valid_flat is non-empty and the zero-range
+        # clamp (eps) in dim 1 is actually exercised.
         positions = positions.at[:, :, 1].set(0.0)
-        positions = positions.at[:, :, 2].set(jnp.nan)
+        positions = positions.at[:, :10, 2].set(jnp.nan)
         buf.update_buffer(positions)
         resources = {
             "local_sampler": self.mala_kernel,
