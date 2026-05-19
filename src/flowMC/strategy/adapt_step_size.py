@@ -1,5 +1,6 @@
 import logging
 
+import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, Key
 
@@ -155,18 +156,20 @@ class AdaptStepSize(Strategy):
 class AdaptStepSizePerDim(Strategy):
     """Strategy to adapt the per-dimension step size profile using empirical scale estimates.
 
-    Computes the central 68% range (Q84 - Q16) / 2 of chain positions per dimension and
-    directly sets the per-dimension step size profile so that each dimension's effective step
-    is proportional to its posterior scale. The geometric mean of the step sizes is preserved,
-    so this strategy controls the *shape* of the step size vector while AdaptStepSize continues
-    to control its *global scale*.
+    Computes the sample standard deviation of the most-recent ``window`` chain
+    positions per chain and sets the per-dimension step size profile so that each
+    dimension's effective step is proportional to its posterior scale.  The geometric mean
+    of the step sizes is preserved, so this strategy controls the *shape* of the step size
+    vector while ``AdaptStepSize`` continues to control its *global scale*.
 
-    Using the percentile range rather than the standard deviation makes the estimate robust to
-    early burn-in outliers, which sit in the tails and do not inflate the 16th–84th percentile
-    interval.
+    The positions buffer is fully overwritten every training loop (written from offset 0),
+    so all stored positions are already from the most recent loop — no burn-in bias.
+    Pass ``window=n_local_steps // local_thinning`` so the window covers exactly one
+    training loop's worth of stored positions.  The fixed shape limits the array that
+    enters the JIT-compiled variance kernel, keeping per-call runtime low.
 
     Each call drives the kernel's effective per-dim profile exactly to the current scale
-    estimate in one step (no damping, no clipping). Adaptation starts from the first call.
+    estimate in one step (no damping, no clipping).  Adaptation starts from the first call.
 
     Run this after AdaptStepSize in the training phase.
     Requires the kernel to implement get_effective_dim_profile() and apply_per_dim_scaling().
@@ -175,6 +178,7 @@ class AdaptStepSizePerDim(Strategy):
     kernel_name: str
     state_name: str
     positions_buffer_key: str
+    window: int
     _call_count: int
 
     def __init__(
@@ -182,6 +186,7 @@ class AdaptStepSizePerDim(Strategy):
         kernel_name: str,
         state_name: str,
         positions_buffer_key: str,
+        window: int = 50,
         verbose: bool = False,
     ):
         """Initialize AdaptStepSizePerDim.
@@ -191,14 +196,32 @@ class AdaptStepSizePerDim(Strategy):
             state_name: Name of the State resource that tracks sampler state.
             positions_buffer_key: Key in State that points to the positions buffer name
                 (e.g. "target_positions").
+            window: Number of most-recent steps per chain to use when estimating
+                per-dimension scales. Pass ``n_local_steps // local_thinning`` so the
+                window exactly covers the positions written in one training loop.
             verbose: Log per-dim step sizes after each adaptation.
         """
         self.kernel_name = kernel_name
         self.state_name = state_name
         self.positions_buffer_key = positions_buffer_key
+        self.window = window
         self._call_count = 0
         if verbose:
             enable_verbose_logging(logger)
+
+    @staticmethod
+    @jax.jit
+    def _compute_sigma(
+        flat: Float[Array, "N n_dim"],
+        mask: Array,
+    ) -> Float[Array, " n_dim"]:
+        n = jnp.sum(mask)
+        safe_n = jnp.maximum(n, 1.0)
+        valid = jnp.where(mask[:, None], flat, 0.0)
+        mean = jnp.sum(valid, axis=0) / safe_n
+        sq_dev = jnp.where(mask[:, None], (flat - mean) ** 2, 0.0)
+        var = jnp.sum(sq_dev, axis=0) / jnp.maximum(safe_n - 1.0, 1.0)
+        return jnp.sqrt(jnp.maximum(var, jnp.finfo(flat.dtype).eps))
 
     def __call__(
         self,
@@ -211,7 +234,7 @@ class AdaptStepSizePerDim(Strategy):
         dict[str, Resource],
         Float[Array, "n_chains n_dim"],
     ]:
-        """Adapt per-dimension step sizes based on the empirical scale of chain positions.
+        """Adapt per-dimension step sizes based on the empirical std of recent chain positions.
 
         Args:
             rng_key: JAX PRNGKey.
@@ -236,22 +259,21 @@ class AdaptStepSizePerDim(Strategy):
             f"Resource {buffer_name} must be a Buffer"
         )
 
-        # positions: (n_chains, n_steps, n_dims) — use all buffered history
+        # positions: (n_chains, n_steps, n_dims)
         positions = positions_buffer.data
 
-        # Extract only finite (filled) positions; unfilled slots are initialised to -inf
-        finite_mask = jnp.all(jnp.isfinite(positions), axis=-1)  # (n_chains, n_steps)
-        flat = positions.reshape(-1, positions.shape[-1])  # (n_chains*n_steps, n_dims)
-        valid_flat = flat[finite_mask.reshape(-1)]  # (n_valid, n_dims)
+        # Slice the last `window` steps per chain — fixed shape, JIT-cache-friendly.
+        # Python slicing handles buffers smaller than window gracefully (returns all).
+        recent = positions[:, -self.window :, :]  # (n_chains, W, n_dims)
 
-        if valid_flat.shape[0] < 2:
+        finite_mask = jnp.all(jnp.isfinite(recent), axis=-1)  # (n_chains, W)
+        flat = recent.reshape(-1, recent.shape[-1])  # (n_chains * W, n_dims)
+        mask = finite_mask.reshape(-1)  # (n_chains * W,)
+
+        if int(jnp.sum(mask)) < 2:
             return rng_key, resources, initial_position
 
-        # Robust scale: half the central 68% range (equals sigma for a Gaussian).
-        # Percentile-based measure is insensitive to early burn-in outliers in the tails.
-        q_lo = jnp.percentile(valid_flat, 16, axis=0)
-        q_hi = jnp.percentile(valid_flat, 84, axis=0)
-        sigma = jnp.maximum(0.5 * (q_hi - q_lo), jnp.finfo(valid_flat.dtype).eps)
+        sigma = self._compute_sigma(flat, mask)
 
         # Target profile: normalised to geometric mean 1
         log_sigma = jnp.log(sigma)

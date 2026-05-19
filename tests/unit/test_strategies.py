@@ -949,7 +949,7 @@ class TestAdaptStepSize:
 
 
 class TestAdaptStepSizePerDim:
-    """Tests for AdaptStepSizePerDim percentile-based per-dim step size tuning."""
+    """Tests for AdaptStepSizePerDim windowed-variance per-dim step size tuning."""
 
     @pytest.fixture(autouse=True)
     def setup(self):

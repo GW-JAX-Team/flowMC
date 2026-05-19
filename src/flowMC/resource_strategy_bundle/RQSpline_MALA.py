@@ -90,7 +90,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             adapt_step_size (bool): Adapt the MALA step size during training.
                 Defaults to True.
             adapt_step_size_per_dim (bool): Also tune per-dimension step size
-                ratios using the empirical scale (central 68% range of chain positions).
+                ratios using the empirical std of recent chain positions.
                 Runs after adapt_step_size. Defaults to True.
             periodic (dict[int, tuple[float, float]] | None): Periodic boundary
                 conditions as ``{dim_index: (lower, upper)}``. Defaults to None.
@@ -363,6 +363,7 @@ class RQSpline_MALA_Bundle(ResourceStrategyBundle):
             kernel_name="local_sampler",
             state_name="sampler_state",
             positions_buffer_key="target_positions",
+            window=n_local_steps // local_thinning,
             verbose=verbose,
         )
 

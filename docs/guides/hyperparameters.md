@@ -188,7 +188,9 @@ Adaptation is disabled during the production phase.
 Whether to additionally tune the per-dimension step size profile using the empirical posterior scale.
 Default `True`.
 After the global step size is adjusted by `adapt_step_size`, this strategy rescales each dimension's step size so that parameters with a larger posterior scale get proportionally larger steps.
-The per-dimension scale is estimated as half the central 68% range of chain positions `(Q84 - Q16) / 2`, which equals the standard deviation for a Gaussian and is robust to early burn-in outliers that sit in the distribution tails.
+The per-dimension scale is estimated as the sample standard deviation of the most-recent `n_local_steps // local_thinning` positions per chain (one full training loop's worth of stored positions).
+The positions buffer is completely overwritten each training loop, so the estimate always reflects the current posterior shape with no burn-in bias.
+The fixed window (set to `n_local_steps // local_thinning`) limits the array size entering the JIT-compiled variance kernel, keeping per-loop runtime low.
 The geometric mean of the step sizes is preserved, so `adapt_step_size` retains full control of the overall magnitude, while this strategy only reshapes the per-dimension profile.
 For MALA and GRW, the per-dimension `step_size` array is scaled directly; for HMC the `condition_matrix` (diagonal mass matrix) is adjusted instead.
 Adaptation is disabled during the production phase.
