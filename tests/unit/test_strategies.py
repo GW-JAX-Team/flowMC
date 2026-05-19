@@ -974,11 +974,12 @@ class TestAdaptStepSizePerDim:
 
     def _make_resources(self, kernel, scales):
         """Build resources with positions drawn from N(0, diag(scales^2))."""
-        buf = Buffer("positions_training", (self.n_chains, self.n_steps, self.n_dims), 1)
-        positions = (
-            jax.random.normal(self.key, (self.n_chains, self.n_steps, self.n_dims))
-            * jnp.array(scales)
+        buf = Buffer(
+            "positions_training", (self.n_chains, self.n_steps, self.n_dims), 1
         )
+        positions = jax.random.normal(
+            self.key, (self.n_chains, self.n_steps, self.n_dims)
+        ) * jnp.array(scales)
         buf.update_buffer(positions)
         return {
             "local_sampler": kernel,
@@ -998,7 +999,9 @@ class TestAdaptStepSizePerDim:
         scales = [10.0, 1.0, 0.1]
         resources = self._make_resources(self.mala_kernel, scales)
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         step = res["local_sampler"].step_size
         assert step[0] > step[1] > step[2], "Step sizes should track variance order"
         assert step[0] / step[1] == pytest.approx(10.0, rel=0.3)
@@ -1010,7 +1013,9 @@ class TestAdaptStepSizePerDim:
         resources = self._make_resources(self.mala_kernel, scales)
         initial_geomean = float(jnp.exp(jnp.mean(jnp.log(self.mala_kernel.step_size))))
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         new_step = res["local_sampler"].step_size
         new_geomean = float(jnp.exp(jnp.mean(jnp.log(new_step))))
         assert new_geomean == pytest.approx(initial_geomean, rel=0.01)
@@ -1028,12 +1033,18 @@ class TestAdaptStepSizePerDim:
         step1 = resources["local_sampler"].step_size
         step2 = resources2["local_sampler"].step_size
         assert not jnp.allclose(initial_step, step1)
-        assert jnp.allclose(step1, step2, rtol=0.01), "Second call should be a near no-op"
+        assert jnp.allclose(step1, step2, rtol=0.01), (
+            "Second call should be a near no-op"
+        )
 
     def test_nan_and_zero_variance_safeguards(self):
         """NaN positions and zero-variance dims must not produce NaN step sizes."""
-        buf = Buffer("positions_training", (self.n_chains, self.n_steps, self.n_dims), 1)
-        positions = jax.random.normal(self.key, (self.n_chains, self.n_steps, self.n_dims))
+        buf = Buffer(
+            "positions_training", (self.n_chains, self.n_steps, self.n_dims), 1
+        )
+        positions = jax.random.normal(
+            self.key, (self.n_chains, self.n_steps, self.n_dims)
+        )
         # Zero variance in dim 1, NaN in dim 2
         positions = positions.at[:, :, 1].set(0.0)
         positions = positions.at[:, :, 2].set(jnp.nan)
@@ -1044,7 +1055,9 @@ class TestAdaptStepSizePerDim:
             "positions_training": buf,
         }
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         step = res["local_sampler"].step_size
         assert jnp.all(jnp.isfinite(step)), "Step sizes must remain finite"
 
@@ -1053,7 +1066,9 @@ class TestAdaptStepSizePerDim:
         scales = [5.0, 1.0, 0.2]
         resources = self._make_resources(self.grw_kernel, scales)
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         step = res["local_sampler"].step_size
         assert step[0] > step[1] > step[2]
 
@@ -1063,7 +1078,9 @@ class TestAdaptStepSizePerDim:
         resources = self._make_resources(self.hmc_kernel, scales)
         initial_cm = self.hmc_kernel.condition_matrix
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         new_cm = res["local_sampler"].condition_matrix
         # Higher variance → larger effective step → lower condition_matrix
         assert new_cm[0] < new_cm[1] < new_cm[2], (
@@ -1078,7 +1095,9 @@ class TestAdaptStepSizePerDim:
         scales = [1000.0, 1.0, 0.001]  # 1e6 ratio between extremes
         resources = self._make_resources(self.mala_kernel, scales)
         strategy = self._strategy()
-        _, res, _ = strategy(self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {})
+        _, res, _ = strategy(
+            self.key, resources, jnp.zeros((self.n_chains, self.n_dims)), {}
+        )
         new_step = res["local_sampler"].step_size
         assert jnp.all(jnp.isfinite(new_step)), "Step sizes must remain finite"
         assert new_step[0] > new_step[1] > new_step[2]
