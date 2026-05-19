@@ -18,7 +18,7 @@ from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
 from flowMC.strategy.parallel_tempering import ParallelTempering
-from flowMC.strategy.adapt_step_size import AdaptStepSize
+from flowMC.strategy.adapt_step_size import AdaptStepSize, AdaptStepSizePerDim
 from flowMC.strategy.check_early_stop import CheckEarlyStop
 
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
@@ -56,6 +56,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
         # --- Local sampler ---
         mala_step_size: Float | Float[Array, " n_dim"] = 1e-1,
         adapt_step_size: bool = True,
+        adapt_step_size_per_dim: bool = True,
         periodic: Optional[dict[int, tuple[float, float]]] = None,
         # --- Normalizing flow model ---
         rq_spline_hidden_units: list[int] = [32, 32],
@@ -101,6 +102,9 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
                 scalar or per-dimension array. Defaults to 0.1.
             adapt_step_size (bool): Adapt the MALA step size during training.
                 Defaults to True.
+            adapt_step_size_per_dim (bool): Also tune per-dimension step size
+                ratios using the empirical std of recent chain positions.
+                Runs after adapt_step_size. Defaults to True.
             periodic (dict[int, tuple[float, float]] | None): Periodic boundary
                 conditions as ``{dim_index: (lower, upper)}``. Defaults to None.
 
@@ -435,6 +439,14 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             verbose=verbose,
         )
 
+        adapt_local_sampler_per_dim = AdaptStepSizePerDim(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            positions_buffer_key="target_positions",
+            window=n_local_steps // local_thinning,
+            verbose=verbose,
+        )
+
         check_early_stop = CheckEarlyStop(
             state_name="sampler_state",
             acceptance_buffer_key="target_global_accs",
@@ -458,6 +470,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "parallel_tempering": parallel_tempering_strat,
             "initialize_tempered_positions": initialize_tempered_positions_lambda,
             "adapt_local_sampler": adapt_local_sampler,
+            "adapt_local_sampler_per_dim": adapt_local_sampler_per_dim,
             "check_early_stop": check_early_stop,
         }
 
@@ -465,6 +478,7 @@ class RQSpline_MALA_PT_Bundle(ResourceStrategyBundle):
             "parallel_tempering",
             "local_stepper",
             *(("adapt_local_sampler",) if adapt_step_size else []),
+            *(("adapt_local_sampler_per_dim",) if adapt_step_size_per_dim else []),
             "update_global_step",
             "model_trainer",
             "update_model",

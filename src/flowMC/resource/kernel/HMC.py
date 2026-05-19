@@ -211,6 +211,36 @@ class HMC(ProposalBase):
         new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
         return tree_at(lambda k: k.step_size, self, new_step_size)
 
+    def get_effective_dim_profile(self) -> Float[Array, " n_dim"]:
+        """Return the current per-dim effective step profile normalised to geometric mean 1.
+
+        The effective step size in dimension i is step_size / sqrt(condition_matrix[i]),
+        so the per-dim profile is 1/sqrt(condition_matrix[i]) normalised to geomean 1.
+        """
+        safe = jnp.maximum(
+            self.condition_matrix, jnp.finfo(self.condition_matrix.dtype).eps
+        )
+        log_eff = -0.5 * jnp.log(safe)
+        return jnp.exp(log_eff - jnp.mean(log_eff))
+
+    def apply_per_dim_scaling(self, ratios: Float[Array, " n_dim"]) -> Self:
+        """Scale the effective per-dimension step size by ratios via the mass matrix.
+
+        The effective step size in dimension i is step_size / sqrt(condition_matrix[i]).
+        Multiplying that by ratios[i] is equivalent to dividing condition_matrix[i]
+        by ratios[i]^2. The geometric mean of condition_matrix is preserved, so
+        adapt_step_size retains control of the global scale.
+
+        Args:
+            ratios: Per-dimension scaling factors for the effective step size, shape
+                (n_dim,). Values > 1 increase the effective step in that dimension.
+
+        Returns:
+            HMC: A new instance with updated condition_matrix.
+        """
+        new_condition_matrix = self.condition_matrix / (ratios * ratios)
+        return tree_at(lambda k: k.condition_matrix, self, new_condition_matrix)
+
     def print_parameters(self):
         logger.debug("HMC parameters:")
         logger.debug(f"  - step_size: {self.step_size}")

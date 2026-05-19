@@ -169,6 +169,24 @@ class MALA(ProposalBase):
         new_step_size = self.step_size * (1.0 + self.ADAPTATION_RATE * diff)
         return tree_at(lambda k: k.step_size, self, new_step_size)
 
+    def get_effective_dim_profile(self) -> Float[Array, " n_dim"]:
+        """Return the current per-dim step size profile normalised to geometric mean 1."""
+        safe = jnp.maximum(self.step_size, jnp.finfo(self.step_size.dtype).eps)
+        log_step = jnp.log(safe)
+        return jnp.exp(log_step - jnp.mean(log_step))
+
+    def apply_per_dim_scaling(self, ratios: Float[Array, " n_dim"]) -> Self:
+        """Multiply step_size element-wise by ratios (returns a new MALA).
+
+        Args:
+            ratios: Per-dimension multiplicative scaling factors, shape (n_dim,).
+
+        Returns:
+            MALA: A new instance with updated step_size.
+        """
+        new_step_size = self.step_size * ratios
+        return tree_at(lambda k: k.step_size, self, new_step_size)
+
     def print_parameters(self):
         logger.debug("MALA parameters:")
         logger.debug(f"  - step_size: {self.step_size}")
