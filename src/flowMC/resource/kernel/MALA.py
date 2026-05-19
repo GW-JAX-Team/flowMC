@@ -171,7 +171,8 @@ class MALA(ProposalBase):
 
     def get_effective_dim_profile(self) -> Float[Array, " n_dim"]:
         """Return the current per-dim step size profile normalised to geometric mean 1."""
-        log_step = jnp.log(self.step_size)
+        safe = jnp.maximum(self.step_size, jnp.finfo(self.step_size.dtype).eps)
+        log_step = jnp.log(safe)
         return jnp.exp(log_step - jnp.mean(log_step))
 
     def apply_per_dim_scaling(self, ratios: Float[Array, " n_dim"]) -> Self:

@@ -217,7 +217,10 @@ class HMC(ProposalBase):
         The effective step size in dimension i is step_size / sqrt(condition_matrix[i]),
         so the per-dim profile is 1/sqrt(condition_matrix[i]) normalised to geomean 1.
         """
-        log_eff = -0.5 * jnp.log(self.condition_matrix)
+        safe = jnp.maximum(
+            self.condition_matrix, jnp.finfo(self.condition_matrix.dtype).eps
+        )
+        log_eff = -0.5 * jnp.log(safe)
         return jnp.exp(log_eff - jnp.mean(log_eff))
 
     def apply_per_dim_scaling(self, ratios: Float[Array, " n_dim"]) -> Self:

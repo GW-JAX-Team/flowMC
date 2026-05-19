@@ -273,9 +273,12 @@ class AdaptStepSizePerDim(Strategy):
 
         # Current per-dim profile from the kernel (geomean=1, kernel-specific)
         current_profile = getattr(kernel, "get_effective_dim_profile")()
+        safe_current = jnp.maximum(
+            current_profile, jnp.finfo(current_profile.dtype).eps
+        )
 
         # Exact ratio to move current profile to target profile in one step
-        ratios = target_profile / current_profile
+        ratios = target_profile / safe_current
 
         logger.debug(f"Adapting per-dim step sizes for {self.kernel_name}:")
         logger.debug(f"  Estimated sigma: {sigma}")

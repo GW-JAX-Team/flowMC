@@ -1089,7 +1089,8 @@ class TestAdaptStepSizePerDim:
             "condition_matrix should be inversely related to posterior variance"
         )
         # step_size scalar must be unchanged
-        assert res["local_sampler"].step_size == self.hmc_kernel.step_size
+        original_step_size = self.hmc_kernel.step_size
+        assert res["local_sampler"].step_size == original_step_size
         assert not jnp.allclose(new_cm, initial_cm)
 
     def test_extreme_anisotropy_handled(self):

@@ -189,8 +189,8 @@ Whether to additionally tune the per-dimension step size profile using the empir
 Default `True`.
 After the global step size is adjusted by `adapt_step_size`, this strategy rescales each dimension's step size so that parameters with a larger posterior scale get proportionally larger steps.
 The per-dimension scale is estimated as half the central 68% range of chain positions `(Q84 - Q16) / 2`, which equals the standard deviation for a Gaussian and is robust to early burn-in outliers that sit in the distribution tails.
-The geometric mean of the step sizes is preserved, so `adapt_step_size` retains full control of the overall magnitude while this strategy only reshapes the per-dimension profile.
-For MALA and GRW the per-dimension `step_size` array is scaled directly; for HMC the `condition_matrix` (diagonal mass matrix) is adjusted instead.
+The geometric mean of the step sizes is preserved, so `adapt_step_size` retains full control of the overall magnitude, while this strategy only reshapes the per-dimension profile.
+For MALA and GRW, the per-dimension `step_size` array is scaled directly; for HMC the `condition_matrix` (diagonal mass matrix) is adjusted instead.
 Adaptation is disabled during the production phase.
 Per-dimension adaptation starts from the first training loop with no damping or clipping, converging to the correct profile in a single call once the chains have explored the posterior.
 
