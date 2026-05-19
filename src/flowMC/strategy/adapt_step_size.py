@@ -150,3 +150,136 @@ class AdaptStepSize(Strategy):
         )
 
         return rng_key, resources, initial_position
+
+
+class AdaptStepSizePerDim(Strategy):
+    """Strategy to adapt the per-dimension step size profile using empirical variance.
+
+    Computes the variance of chain positions and directly sets the per-dimension step size
+    profile so that each dimension's effective step is proportional to its posterior standard
+    deviation. The geometric mean of the step sizes is preserved, so this strategy controls
+    the *shape* of the step size vector while AdaptStepSize continues to control its
+    *global scale*.
+
+    Each call drives the kernel's effective per-dim profile exactly to the current variance
+    estimate in one step (no damping, no clipping). Adaptation starts from the first call.
+
+    Run this after AdaptStepSize in the training phase.
+    Requires the kernel to implement get_effective_dim_profile() and apply_per_dim_scaling().
+    """
+
+    kernel_name: str
+    state_name: str
+    positions_buffer_key: str
+    _call_count: int
+
+    def __init__(
+        self,
+        kernel_name: str,
+        state_name: str,
+        positions_buffer_key: str,
+        verbose: bool = False,
+    ):
+        """Initialize AdaptStepSizePerDim.
+
+        Args:
+            kernel_name: Name of the kernel resource to adapt.
+            state_name: Name of the State resource that tracks sampler state.
+            positions_buffer_key: Key in State that points to the positions buffer name
+                (e.g. "target_positions").
+            verbose: Log per-dim step sizes after each adaptation.
+        """
+        self.kernel_name = kernel_name
+        self.state_name = state_name
+        self.positions_buffer_key = positions_buffer_key
+        self._call_count = 0
+        if verbose:
+            enable_verbose_logging(logger)
+
+    def __call__(
+        self,
+        rng_key: Key,
+        resources: dict[str, Resource],
+        initial_position: Float[Array, "n_chains n_dim"],
+        data: dict,
+    ) -> tuple[
+        Key,
+        dict[str, Resource],
+        Float[Array, "n_chains n_dim"],
+    ]:
+        """Adapt per-dimension step sizes based on empirical posterior variance.
+
+        Args:
+            rng_key: JAX PRNGKey.
+            resources: Dictionary of resources.
+            initial_position: Current positions of chains.
+            data: Additional data (unused).
+
+        Returns:
+            Tuple of (rng_key, resources, initial_position).
+        """
+        self._call_count += 1
+
+        assert isinstance(state := resources[self.state_name], State), (
+            f"Resource {self.state_name} must be a State"
+        )
+
+        assert isinstance(
+            buffer_name := state.data.get(self.positions_buffer_key), str
+        ), f"State key {self.positions_buffer_key} must point to a string (buffer name)"
+
+        assert isinstance(positions_buffer := resources[buffer_name], Buffer), (
+            f"Resource {buffer_name} must be a Buffer"
+        )
+
+        # positions: (n_chains, n_steps, n_dims) — use all buffered history
+        positions = positions_buffer.data
+
+        # Mask out unfilled slots (initialised to -inf)
+        finite_mask = jnp.all(jnp.isfinite(positions), axis=-1)  # (n_chains, n_steps)
+        flat = positions.reshape(-1, positions.shape[-1])  # (n_chains*n_steps, n_dims)
+        flat_mask = finite_mask.reshape(-1)  # (n_chains*n_steps,)
+
+        # Masked mean then variance over finite samples
+        n_samples = jnp.sum(flat_mask)
+        safe_n = jnp.maximum(n_samples, 1.0)
+        masked_flat = jnp.where(flat_mask[:, None], flat, 0.0)
+        mean = jnp.sum(masked_flat, axis=0) / safe_n
+        sq_dev = jnp.where(flat_mask[:, None], (flat - mean) ** 2, 0.0)
+        var = jnp.sum(sq_dev, axis=0) / jnp.maximum(safe_n - 1.0, 1.0)  # (n_dims,)
+
+        var = jnp.where(jnp.isfinite(var), var, 1.0)
+        var = jnp.maximum(var, jnp.finfo(positions.dtype).eps)
+        sigma = jnp.sqrt(var)
+
+        # Target profile: normalised to geometric mean 1
+        log_sigma = jnp.log(sigma)
+        target_profile = jnp.exp(log_sigma - jnp.mean(log_sigma))
+
+        assert self.kernel_name in resources, (
+            f"Kernel '{self.kernel_name}' not found in resources"
+        )
+        kernel = resources[self.kernel_name]
+        assert isinstance(kernel, ProposalBase), (
+            f"Resource '{self.kernel_name}' must be a ProposalBase, got {type(kernel)}"
+        )
+        assert hasattr(kernel, "get_effective_dim_profile") and hasattr(
+            kernel, "apply_per_dim_scaling"
+        ), (
+            f"Kernel '{self.kernel_name}' must implement get_effective_dim_profile() "
+            f"and apply_per_dim_scaling(). Got {type(kernel)}."
+        )
+
+        # Current per-dim profile from the kernel (geomean=1, kernel-specific)
+        current_profile = getattr(kernel, "get_effective_dim_profile")()
+
+        # Exact ratio to move current profile to target profile in one step
+        ratios = target_profile / current_profile
+
+        logger.debug(f"Adapting per-dim step sizes for {self.kernel_name}:")
+        logger.debug(f"  Estimated sigma: {sigma}")
+        logger.debug(f"  Applied ratios: {ratios}")
+
+        resources[self.kernel_name] = getattr(kernel, "apply_per_dim_scaling")(ratios)
+
+        return rng_key, resources, initial_position

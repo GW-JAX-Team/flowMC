@@ -21,7 +21,8 @@ Quick-reference index by category. Click any parameter name to jump to its descr
 | Parameter | Default | Description |
 | --- | --- | --- |
 | [`mala_step_size`](#mala_step_size) | `1e-1` | Initial MALA step size |
-| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt step size |
+| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt global step size |
+| [`adapt_step_size_per_dim`](#adapt_step_size_per_dim) | `True` | Auto-adapt per-dimension step sizes |
 | [`periodic`](#periodic) | `None` | Periodic dimensions |
 
 ## Local sampler — HMC
@@ -31,7 +32,8 @@ Quick-reference index by category. Click any parameter name to jump to its descr
 | [`hmc_step_size`](#hmc_step_size) | `0.1` | Initial leapfrog step size |
 | [`hmc_n_leapfrog`](#hmc_n_leapfrog) | `10` | Leapfrog steps per proposal |
 | [`condition_matrix`](#condition_matrix) | `1` | Diagonal inverse mass matrix |
-| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt step size |
+| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt global step size |
+| [`adapt_step_size_per_dim`](#adapt_step_size_per_dim) | `True` | Auto-adapt per-dimension step sizes |
 | [`periodic`](#periodic) | `None` | Periodic dimensions |
 
 ## Local sampler — Gaussian random walk
@@ -39,7 +41,8 @@ Quick-reference index by category. Click any parameter name to jump to its descr
 | Parameter | Default | Description |
 | --- | --- | --- |
 | [`grw_step_size`](#grw_step_size) | `1e-1` | Initial random walk step size |
-| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt step size |
+| [`adapt_step_size`](#adapt_step_size) | `True` | Auto-adapt global step size |
+| [`adapt_step_size_per_dim`](#adapt_step_size_per_dim) | `True` | Auto-adapt per-dimension step sizes |
 | [`periodic`](#periodic) | `None` | Periodic dimensions |
 
 ## Normalizing flow
@@ -179,6 +182,16 @@ Whether to automatically adapt the local step size during the training phase.
 Default `True`.
 The step size is updated after each training loop using a simple multiplicative rule targeting the algorithm-specific optimal acceptance rate.
 Adaptation is disabled during the production phase.
+
+### adapt_step_size_per_dim
+
+Whether to additionally tune the per-dimension step size profile using the empirical posterior variance.
+Default `True`.
+After the global step size is adjusted by `adapt_step_size`, this strategy rescales each dimension's step size so that parameters with a larger posterior variance get proportionally larger steps.
+The geometric mean of the step sizes is preserved, so `adapt_step_size` retains full control of the overall magnitude while this strategy only reshapes the per-dimension profile.
+For MALA and GRW the per-dimension `step_size` array is scaled directly; for HMC the `condition_matrix` (diagonal mass matrix) is adjusted instead.
+Adaptation is disabled during the production phase.
+Per-dimension adaptation starts from the first training loop; the per-call adjustment is capped at a factor of 2 and smoothed with EMA to ensure stability.
 
 ### periodic
 

@@ -17,7 +17,7 @@ from flowMC.strategy.lambda_function import Lambda
 from flowMC.strategy.take_steps import TakeSerialSteps, TakeGroupSteps
 from flowMC.strategy.train_model import TrainModel
 from flowMC.strategy.update_state import UpdateState
-from flowMC.strategy.adapt_step_size import AdaptStepSize
+from flowMC.strategy.adapt_step_size import AdaptStepSize, AdaptStepSizePerDim
 from flowMC.strategy.check_early_stop import CheckEarlyStop
 from flowMC.resource_strategy_bundle.base import ResourceStrategyBundle
 
@@ -50,6 +50,7 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
         hmc_n_leapfrog: int = 10,
         condition_matrix: Float | Float[Array, " n_dim"] = 1,
         adapt_step_size: bool = True,
+        adapt_step_size_per_dim: bool = True,
         periodic: Optional[dict[int, tuple[float, float]]] = None,
         # --- Normalizing flow model ---
         rq_spline_hidden_units: list[int] = [32, 32],
@@ -93,6 +94,9 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
                 elements; scalar (broadcast) or per-dimension array. Defaults to 1.
             adapt_step_size (bool): Adapt the HMC step size during training.
                 Defaults to True.
+            adapt_step_size_per_dim (bool): Also tune per-dimension effective
+                step sizes via the mass matrix using empirical posterior variance.
+                Runs after adapt_step_size. Defaults to True.
             periodic (dict[int, tuple[float, float]] | None): Periodic boundary
                 conditions as ``{dim_index: (lower, upper)}``. Defaults to None.
 
@@ -362,6 +366,13 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
             verbose=verbose,
         )
 
+        adapt_local_sampler_per_dim = AdaptStepSizePerDim(
+            kernel_name="local_sampler",
+            state_name="sampler_state",
+            positions_buffer_key="target_positions",
+            verbose=verbose,
+        )
+
         check_early_stop = CheckEarlyStop(
             state_name="sampler_state",
             acceptance_buffer_key="target_global_accs",
@@ -383,12 +394,14 @@ class RQSpline_HMC_Bundle(ResourceStrategyBundle):
             "reset_steppers": reset_steppers_lambda,
             "update_model": update_model_lambda,
             "adapt_local_sampler": adapt_local_sampler,
+            "adapt_local_sampler_per_dim": adapt_local_sampler_per_dim,
             "check_early_stop": check_early_stop,
         }
 
         training_phase = [
             "local_stepper",
             *(("adapt_local_sampler",) if adapt_step_size else []),
+            *(("adapt_local_sampler_per_dim",) if adapt_step_size_per_dim else []),
             "update_global_step",
             "model_trainer",
             "update_model",
