@@ -10,8 +10,8 @@ from abc import abstractmethod
 class Bijection(eqx.Module):
     """Base class for bijective transformations.
 
-    Subclasses must implement :meth:`forward` and :meth:`inverse`.
-    The default :meth:`__call__` delegates to :meth:`forward`.
+    Subclasses must implement ``forward`` and ``inverse``.
+    The default ``__call__`` delegates to ``forward``.
 
     This is an abstract template that should not be directly used.
     """
@@ -74,8 +74,8 @@ class Bijection(eqx.Module):
 class Distribution(eqx.Module):
     """Base class for probability distributions.
 
-    Subclasses must implement :meth:`log_prob` and :meth:`sample`.
-    The default :meth:`__call__` delegates to :meth:`log_prob`.
+    Subclasses must implement ``log_prob`` and ``sample``.
+    The default ``__call__`` delegates to ``log_prob``.
 
     This is an abstract template that should not be directly used.
     """

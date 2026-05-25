@@ -18,7 +18,7 @@ class Buffer(Resource):
         name (str): Name of the buffer.
         data (Float[Array, "..."]): Underlying data array, initialised to ``-inf``.
         cursor (int): Current write offset along ``cursor_dim``.
-        cursor_dim (int): Dimension along which :meth:`update_buffer` writes.
+        cursor_dim (int): Dimension along which ``update_buffer`` writes.
     """
 
     name: str

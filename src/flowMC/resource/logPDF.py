@@ -86,15 +86,17 @@ class LogPDF(Resource):
 
 @jax.tree_util.register_pytree_node_class
 class TemperedPDF(LogPDF):
-    """A tempered version of :class:`LogPDF` used for parallel tempering.
+    """A tempered version of ``LogPDF`` used for parallel tempering.
 
-    The tempered log-pdf at inverse temperature ``β = 1/T`` is:
+    The tempered log-pdf at inverse temperature ``beta = 1/T`` is:
 
-    .. math::
+    $$
 
-        \\log p_\\beta(x) = \\beta \\cdot \\log \\mathcal{L}(x) + \\log \\pi(x)
+    \\log p_\\beta(x) = \\beta \\cdot \\log \\mathcal{L}(x) + \\log \\pi(x)
 
-    where :math:`\\mathcal{L}` is the likelihood and :math:`\\pi` is the prior.
+    $$
+
+    where $\\mathcal{L}$ is the likelihood and $\\pi$ is the prior.
 
     Attributes:
         log_prior (Callable): The log-prior function.

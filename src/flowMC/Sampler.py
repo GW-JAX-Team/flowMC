@@ -62,7 +62,7 @@ class Sampler:
             strategies (Optional[dict[str, Strategy]]): Dictionary of named strategies.
                 Must be paired with ``resources``.
             strategy_order (Optional[list[str]]): Ordered list of strategy names to
-                execute each call to :meth:`sample`.
+                execute each call to ``sample``.
             resource_strategy_bundles (Optional[ResourceStrategyBundle]): Pre-configured
                 bundle that provides resources, strategies, and ordering.
             **kwargs: Additional keyword arguments that override class-level attributes

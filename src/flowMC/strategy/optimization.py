@@ -111,7 +111,7 @@ class AdamOptimization(Strategy):
         initial_position: Float[Array, "n_chain n_dim"],
         data: dict,
     ) -> tuple[Key, Float[Array, "n_chain n_dim"], Float[Array, " n_chain"]]:
-        """Optimization kernel that can be used independently of :meth:`__call__`.
+        """Optimization kernel that can be used independently of ``__call__``.
 
         Args:
             rng_key (Key): JAX PRNGKey for noise generation.

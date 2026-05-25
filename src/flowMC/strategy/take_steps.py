@@ -18,14 +18,14 @@ logger = logging.getLogger(__name__)
 class TakeSteps(Strategy):
     """Base class for strategies that run a kernel for a fixed number of steps.
 
-    Subclasses implement :meth:`sample` to define how a single chain is advanced,
+    Subclasses implement ``sample`` to define how a single chain is advanced,
     and this base class handles vmapping over chains, thinning, and writing results
-    into the associated :class:`~flowMC.resource.buffers.Buffer` resources.
+    into the associated ``flowMC.resource.buffers.Buffer`` resources.
 
     Attributes:
-        logpdf_name (str): Resource key for the :class:`~flowMC.resource.logPDF.LogPDF`.
+        logpdf_name (str): Resource key for the ``flowMC.resource.logPDF.LogPDF``.
         kernel_name (str): Resource key for the proposal kernel.
-        state_name (str): Resource key for the sampler :class:`~flowMC.resource.states.State`.
+        state_name (str): Resource key for the sampler ``flowMC.resource.states.State``.
         buffer_names (list[str]): State keys pointing to the position, log-prob, and
             acceptance-rate buffer names (in that order).
         n_steps (int): Number of kernel steps per call.
@@ -93,7 +93,7 @@ class TakeSteps(Strategy):
     ]:
         """Advance a single chain for ``n_steps`` using the given kernel.
 
-        This method is vmapped over chains by :meth:`__call__`, so it operates
+        This method is vmapped over chains by ``__call__``, so it operates
         on a single chain at a time.
 
         Args:
@@ -321,7 +321,7 @@ class TakeGroupSteps(TakeSteps):
         proposals are generated in a single batched call — no sequential dependency.
 
         Args:
-            kernel (ProposalBase): Proposal kernel (e.g., :class:`~flowMC.resource.kernel.NF_proposal.NFProposal`).
+            kernel (ProposalBase): Proposal kernel (e.g., ``flowMC.resource.kernel.NF_proposal.NFProposal``).
             rng_key (Key): JAX PRNGKey for this chain.
             initial_position (Float[Array, "n_dim"]): Starting position.
             logpdf (LogPDF): Log-PDF to sample from.

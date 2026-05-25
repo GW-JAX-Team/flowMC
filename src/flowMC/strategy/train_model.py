@@ -17,14 +17,14 @@ class TrainModel(Strategy):
 
     Each call draws the most-recent ``history_window`` steps from the position
     buffer, sub-samples up to ``n_max_examples`` points, and runs ``n_epochs``
-    of gradient descent via the associated :class:`~flowMC.resource.optimizer.Optimizer`.
+    of gradient descent via the associated ``flowMC.resource.optimizer.Optimizer``.
 
     Attributes:
-        model_resource (str): Resource key for the :class:`~flowMC.resource.model.nf_model.base.NFModel`.
-        data_resource (str): Resource key for the position :class:`~flowMC.resource.buffers.Buffer`.
-        optimizer_resource (str): Resource key for the :class:`~flowMC.resource.optimizer.Optimizer`.
+        model_resource (str): Resource key for the ``flowMC.resource.model.nf_model.base.NFModel``.
+        data_resource (str): Resource key for the position ``flowMC.resource.buffers.Buffer``.
+        optimizer_resource (str): Resource key for the ``flowMC.resource.optimizer.Optimizer``.
         loss_buffer_name (str): Resource key for an optional
-            :class:`~flowMC.resource.buffers.Buffer` to record loss values.
+            ``flowMC.resource.buffers.Buffer`` to record loss values.
             Empty string disables loss recording.
         n_epochs (int): Number of training epochs per call.
         batch_size (int): Mini-batch size.
@@ -66,7 +66,7 @@ class TrainModel(Strategy):
                 training data.
             optimizer_resource (str): Resource key for the optimizer.
             loss_buffer_name (str): Resource key for an optional
-                :class:`~flowMC.resource.buffers.Buffer` to record loss values.
+                ``flowMC.resource.buffers.Buffer`` to record loss values.
                 Pass ``""`` to disable. Defaults to ``""``.
             n_epochs (int): Number of training epochs per call. Defaults to 100.
             batch_size (int): Mini-batch size. Defaults to 64.

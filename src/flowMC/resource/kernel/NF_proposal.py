@@ -19,7 +19,7 @@ class NFProposal(ProposalBase):
     Proposes new positions by sampling from a trained normalizing flow and accepts
     or rejects via a corrected Metropolis-Hastings ratio that accounts for the
     flow density.  All ``n_steps`` proposals are drawn in one batched call, so
-    this kernel is suited for use with :class:`~flowMC.strategy.take_steps.TakeGroupSteps`.
+    this kernel is suited for use with ``flowMC.strategy.take_steps.TakeGroupSteps``.
 
     Attributes:
         model (NFModel): Trained normalizing flow model used to propose samples.

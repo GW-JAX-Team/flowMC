@@ -44,12 +44,12 @@ class ParallelTempering(Strategy):
         Args:
             n_steps (int): Number of local kernel steps per temperature per call.
             tempered_logpdf_name (str): Resource key for the
-                :class:`~flowMC.resource.logPDF.TemperedPDF`.
+                ``flowMC.resource.logPDF.TemperedPDF``.
             kernel_name (str): Resource key for the local proposal kernel.
             tempered_buffer_names (list[str]): Resource keys for the tempered-position
                 buffer and the temperature buffer (in that order).
             state_name (str): Resource key for the sampler
-                :class:`~flowMC.resource.states.State`.
+                ``flowMC.resource.states.State``.
             verbose (bool): Enable debug logging. Defaults to False.
         """
         self.n_steps = n_steps
