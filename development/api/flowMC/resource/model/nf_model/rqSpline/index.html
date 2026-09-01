@@ -2996,10 +2996,10 @@ data_cov (Array) : Covariance of the data.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27;n_sample n_dim&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27; n_sample&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.resource.model.nf_model.rqSpline.MaskedCouplingRQSpline.log_prob">log_prob</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;log_prob&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27; n_dim&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27;n_sample n_dim&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FloatScalar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27; n_sample&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.resource.model.nf_model.rqSpline.MaskedCouplingRQSpline.log_prob">log_prob</a></code></td>
               <td>
                 <div class="doc-md-description">
-                  <p>From data space to latent space.</p>
+                  <p>Evaluate the normalized log density in data space.</p>
                 </div>
               </td>
             </tr>
@@ -3194,14 +3194,14 @@ Inputs outside this range are mapped linearly. Defaults to <code>(-10.0, 10.0)</
 
 
 <h4 id="flowMC.resource.model.nf_model.rqSpline.MaskedCouplingRQSpline.log_prob" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_sample n_dim'</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_sample'</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">log_prob</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">]</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_sample n_dim'</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FloatScalar</span> <span class="o">|</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_sample'</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.nf_model.rqSpline.MaskedCouplingRQSpline.log_prob" class="headerlink" title="Permanent link">¤</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>From data space to latent space.</p>
+        <p>Evaluate the normalized log density in data space.</p>
 
 
     </div>
