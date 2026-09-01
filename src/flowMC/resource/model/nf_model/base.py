@@ -56,7 +56,9 @@ class NFModel(eqx.Module, Resource):
         return self.forward(x)
 
     @abstractmethod
-    def log_prob(self, x: Float[Array, " n_dim"]) -> FloatScalar:
+    def log_prob(
+        self, x: Float[Array, " n_dim"] | Float[Array, "n_sample n_dim"]
+    ) -> FloatScalar | Float[Array, " n_sample"]:
         raise NotImplementedError
 
     @abstractmethod

@@ -233,12 +233,19 @@ class RealNVP(NFModel):
         samples = samples * jnp.sqrt(jnp.diag(self.data_cov)) + self.data_mean
         return samples
 
-    def log_prob(self, x: Float[Array, " n_dim"]) -> FloatScalar:
-        # TODO: Check whether taking away vmap hurts accuracy.
-        x = (x - self.data_mean) / jnp.sqrt(jnp.diag(self.data_cov))
-        y, log_det = self.__call__(x)
+    def _log_prob_single(self, x: Float[Array, " n_dim"]) -> FloatScalar:
+        scale = jnp.sqrt(jnp.diag(self.data_cov))
+        y, log_det = self.__call__((x - self.data_mean) / scale)
         log_det = log_det + self.base_dist.log_prob(y)
-        return log_det
+        return log_det - jnp.sum(jnp.log(scale))
+
+    def log_prob(
+        self, x: Float[Array, " n_dim"] | Float[Array, "n_sample n_dim"]
+    ) -> FloatScalar | Float[Array, " n_sample"]:
+        """Evaluate the normalized log density in data space."""
+        if x.ndim == 2:
+            return jax.vmap(self._log_prob_single)(x)
+        return self._log_prob_single(x)
 
     def print_parameters(self):
         logger.debug("RealNVP parameters:")
