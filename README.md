@@ -2,7 +2,7 @@
 
 ### A JAX-based normalizing-flow-enhanced MCMC sampler for probabilistic inference
 
-[![docs](https://img.shields.io/badge/docs-online-blue)](https://gw-jax-team.github.io/flowMC/) [![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/GW-JAX-Team/flowMC/blob/main/LICENSE) [![coverage](https://img.shields.io/coveralls/github/GW-JAX-Team/flowMC/main)](https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GW-JAX-Team/flowMC/main.svg)](https://results.pre-commit.ci/latest/github/GW-JAX-Team/flowMC/main)
+[![CI](https://github.com/GW-JAX-Team/flowMC/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/GW-JAX-Team/flowMC/actions/workflows/CI.yml) [![coverage](https://img.shields.io/coveralls/github/GW-JAX-Team/flowMC/main)](https://coveralls.io/github/GW-JAX-Team/flowMC?branch=main) [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GW-JAX-Team/flowMC/main.svg)](https://results.pre-commit.ci/latest/github/GW-JAX-Team/flowMC/main) [![PyPI](https://img.shields.io/pypi/v/flowMC.svg)](https://pypi.org/project/flowMC/) [![Python](https://img.shields.io/pypi/pyversions/flowMC.svg)](https://pypi.org/project/flowMC/) [![docs](https://img.shields.io/badge/docs-online-blue)](https://gw-jax-team.github.io/flowMC/) [![license](https://img.shields.io/badge/License-MIT-blue)](https://github.com/GW-JAX-Team/flowMC/blob/main/LICENSE)
 
 ![flowMC_logo](https://raw.githubusercontent.com/GW-JAX-Team/flowMC/main/docs/logo.png)
 
