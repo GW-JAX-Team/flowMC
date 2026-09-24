@@ -94,9 +94,7 @@ class TemperedPDF(LogPDF):
     The tempered log-pdf at inverse temperature ``beta = 1/T`` is:
 
     $$
-
     \\log p_\\beta(x) = \\beta \\cdot \\log \\mathcal{L}(x) + \\log \\pi(x)
-
     $$
 
     where $\\mathcal{L}$ is the likelihood and $\\pi$ is the prior.
