@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.63">
+      <meta name="generator" content="zensical-0.0.66">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.10763589.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.1502b751.min.css">
       
         
           
@@ -2891,7 +2891,7 @@
                 <code>resources</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" href="../resource/base/#flowMC.resource.base.Resource">Resource</a>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="Resource (flowMC.resource.base.Resource)" href="../resource/base/#flowMC.resource.base.Resource">Resource</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2907,7 +2907,7 @@
                 <code>strategies</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" href="../strategy/base/#flowMC.strategy.base.Strategy">Strategy</a>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="Strategy (flowMC.strategy.base.Strategy)" href="../strategy/base/#flowMC.strategy.base.Strategy">Strategy</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2939,7 +2939,7 @@
                 <code>resource_strategy_bundles</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" href="../resource_strategy_bundle/base/#flowMC.resource_strategy_bundle.base.ResourceStrategyBundle">ResourceStrategyBundle</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ResourceStrategyBundle (flowMC.resource_strategy_bundle.base.ResourceStrategyBundle)" href="../resource_strategy_bundle/base/#flowMC.resource_strategy_bundle.base.ResourceStrategyBundle">ResourceStrategyBundle</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2991,7 +2991,7 @@ entirely.</p>
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;fm&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_dim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n_chains&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rng_key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Optional&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;strategies&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Optional&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Strategy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;strategy_order&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Optional&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resource_strategy_bundles&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Optional&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ResourceStrategyBundle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;outdir&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27;./outdir/&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;checkpoint_interval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;600.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;None&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.Sampler.Sampler.__init__">__init__</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="__init__(*, n_dim: int, n_chains: int, rng_key: Key, resources: Optional[dict[str, Resource]] = None, strategies: Optional[dict[str, Strategy]] = None, strategy_order: Optional[list[str]] = None, resource_strategy_bundles: Optional[ResourceStrategyBundle] = None, outdir: str = &#x27;./outdir/&#x27;, checkpoint_interval: float = 600.0) -&gt; None (flowMC.Sampler.Sampler.__init__)" href="./#flowMC.Sampler.Sampler.__init__">__init__</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Initialize the sampler.</p>
@@ -2999,7 +2999,7 @@ entirely.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;deserialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.Sampler.Sampler.deserialize">deserialize</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="deserialize() (flowMC.Sampler.Sampler.deserialize)" href="./#flowMC.Sampler.Sampler.deserialize">deserialize</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Deserialize the sampler object.</p>
@@ -3007,7 +3007,7 @@ entirely.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;sample&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;initial_position&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#x27;n_chains n_dim&#x27;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;dict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.Sampler.Sampler.sample">sample</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="sample(initial_position: Float[Array, &#x27;n_chains n_dim&#x27;], data: dict) (flowMC.Sampler.Sampler.sample)" href="./#flowMC.Sampler.Sampler.sample">sample</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Execute the strategy loop and populate resource buffers with samples.</p>
@@ -3015,7 +3015,7 @@ entirely.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;highlight language-python&quot;&gt;&lt;span class=&quot;n&quot;&gt;serialize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;" href="./#flowMC.Sampler.Sampler.serialize">serialize</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="serialize() (flowMC.Sampler.Sampler.serialize)" href="./#flowMC.Sampler.Sampler.serialize">serialize</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Serialize the sampler object.</p>
@@ -3121,7 +3121,7 @@ entirely.</p>
                 <code>resources</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" href="../resource/base/#flowMC.resource.base.Resource">Resource</a>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[<span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="Resource (flowMC.resource.base.Resource)" href="../resource/base/#flowMC.resource.base.Resource">Resource</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3138,7 +3138,7 @@ entirely.</p>
                 <code>strategies</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" href="../strategy/base/#flowMC.strategy.base.Strategy">Strategy</a>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[<span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="Strategy (flowMC.strategy.base.Strategy)" href="../strategy/base/#flowMC.strategy.base.Strategy">Strategy</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3172,7 +3172,7 @@ execute each call to <code>sample</code>.</p>
                 <code>resource_strategy_bundles</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" href="../resource_strategy_bundle/base/#flowMC.resource_strategy_bundle.base.ResourceStrategyBundle">ResourceStrategyBundle</a>]</code>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ResourceStrategyBundle (flowMC.resource_strategy_bundle.base.ResourceStrategyBundle)" href="../resource_strategy_bundle/base/#flowMC.resource_strategy_bundle.base.ResourceStrategyBundle">ResourceStrategyBundle</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3432,7 +3432,7 @@ the logpdf fingerprint when available.</p>
       <script id="__config" type="application/json">{"annotate":null,"base":"../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.8dcc8e9c.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.b7d3f789.min.js"></script>
       
         <script src="../../../javascripts/mathjax.js"></script>
       
