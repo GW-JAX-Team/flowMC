@@ -53,8 +53,18 @@ def test_rqSpline():
     optim = optax.adam(learning_rate, momentum)
     state = optim.init(eqx.filter(model, eqx.is_inexact_array))
 
-    rng, _best_model, state, _loss_values = model.train(
+    rng, model, state, _loss_values = model.train(
         init_rng, data, optim, state, num_epochs, batch_size, verbose=True
     )
     rng_key_nf = jax.random.key(124098)
     model.sample(rng_key_nf, 10000)
+
+    # Training moves the affine layers away from identity, exposing composition bugs.
+    assert jnp.any(model.layers[0].bijector.scale != 0) or jnp.any(
+        model.layers[0].bijector.shift != 0
+    )
+    latent = model.base_dist.sample(rng_key_nf, 64)
+    standardized, log_det_inverse = jax.vmap(model.inverse)(latent)
+    reconstructed, log_det_forward = jax.vmap(model.forward)(standardized)
+    assert jnp.allclose(reconstructed, latent, rtol=2e-5, atol=2e-5)
+    assert jnp.allclose(log_det_inverse + log_det_forward, 0, atol=2e-5)
