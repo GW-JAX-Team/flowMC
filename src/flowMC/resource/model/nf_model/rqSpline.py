@@ -504,9 +504,10 @@ class MaskedCouplingRQSpline(NFModel):
         def f(carry, data):
             x, log_det = carry
             layers = eqx.combine(data, statics)
-            x, log_det_i = layers[0].inverse(x, condition)
-            log_det += log_det_i
+            # Each forward block applies affine then spline; undo spline first.
             x, log_det_i = layers[1].inverse(x, condition)
+            log_det += log_det_i
+            x, log_det_i = layers[0].inverse(x, condition)
             return (x, log_det + log_det_i), None
 
         (x, log_det), _ = jax.lax.scan(f, (x, log_det), dynamics, reverse=True)
