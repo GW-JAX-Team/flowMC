@@ -1,5 +1,8 @@
+import equinox as eqx
 import jax
 import jax.numpy as jnp
+import numpy as np
+import pytest
 
 from flowMC.resource.model.common import Gaussian
 from flowMC.resource.model.nf_model.realNVP import AffineCoupling, RealNVP
@@ -102,3 +105,87 @@ def test_rqspline():
     log_prob = jax.vmap(model.log_prob)(samples)
 
     assert log_prob.shape == (2,)
+
+
+def _rqspline_with_nonidentity_affines(n_features, n_layers, **kwargs):
+    model = MaskedCouplingRQSpline(
+        n_features, n_layers, [8, 8], 4, jax.random.key(10), **kwargs
+    )
+    # Identity affine initialization hides an incorrect inverse order inside a block.
+    return eqx.tree_at(
+        lambda m: (m.layers[0].bijector.scale, m.layers[0].bijector.shift),
+        model,
+        (
+            jnp.linspace(0.2, -0.15, n_layers),
+            jnp.linspace(0.3, -0.2, n_layers),
+        ),
+    )
+
+
+@pytest.mark.parametrize("n_features", [2, 3])
+@pytest.mark.parametrize("n_layers", [1, 3])
+def test_rqspline_forward_inverse_roundtrips(n_features, n_layers):
+    model = _rqspline_with_nonidentity_affines(n_features, n_layers)
+    # Include interior points and both linear tails of the default [-10, 10] spline.
+    points = jnp.array(
+        [
+            [-2.0, 0.7, 1.5],
+            [0.2, -1.4, 3.0],
+            [0.0, 0.0, 0.0],
+            [-12.0, 11.0, -13.0],
+            [12.0, -11.0, 13.0],
+        ]
+    )[:, :n_features]
+
+    forward = jax.vmap(model.forward)
+    inverse = jax.vmap(model.inverse)
+    for compiled in (False, True):
+        if compiled:
+            forward = jax.jit(forward)
+            inverse = jax.jit(inverse)
+
+        latent, forward_logdet = forward(points)
+        recovered, inverse_logdet = inverse(latent)
+        np.testing.assert_allclose(recovered, points, rtol=1e-5, atol=1e-5)
+        np.testing.assert_allclose(
+            forward_logdet, -inverse_logdet, rtol=1e-5, atol=1e-5
+        )
+
+        data, inverse_logdet = inverse(points)
+        recovered, forward_logdet = forward(data)
+        np.testing.assert_allclose(recovered, points, rtol=1e-5, atol=1e-5)
+        np.testing.assert_allclose(
+            forward_logdet, -inverse_logdet, rtol=1e-5, atol=1e-5
+        )
+
+
+def test_rqspline_sample_log_prob_consistency():
+    model = _rqspline_with_nonidentity_affines(
+        3,
+        3,
+        data_mean=jnp.array([1.0, -2.0, 0.5]),
+        data_cov=jnp.diag(jnp.array([0.04, 9.0, 0.25])),
+    )
+    key = jax.random.key(20)
+    latents = model.base_dist.sample(key, 32)
+    _, inverse_logdet = jax.vmap(model.inverse)(latents)
+    scale = jnp.sqrt(jnp.diag(model.data_cov))
+    expected_log_prob = (
+        jax.vmap(model.base_dist.log_prob)(latents)
+        - inverse_logdet
+        - jnp.sum(jnp.log(scale))
+    )
+
+    # Check the public sampling/density API against the density of its known draws.
+    for sample, log_prob in (
+        (model.sample, model.log_prob),
+        (eqx.filter_jit(model.sample), eqx.filter_jit(model.log_prob)),
+    ):
+        samples = sample(key, 32)
+        recovered_latents, _ = jax.vmap(model.forward)(
+            (samples - model.data_mean) / scale
+        )
+        np.testing.assert_allclose(recovered_latents, latents, rtol=1e-5, atol=1e-5)
+        np.testing.assert_allclose(
+            log_prob(samples), expected_log_prob, rtol=1e-5, atol=1e-5
+        )
