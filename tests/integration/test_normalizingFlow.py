@@ -20,7 +20,7 @@ def test_realNVP():
     optim = optax.adam(learning_rate, momentum)
     state = optim.init(eqx.filter(model, eqx.is_inexact_array))
 
-    rng, _best_model, state, _loss_values = model.train(
+    rng, model, state, _loss_values = model.train(
         init_rng, data, optim, state, num_epochs, batch_size, verbose=True
     )
     rng_key_nf = jax.random.key(124098)
