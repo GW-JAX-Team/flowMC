@@ -3293,11 +3293,11 @@
 
 
 
-<h3 id="flowMC.strategy.take_steps.TakeGroupSteps" class="doc doc-heading">
+<h2 id="flowMC.strategy.take_steps.TakeGroupSteps" class="doc doc-heading">
             <code>TakeGroupSteps</code>
 
 
-<a href="#flowMC.strategy.take_steps.TakeGroupSteps" class="headerlink" title="Permanent link">¤</a></h3>
+<a href="#flowMC.strategy.take_steps.TakeGroupSteps" class="headerlink" title="Permanent link">¤</a></h2>
 
 
     <div class="doc doc-contents ">
@@ -3358,10 +3358,10 @@ steps are independent of each other, and benefit from being computed in parallel
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeGroupSteps.sample" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeGroupSteps.sample" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeGroupSteps.sample" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeGroupSteps.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -3505,11 +3505,11 @@ proposals are generated in a single batched call — no sequential dependency.</
 
 
 
-<h3 id="flowMC.strategy.take_steps.TakeSerialSteps" class="doc doc-heading">
+<h2 id="flowMC.strategy.take_steps.TakeSerialSteps" class="doc doc-heading">
             <code>TakeSerialSteps</code>
 
 
-<a href="#flowMC.strategy.take_steps.TakeSerialSteps" class="headerlink" title="Permanent link">¤</a></h3>
+<a href="#flowMC.strategy.take_steps.TakeSerialSteps" class="headerlink" title="Permanent link">¤</a></h2>
 
 
     <div class="doc doc-contents ">
@@ -3579,10 +3579,10 @@ the previous step.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSerialSteps.body" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSerialSteps.body" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">body</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">carry</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">aux</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeSerialSteps.body" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSerialSteps.body" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -3683,10 +3683,10 @@ the previous step.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSerialSteps.sample" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSerialSteps.sample" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeSerialSteps.sample" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSerialSteps.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -3828,11 +3828,11 @@ the previous step.</p>
 
 
 
-<h3 id="flowMC.strategy.take_steps.TakeSteps" class="doc doc-heading">
+<h2 id="flowMC.strategy.take_steps.TakeSteps" class="doc doc-heading">
             <code>TakeSteps</code>
 
 
-<a href="#flowMC.strategy.take_steps.TakeSteps" class="headerlink" title="Permanent link">¤</a></h3>
+<a href="#flowMC.strategy.take_steps.TakeSteps" class="headerlink" title="Permanent link">¤</a></h2>
 
 
     <div class="doc doc-contents ">
@@ -4024,10 +4024,10 @@ acceptance-rate buffer names (in that order).</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSteps.__call__" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSteps.__call__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">]]</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeSteps.__call__" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSteps.__call__" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -4154,10 +4154,10 @@ acceptance-rate buffer names (in that order).</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSteps.__init__" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSteps.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">logpdf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kernel_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">buffer_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">thinning</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">chain_batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeSteps.__init__" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSteps.__init__" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -4316,14 +4316,14 @@ size to reduce peak memory. 0 disables batching. Defaults to 0.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSteps.sample" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSteps.sample" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-<a href="#flowMC.strategy.take_steps.TakeSteps.sample" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSteps.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -4458,10 +4458,10 @@ on a single chain at a time.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.take_steps.TakeSteps.set_current_position" class="doc doc-heading">
+<h3 id="flowMC.strategy.take_steps.TakeSteps.set_current_position" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">set_current_position</span><span class="p">(</span><span class="n">current_position</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
-<a href="#flowMC.strategy.take_steps.TakeSteps.set_current_position" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.take_steps.TakeSteps.set_current_position" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">

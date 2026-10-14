@@ -3137,11 +3137,11 @@
 
 
 
-<h3 id="flowMC.strategy.optimization.AdamOptimization" class="doc doc-heading">
+<h2 id="flowMC.strategy.optimization.AdamOptimization" class="doc doc-heading">
             <code>AdamOptimization</code>
 
 
-<a href="#flowMC.strategy.optimization.AdamOptimization" class="headerlink" title="Permanent link">¤</a></h3>
+<a href="#flowMC.strategy.optimization.AdamOptimization" class="headerlink" title="Permanent link">¤</a></h2>
 
 
     <div class="doc doc-contents ">
@@ -3287,10 +3287,10 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.optimization.AdamOptimization.__call__" class="doc doc-heading">
+<h3 id="flowMC.strategy.optimization.AdamOptimization.__call__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chain n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chain n_dim'</span><span class="p">]]</span></code>
 
-<a href="#flowMC.strategy.optimization.AdamOptimization.__call__" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.optimization.AdamOptimization.__call__" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -3407,10 +3407,10 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.optimization.AdamOptimization.__init__" class="doc doc-heading">
+<h3 id="flowMC.strategy.optimization.AdamOptimization.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">logpdf</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">FloatScalar</span><span class="p">],</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">noise_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_dim 2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_UNBOUNDED_BOUNDS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
-<a href="#flowMC.strategy.optimization.AdamOptimization.__init__" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.optimization.AdamOptimization.__init__" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
@@ -3521,10 +3521,10 @@ or <code>(1, 2)</code> (broadcast). Defaults to <code>[[-inf, inf]]</code> (unco
 <div class="doc doc-object doc-function">
 
 
-<h4 id="flowMC.strategy.optimization.AdamOptimization.optimize" class="doc doc-heading">
+<h3 id="flowMC.strategy.optimization.AdamOptimization.optimize" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">optimize</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">objective</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chain n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chain n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_chain'</span><span class="p">]]</span></code>
 
-<a href="#flowMC.strategy.optimization.AdamOptimization.optimize" class="headerlink" title="Permanent link">¤</a></h4>
+<a href="#flowMC.strategy.optimization.AdamOptimization.optimize" class="headerlink" title="Permanent link">¤</a></h3>
 
 
     <div class="doc doc-contents ">
