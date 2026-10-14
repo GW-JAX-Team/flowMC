@@ -24,17 +24,3 @@ Builds a parallel tempering sampler from scratch using the low-level resource-st
 
 Shows the flexibility of the resource-strategy interface by composing a custom pipeline that prepends an Adam optimization phase to a random-walk MCMC kernel.
 A useful pattern when chains are initialized far from the high-probability region.
-
----
-
-## [Training Normalising Flows](train_normalizing_flow)
-
-A standalone introduction to the two normalising flow architectures available in flowMC — **RealNVP** and **Masked Coupling RQSpline** — trained on a 2D toy dataset.
-Compares their expressiveness and computational cost, and shows how a trained flow plugs into the resource-strategy system via the `TrainModel` strategy.
-
----
-
-## [Training Flow Matching Models](train_flow_match)
-
-Introduces **flow matching** as an alternative to traditional normalising flows.
-Trains a Conditional Optimal Transport model on a 2D distribution using an MLP-parameterised velocity field, then generates samples by integrating the learned ODE and evaluates the inferred density on a grid.

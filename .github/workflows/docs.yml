@@ -49,8 +49,8 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          for nb in docs/tutorials/*.ipynb; do
-            uv run jupyter nbconvert --to markdown "$nb" --output-dir docs/tutorials/
+          for nb in docs/tutorials/*.ipynb docs/guides/*.ipynb; do
+            uv run jupyter nbconvert --to markdown "$nb" --output-dir "$(dirname "$nb")/"
           done
 
       - name: Generate API stubs and versioned config

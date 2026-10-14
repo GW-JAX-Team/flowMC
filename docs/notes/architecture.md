@@ -1,6 +1,6 @@
 # Architecture
 
-This guide describes the internal architecture of flowMC — how its components are designed, how they interact, and how to extend them for your own use case.
+This page describes the internal architecture of flowMC — how its components are designed, how they interact, and how to extend them for your own use case.
 
 ## Anatomy of flowMC
 

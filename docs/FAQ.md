@@ -38,15 +38,5 @@ While we cannot fundamentally get rid of the problem, [using a jax.lax.scan](htt
 
 **I am running out of GPU memory**
 
-flowMC has two independent memory bottlenecks, so there are two knobs to turn.
-
-The first — and usually the bottleneck — is the NF proposal step.
-During each global step the target log-PDF (`logpdf`) is evaluated at all `n_chains * n_global_steps` flow proposals at once.
-Reduce `n_NFproposal_batch_size` (default `10000`): when `n_global_steps` exceeds it, the proposals are evaluated in smaller `jax.lax.map` chunks rather than a single `vmap`, lowering peak memory.
-Try this first.
-
-The second matters when your `logpdf` is expensive to evaluate.
-Sometimes the problem is not the `n_chains * n_global_steps` proposals, but that even a single `logpdf` evaluation per chain across all `n_chains` chains will not fit.
-In that case also set `chain_batch_size` to a small positive integer (default `0` means all chains are vmapped at once; smaller values use less memory) so the local sampler processes chains in sequential sub-batches.
-
-Both are bundle arguments (e.g. to `RQSpline_MALA_Bundle`); see the [hyperparameters guide](guides/hyperparameters.md) for details.
+Shrink how much work runs simultaneously: lower `n_NFproposal_batch_size` first, then set `chain_batch_size`.
+See [Reduce GPU Memory Use](how-to/reduce_gpu_memory.md).

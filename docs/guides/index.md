@@ -1,8 +1,6 @@
 # Guides
 
-These guides cover each flowMC component in depth — what it does and how to use it.
+Each guide takes one part of flowMC and shows it in use, with examples of its options.
 
-- **[Architecture](architecture.md)** — How flowMC is designed internally: the resource-strategy API, the `Sampler` control loop, and the guiding principles behind the design.
-- **[Bundles](bundles.md)** — Reference guide for the built-in resource-strategy bundles (`RQSpline_MALA`, `RQSpline_HMC`, `RQSpline_GRW`, and their parallel-tempering variants).
-  Explains what each bundle does, when to choose it, and the structure of the training and production sampling loops.
-- **[Hyperparameter Reference](hyperparameters.md)** — Complete reference for every constructor parameter across all bundles, organised into categories (required, local sampler, normalising flow, training, execution, early stopping, parallel tempering).
+- **[Training Normalising Flows](train_normalizing_flow)** — The two normalising flow architectures in flowMC, RealNVP and Masked Coupling RQSpline, trained on a 2D toy dataset: their expressiveness and cost, and how a trained flow plugs into the resource-strategy system via the `TrainModel` strategy.
+- **[Training Flow Matching Models](train_flow_match)** — Flow matching as an alternative to normalising flows: training a Conditional Optimal Transport model on a 2D distribution, sampling by integrating the learned ODE, and evaluating the density on a grid.
