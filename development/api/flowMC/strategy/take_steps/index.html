@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/strategy/take_steps/">
       
       
+      
         <link rel="prev" href="../sequential_monte_carlo/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3329,7 +3330,7 @@ steps are independent of each other, and benefit from being computed in parallel
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key, initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.strategy.take_steps.TakeGroupSteps.sample)" href="./#flowMC.strategy.take_steps.TakeGroupSteps.sample">sample</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key[Array, &#x27;&#x27;], initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.strategy.take_steps.TakeGroupSteps.sample)" href="./#flowMC.strategy.take_steps.TakeGroupSteps.sample">sample</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Advance a single chain by running all steps simultaneously via the kernel.</p>
@@ -3359,7 +3360,7 @@ steps are independent of each other, and benefit from being computed in parallel
 
 
 <h3 id="flowMC.strategy.take_steps.TakeGroupSteps.sample" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
 <a href="#flowMC.strategy.take_steps.TakeGroupSteps.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3550,7 +3551,7 @@ the previous step.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key, initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.strategy.take_steps.TakeSerialSteps.sample)" href="./#flowMC.strategy.take_steps.TakeSerialSteps.sample">sample</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key[Array, &#x27;&#x27;], initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.strategy.take_steps.TakeSerialSteps.sample)" href="./#flowMC.strategy.take_steps.TakeSerialSteps.sample">sample</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Advance a single chain serially using <code>jax.lax.scan</code>.</p>
@@ -3684,7 +3685,7 @@ the previous step.</p>
 
 
 <h3 id="flowMC.strategy.take_steps.TakeSerialSteps.sample" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
 <a href="#flowMC.strategy.take_steps.TakeSerialSteps.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3967,7 +3968,7 @@ acceptance-rate buffer names (in that order).</p>
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="__call__(rng_key: Key, resources: dict[str, Resource], initial_position: Float[Array, &#x27;n_chains n_dim&#x27;], data: dict) -&gt; tuple[Key, dict[str, Resource], Float[Array, &#x27;n_chains n_dim&#x27;]] (flowMC.strategy.take_steps.TakeSteps.__call__)" href="./#flowMC.strategy.take_steps.TakeSteps.__call__">__call__</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="__call__(rng_key: Key[Array, &#x27;&#x27;], resources: dict[str, Resource], initial_position: Float[Array, &#x27;n_chains n_dim&#x27;], data: dict) -&gt; tuple[Key[Array, &#x27;&#x27;], dict[str, Resource], Float[Array, &#x27;n_chains n_dim&#x27;]] (flowMC.strategy.take_steps.TakeSteps.__call__)" href="./#flowMC.strategy.take_steps.TakeSteps.__call__">__call__</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Run the kernel for all chains, apply thinning, and update buffers.</p>
@@ -3983,7 +3984,7 @@ acceptance-rate buffer names (in that order).</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key, initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]]
+              <td><code><a class="autorefs autorefs-internal" title="sample(kernel: ProposalBase, rng_key: Key[Array, &#x27;&#x27;], initial_position: Float[Array, &#x27; n_dim&#x27;], logpdf: LogPDF, data: dict) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;], Float[Array, &#x27; n_steps&#x27;]]
 
   
       abstractmethod
@@ -4025,7 +4026,7 @@ acceptance-rate buffer names (in that order).</p>
 
 
 <h3 id="flowMC.strategy.take_steps.TakeSteps.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_chains n_dim'</span><span class="p">]]</span></code>
 
 <a href="#flowMC.strategy.take_steps.TakeSteps.__call__" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -4125,7 +4126,7 @@ acceptance-rate buffer names (in that order).</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>tuple</code></td>            <td>
-                  <code><span title="jaxtyping.Key">Key</span></code>
+                  <code><span title="jaxtyping.Key">Key</span>[<span title="jaxtyping.Array">Array</span>, &#39;&#39;]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4317,7 +4318,7 @@ size to reduce peak memory. 0 disables batching. Defaults to 0.</p>
 
 
 <h3 id="flowMC.strategy.take_steps.TakeSteps.sample" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">kernel</span><span class="p">:</span> <span class="n">ProposalBase</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">initial_position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -4581,10 +4582,10 @@ on a single chain at a time.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../../javascripts/mathjax.js"></script>
       

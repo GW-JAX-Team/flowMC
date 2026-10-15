@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/resource/model/nf_model/base/">
       
       
+      
         <link rel="prev" href="../../flowmatching/base/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3271,7 +3272,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="forward(x: Float[Array, &#x27; n_dim&#x27;], key: Optional[Key] = None) -&gt; tuple[Float[Array, &#x27; n_dim&#x27;], FloatScalar]
+              <td><code><a class="autorefs autorefs-internal" title="forward(x: Float[Array, &#x27; n_dim&#x27;], key: Optional[Key[Array, &#x27;&#x27;]] = None) -&gt; tuple[Float[Array, &#x27; n_dim&#x27;], FloatScalar]
 
   
       abstractmethod
@@ -3303,7 +3304,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="train(rng: Key, data: Array, optim: optax.GradientTransformation, state: optax.OptState, num_epochs: int, batch_size: int, verbose: bool = True) -&gt; tuple[Key, Self, optax.OptState, Array] (flowMC.resource.model.nf_model.base.NFModel.train)" href="./#flowMC.resource.model.nf_model.base.NFModel.train">train</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="train(rng: Key[Array, &#x27;&#x27;], data: Array, optim: optax.GradientTransformation, state: optax.OptState, num_epochs: int, batch_size: int, verbose: bool = True) -&gt; tuple[Key[Array, &#x27;&#x27;], Self, optax.OptState, Array] (flowMC.resource.model.nf_model.base.NFModel.train)" href="./#flowMC.resource.model.nf_model.base.NFModel.train">train</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Train a normalizing flow model.</p>
@@ -3311,7 +3312,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="train_epoch(rng: Key, optim: optax.GradientTransformation, state: optax.OptState, data: Float[Array, &#x27;n_example n_dim&#x27;], batch_size: int) -&gt; tuple[FloatLike, Self, optax.OptState] (flowMC.resource.model.nf_model.base.NFModel.train_epoch)" href="./#flowMC.resource.model.nf_model.base.NFModel.train_epoch">train_epoch</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="train_epoch(rng: Key[Array, &#x27;&#x27;], optim: optax.GradientTransformation, state: optax.OptState, data: Float[Array, &#x27;n_example n_dim&#x27;], batch_size: int) -&gt; tuple[FloatLike, Self, optax.OptState] (flowMC.resource.model.nf_model.base.NFModel.train_epoch)" href="./#flowMC.resource.model.nf_model.base.NFModel.train_epoch">train_epoch</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Train for a single epoch.</p>
@@ -3422,7 +3423,7 @@ Output data and log determinant of the Jacobian.</p>
 
 
 <h3 id="flowMC.resource.model.nf_model.base.NFModel.forward" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">FloatScalar</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">FloatScalar</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -3652,7 +3653,7 @@ Output data and log determinant of the Jacobian.</p>
 
 
 <h3 id="flowMC.resource.model.nf_model.base.NFModel.train" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Array</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.nf_model.base.NFModel.train" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3850,7 +3851,7 @@ Output data and log determinant of the Jacobian.</p>
 
 
 <h3 id="flowMC.resource.model.nf_model.base.NFModel.train_epoch" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">train_epoch</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FloatLike</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">train_epoch</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FloatLike</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.nf_model.base.NFModel.train_epoch" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -4045,10 +4046,10 @@ Output data and log determinant of the Jacobian.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../../../../javascripts/mathjax.js"></script>
       

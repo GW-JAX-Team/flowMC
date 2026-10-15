@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/resource/model/flowmatching/base/">
       
       
+      
         <link rel="prev" href="../../common/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3485,7 +3486,7 @@
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="train(rng: Key, data: tuple[Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example 1&#x27;]], optim: optax.GradientTransformation, state: optax.OptState, num_epochs: int, batch_size: int, verbose: bool = True) -&gt; tuple[Key, Self, optax.OptState, Array] (flowMC.resource.model.flowmatching.base.FlowMatchingModel.train)" href="./#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train">train</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="train(rng: Key[Array, &#x27;&#x27;], data: tuple[Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example 1&#x27;]], optim: optax.GradientTransformation, state: optax.OptState, num_epochs: int, batch_size: int, verbose: bool = True) -&gt; tuple[Key[Array, &#x27;&#x27;], Self, optax.OptState, Array] (flowMC.resource.model.flowmatching.base.FlowMatchingModel.train)" href="./#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train">train</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Train a flow matching model.</p>
@@ -3493,7 +3494,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="train_epoch(rng: Key, optim: optax.GradientTransformation, state: optax.OptState, data: tuple[Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example 1&#x27;]], batch_size: int) -&gt; tuple[FloatLike, Self, optax.OptState] (flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch)" href="./#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch">train_epoch</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="train_epoch(rng: Key[Array, &#x27;&#x27;], optim: optax.GradientTransformation, state: optax.OptState, data: tuple[Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example n_dim&#x27;], Float[Array, &#x27;n_example 1&#x27;]], batch_size: int) -&gt; tuple[FloatLike, Self, optax.OptState] (flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch)" href="./#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch">train_epoch</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Train for a single epoch.</p>
@@ -3523,7 +3524,7 @@
 
 
 <h3 id="flowMC.resource.model.flowmatching.base.FlowMatchingModel.train" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example 1'</span><span class="p">]],</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">train</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example 1'</span><span class="p">]],</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3721,7 +3722,7 @@
 
 
 <h3 id="flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">train_epoch</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example 1'</span><span class="p">]],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FloatLike</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">train_epoch</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example 1'</span><span class="p">]],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FloatLike</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.flowmatching.base.FlowMatchingModel.train_epoch" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3956,7 +3957,7 @@
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="sample(rng_key: Key, n_samples: int, dt: float = 0.1) -&gt; Float[Array, &#x27;n_samples n_dims&#x27;] (flowMC.resource.model.flowmatching.base.Solver.sample)" href="./#flowMC.resource.model.flowmatching.base.Solver.sample">sample</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="sample(rng_key: Key[Array, &#x27;&#x27;], n_samples: int, dt: float = 0.1) -&gt; Float[Array, &#x27;n_samples n_dims&#x27;] (flowMC.resource.model.flowmatching.base.Solver.sample)" href="./#flowMC.resource.model.flowmatching.base.Solver.sample">sample</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Sample points from the solver.</p>
@@ -4005,7 +4006,7 @@ This solves the ODE backward, i.e. from the posterior to the prior.</p>
 
 
 <h3 id="flowMC.resource.model.flowmatching.base.Solver.sample" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_samples n_dims'</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">sample</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_samples n_dims'</span><span class="p">]</span></code>
 
 <a href="#flowMC.resource.model.flowmatching.base.Solver.sample" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -4097,10 +4098,10 @@ This sovles the ODE forward, i.e. from the prior to the posterior.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../../../../javascripts/mathjax.js"></script>
       

@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/resource/kernel/NF_proposal/">
       
       
+      
         <link rel="prev" href="../MALA/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3221,7 +3222,7 @@ this kernel is suited for use with <code>flowMC.strategy.take_steps.TakeGroupSte
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="kernel(rng_key: Key, position: Float[Array, &#x27; n_dim&#x27;], log_prob: Float[Array, 1], logpdf: LogPDF | Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], data: PyTree) -&gt; tuple[Float[Array, &#x27;n_step n_dim&#x27;], Float[Array, &#x27;n_step 1&#x27;], Bool[Array, &#x27;n_step 1&#x27;]] (flowMC.resource.kernel.NF_proposal.NFProposal.kernel)" href="./#flowMC.resource.kernel.NF_proposal.NFProposal.kernel">kernel</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="kernel(rng_key: Key[Array, &#x27;&#x27;], position: Float[Array, &#x27; n_dim&#x27;], log_prob: Float[Array, 1], logpdf: LogPDF | Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], data: PyTree) -&gt; tuple[Float[Array, &#x27;n_step n_dim&#x27;], Float[Array, &#x27;n_step 1&#x27;], Bool[Array, &#x27;n_step 1&#x27;]] (flowMC.resource.kernel.NF_proposal.NFProposal.kernel)" href="./#flowMC.resource.kernel.NF_proposal.NFProposal.kernel">kernel</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Generate and accept/reject <code>n_steps</code> flow proposals for a single chain.</p>
@@ -3229,7 +3230,7 @@ this kernel is suited for use with <code>flowMC.strategy.take_steps.TakeGroupSte
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="sample_flow(rng_key: Key, n_steps: int) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow)" href="./#flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow">sample_flow</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="sample_flow(rng_key: Key[Array, &#x27;&#x27;], n_steps: int) -&gt; tuple[Float[Array, &#x27;n_steps n_dim&#x27;], Float[Array, &#x27; n_steps&#x27;]] (flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow)" href="./#flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow">sample_flow</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Sample positions and their flow log-densities.</p>
@@ -3324,7 +3325,7 @@ this kernel is suited for use with <code>flowMC.strategy.take_steps.TakeGroupSte
 
 
 <h3 id="flowMC.resource.kernel.NF_proposal.NFProposal.kernel" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step 1'</span><span class="p">],</span> <span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step 1'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step 1'</span><span class="p">],</span> <span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_step 1'</span><span class="p">]]</span></code>
 
 <a href="#flowMC.resource.kernel.NF_proposal.NFProposal.kernel" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3467,7 +3468,7 @@ sampled from the flow at once and then evaluated serially via
 
 
 <h3 id="flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">sample_flow</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">sample_flow</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">n_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_steps n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_steps'</span><span class="p">]]</span></code>
 
 <a href="#flowMC.resource.kernel.NF_proposal.NFProposal.sample_flow" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3631,10 +3632,10 @@ sampled from the flow at once and then evaluated serially via
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../../../javascripts/mathjax.js"></script>
       

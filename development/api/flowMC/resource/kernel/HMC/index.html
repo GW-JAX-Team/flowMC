@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/resource/kernel/HMC/">
       
       
+      
         <link rel="prev" href="../Gaussian_random_walk/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3366,7 +3367,7 @@ target logpdf.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="get_initial_hamiltonian(potential: Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], kinetic: Callable[[Float[Array, &#x27; n_dim&#x27;], Float[Array, &#x27; n_dim&#x27;]], Float[Array, 1]], rng_key: Key, position: Float[Array, &#x27; n_dim&#x27;], data: PyTree) (flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian)" href="./#flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian">get_initial_hamiltonian</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="get_initial_hamiltonian(potential: Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], kinetic: Callable[[Float[Array, &#x27; n_dim&#x27;], Float[Array, &#x27; n_dim&#x27;]], Float[Array, 1]], rng_key: Key[Array, &#x27;&#x27;], position: Float[Array, &#x27; n_dim&#x27;], data: PyTree) (flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian)" href="./#flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian">get_initial_hamiltonian</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Compute the value of the Hamiltonian from positions with initial momentum</p>
@@ -3374,7 +3375,7 @@ target logpdf.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="kernel(rng_key: Key, position: Float[Array, &#x27; n_dim&#x27;], log_prob: Float[Array, 1], logpdf: LogPDF | Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], data: PyTree) -&gt; tuple[Float[Array, &#x27; n_dim&#x27;], Float[Array, 1], Bool[Array, 1]] (flowMC.resource.kernel.HMC.HMC.kernel)" href="./#flowMC.resource.kernel.HMC.HMC.kernel">kernel</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="kernel(rng_key: Key[Array, &#x27;&#x27;], position: Float[Array, &#x27; n_dim&#x27;], log_prob: Float[Array, 1], logpdf: LogPDF | Callable[[Float[Array, &#x27; n_dim&#x27;], PyTree], Float[Array, 1]], data: PyTree) -&gt; tuple[Float[Array, &#x27; n_dim&#x27;], Float[Array, 1], Bool[Array, 1]] (flowMC.resource.kernel.HMC.HMC.kernel)" href="./#flowMC.resource.kernel.HMC.HMC.kernel">kernel</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Note that since the potential function is the negative log likelihood,</p>
@@ -3705,7 +3706,7 @@ so the per-dim profile is 1/sqrt(condition_matrix[i]) normalised to geomean 1.</
 
 
 <h3 id="flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_initial_hamiltonian</span><span class="p">(</span><span class="n">potential</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">kinetic</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">]],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_initial_hamiltonian</span><span class="p">(</span><span class="n">potential</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">kinetic</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">]],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span></code>
 
 <a href="#flowMC.resource.kernel.HMC.HMC.get_initial_hamiltonian" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3724,7 +3725,7 @@ draw at random from the standard normal distribution.</p>
 
 
 <h3 id="flowMC.resource.kernel.HMC.HMC.kernel" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">kernel</span><span class="p">(</span><span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">position</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">logpdf</span><span class="p">:</span> <span class="n">LogPDF</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">PyTree</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">data</span><span class="p">:</span> <span class="n">PyTree</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">' n_dim'</span><span class="p">],</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">Bool</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span></code>
 
 <a href="#flowMC.resource.kernel.HMC.HMC.kernel" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3934,10 +3935,10 @@ hamiltonian is going down, but the likelihood value should go up.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../../../javascripts/mathjax.js"></script>
       

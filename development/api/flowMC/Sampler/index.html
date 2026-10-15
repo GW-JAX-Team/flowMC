@@ -15,6 +15,7 @@
         <link rel="canonical" href="https://gw-jax-team.github.io/flowMC/development/api/flowMC/Sampler/">
       
       
+      
         <link rel="prev" href="../resource_strategy_bundle/RQSpline_MALA_PT/">
       
       
@@ -25,7 +26,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.69">
+      <meta name="generator" content="zensical-0.0.70">
     
     
       
@@ -36,12 +37,12 @@
       
         
       
-      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.e15858d4.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/modern/main.e442bf79.min.css">
       
         
           
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.b27955a4.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/modern/palette.b60ce83d.min.css">
       
       
 
@@ -3335,7 +3336,7 @@ entirely.</p>
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="__init__(*, n_dim: int, n_chains: int, rng_key: Key, resources: Optional[dict[str, Resource]] = None, strategies: Optional[dict[str, Strategy]] = None, strategy_order: Optional[list[str]] = None, resource_strategy_bundles: Optional[ResourceStrategyBundle] = None, outdir: str = &#x27;./outdir/&#x27;, checkpoint_interval: float = 600.0) -&gt; None (flowMC.Sampler.Sampler.__init__)" href="./#flowMC.Sampler.Sampler.__init__">__init__</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="__init__(*, n_dim: int, n_chains: int, rng_key: Key[Array, &#x27;&#x27;], resources: Optional[dict[str, Resource]] = None, strategies: Optional[dict[str, Strategy]] = None, strategy_order: Optional[list[str]] = None, resource_strategy_bundles: Optional[ResourceStrategyBundle] = None, outdir: str = &#x27;./outdir/&#x27;, checkpoint_interval: float = 600.0) -&gt; None (flowMC.Sampler.Sampler.__init__)" href="./#flowMC.Sampler.Sampler.__init__">__init__</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Initialize the sampler.</p>
@@ -3389,7 +3390,7 @@ entirely.</p>
 
 
 <h3 id="flowMC.Sampler.Sampler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">n_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">,</span> <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strategies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Strategy</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strategy_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resource_strategy_bundles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResourceStrategyBundle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'./outdir/'</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">600.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">n_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n_chains</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng_key</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">resources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Resource</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strategies</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Strategy</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">strategy_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">resource_strategy_bundles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResourceStrategyBundle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'./outdir/'</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">600.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span></code>
 
 <a href="#flowMC.Sampler.Sampler.__init__" class="headerlink" title="Permanent link">¤</a></h3>
 
@@ -3773,10 +3774,10 @@ the logpdf fingerprint when available.</p>
       
         
         
-      <script id="__config" type="application/json">{"annotate":null,"base":"../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
+      <script id="__config" type="application/json">{"annotate":null,"base":"../../..","features":["content.code.copy","navigation.instant","navigation.tabs","navigation.top","toc.follow","header.autohide"],"redirect":null,"search":"../../../assets/javascripts/workers/search.c47bb847.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"default":"stable","provider":"mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.8b1c90bd.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a2388154.min.js"></script>
       
         <script src="../../../javascripts/mathjax.js"></script>
       
