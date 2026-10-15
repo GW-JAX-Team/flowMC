@@ -47,7 +47,7 @@ class NFProposal(ProposalBase):
 
     def kernel(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         position: Float[Array, " n_dim"],
         log_prob: Float[Array, "1"],
         logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
@@ -136,7 +136,7 @@ class NFProposal(ProposalBase):
 
     def sample_flow(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         n_steps: int,
     ) -> tuple[Float[Array, "n_steps n_dim"], Float[Array, " n_steps"]]:
         """Sample positions and their flow log-densities.

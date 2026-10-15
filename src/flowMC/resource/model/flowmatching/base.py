@@ -28,7 +28,7 @@ class Solver(eqx.Module):
         self.method = method
 
     def sample(
-        self, rng_key: Key, n_samples: int, dt: float = 1e-1
+        self, rng_key: Key[Array, ""], n_samples: int, dt: float = 1e-1
     ) -> Float[Array, "n_samples n_dims"]:
         """Sample points from the solver.
         This sovles the ODE forward, i.e. from the prior to the posterior.
@@ -181,7 +181,7 @@ class FlowMatchingModel(eqx.Module, Resource):
             self._data_cov = jnp.eye(n_features)
 
     def sample(
-        self, rng_key: Key, num_samples: int, dt: float = 1e-1
+        self, rng_key: Key[Array, ""], num_samples: int, dt: float = 1e-1
     ) -> Float[Array, "n_samples n_dim"]:
         rng_key, subkey = jax.random.split(rng_key)
         samples = self.solver.sample(subkey, num_samples, dt=dt)
@@ -232,7 +232,7 @@ class FlowMatchingModel(eqx.Module, Resource):
 
     def train_epoch(
         self: Self,
-        rng: Key,
+        rng: Key[Array, ""],
         optim: optax.GradientTransformation,
         state: optax.OptState,
         data: tuple[
@@ -272,7 +272,7 @@ class FlowMatchingModel(eqx.Module, Resource):
 
     def train(
         self: Self,
-        rng: Key,
+        rng: Key[Array, ""],
         data: tuple[
             Float[Array, "n_example n_dim"],
             Float[Array, "n_example n_dim"],
@@ -283,7 +283,7 @@ class FlowMatchingModel(eqx.Module, Resource):
         num_epochs: int,
         batch_size: int,
         verbose: bool = True,
-    ) -> tuple[Key, Self, optax.OptState, Array]:
+    ) -> tuple[Key[Array, ""], Self, optax.OptState, Array]:
         """Train a flow matching model.
 
         Args:

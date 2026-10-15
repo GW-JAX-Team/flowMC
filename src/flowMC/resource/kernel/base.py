@@ -19,7 +19,7 @@ class ProposalBase(eqx.Module, Resource):
     @abstractmethod
     def kernel(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         position: Float[Array, "nstep n_dim"],
         log_prob: Float[Array, "nstep 1"],
         logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],

@@ -62,12 +62,12 @@ class NFModel(eqx.Module, Resource):
         raise NotImplementedError
 
     @abstractmethod
-    def sample(self, rng_key: Key, n_samples: int) -> Array:
+    def sample(self, rng_key: Key[Array, ""], n_samples: int) -> Array:
         raise NotImplementedError
 
     @abstractmethod
     def forward(
-        self, x: Float[Array, " n_dim"], key: Optional[Key] = None
+        self, x: Float[Array, " n_dim"], key: Optional[Key[Array, ""]] = None
     ) -> tuple[Float[Array, " n_dim"], FloatScalar]:
         """Forward pass of the model.
 
@@ -132,7 +132,7 @@ class NFModel(eqx.Module, Resource):
 
     def train_epoch(
         self: Self,
-        rng: Key,
+        rng: Key[Array, ""],
         optim: optax.GradientTransformation,
         state: optax.OptState,
         data: Float[Array, "n_example n_dim"],
@@ -158,14 +158,14 @@ class NFModel(eqx.Module, Resource):
 
     def train(
         self: Self,
-        rng: Key,
+        rng: Key[Array, ""],
         data: Array,
         optim: optax.GradientTransformation,
         state: optax.OptState,
         num_epochs: int,
         batch_size: int,
         verbose: bool = True,
-    ) -> tuple[Key, Self, optax.OptState, Array]:
+    ) -> tuple[Key[Array, ""], Self, optax.OptState, Array]:
         """Train a normalizing flow model.
 
         Args:

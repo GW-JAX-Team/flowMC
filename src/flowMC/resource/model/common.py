@@ -90,7 +90,7 @@ class Distribution(eqx.Module):
     def __init__(self):
         raise NotImplementedError
 
-    def __call__(self, x: Array, key: Optional[Key] = None) -> Array:
+    def __call__(self, x: Array, key: Optional[Key[Array, ""]] = None) -> Array:
         """Evaluate the log-probability of ``x``.
 
         Args:
@@ -108,7 +108,7 @@ class Distribution(eqx.Module):
 
     @abstractmethod
     def sample(
-        self, rng_key: Key, n_samples: int
+        self, rng_key: Key[Array, ""], n_samples: int
     ) -> Float[Array, "n_samples n_features"]:
         raise NotImplementedError
 
@@ -132,7 +132,7 @@ class MLP(eqx.Module):
     def __init__(
         self,
         shape: list[int],
-        key: Key,
+        key: Key[Array, ""],
         scale: float = 1e-4,
         activation: Callable = jax.nn.relu,
         use_bias: bool = True,
@@ -335,7 +335,7 @@ class Gaussian(Distribution):
         )
 
     def sample(
-        self, rng_key: Key, n_samples: int
+        self, rng_key: Key[Array, ""], n_samples: int
     ) -> Float[Array, "n_samples n_features"]:
         return jax.random.multivariate_normal(
             rng_key, self.mean, self.cov, (n_samples,)
@@ -359,7 +359,7 @@ class Composable(Distribution):
         return log_prob
 
     def sample(
-        self, rng_key: Key, n_samples: int
+        self, rng_key: Key[Array, ""], n_samples: int
     ) -> Float[Array, "n_samples n_features"]:
         samples = []
         for dist in self.distributions:

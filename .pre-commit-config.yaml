@@ -1,7 +1,7 @@
 ci:
   autoupdate_branch: flowMC-dev
   autoupdate_schedule: quarterly
-  skip: [pyright, ty]
+  skip: [ty]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -40,13 +40,3 @@ repos:
     rev: v0.0.84
     hooks:
       - id: ty
-
-  - repo: local
-    hooks:
-      - id: pyright
-        name: pyright
-        entry: uv run pyright
-        language: system
-        files: src/
-        types_or: [python, pyi]
-        require_serial: true

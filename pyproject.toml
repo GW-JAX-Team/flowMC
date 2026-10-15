@@ -50,7 +50,6 @@ visualize = [
 test = [
     "coveralls>=4.0.1",
     "pre-commit>=4.0.1",
-    "pyright>=1.1.402",
     "pytest>=8.3.3",
     "pytest-cov>=6.0.0",
     "ruff>=0.12.2",
@@ -93,25 +92,13 @@ ignore = [
     "N999",
 ]
 
-[tool.pyright]
-include = ["src"]
-reportUnnecessaryTypeIgnoreComment = "error"
-
 [tool.ty.src]
 # Match the existing static-analysis scope; tests are linted separately.
 include = ["src"]
 
-[tool.ty.analysis]
-# jaxtyping's dtype/shape markers (Float, Bool, Int, Key, PyTree, Shaped, ...) are
-# generated via __class_getitem__ into Annotated[...] forms that ty cannot yet
-# resolve (each usage raises invalid-type-form). That covers effectively every
-# public symbol we import from the package -- only jaxtyping.Array (a re-export of
-# jax.Array) is unaffected, and it's never used outside those markers here.
-# replace-imports-with-any matches import paths, not individual symbols, so there
-# is no way to opt out of just the problematic aliases; verified narrowing this to
-# e.g. ["jaxtyping.Key"] does not work and reintroduces the same errors for the
-# other markers. Revisit once ty supports Annotated-based generics.
-replace-imports-with-any = ["jaxtyping.**"]
+[tool.ty.rules]
+possibly-unresolved-reference = "error"
+unused-ignore-comment = "error"
 
 [tool.coverage.report]
 exclude_also = [

@@ -64,12 +64,12 @@ class ParallelTempering(Strategy):
 
     def __call__(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         resources: dict[str, Resource],
         initial_position: Float[Array, "n_chains n_dims"],
         data: dict,
     ) -> tuple[
-        Key,
+        Key[Array, ""],
         dict[str, Resource],
         Float[Array, "n_chains n_dim"],
     ]:
@@ -151,7 +151,7 @@ class ParallelTempering(Strategy):
         self,
         kernel: ProposalBase,
         carry: tuple[
-            Key,
+            Key[Array, ""],
             Float[Array, " n_dims"],
             Float[Array, "1"],
             TemperedPDF,
@@ -161,7 +161,7 @@ class ParallelTempering(Strategy):
         aux,
     ) -> tuple[
         tuple[
-            Key,
+            Key[Array, ""],
             Float[Array, " n_dims"],
             Float[Array, "1"],
             TemperedPDF,
@@ -220,7 +220,7 @@ class ParallelTempering(Strategy):
     def _individal_step(
         self,
         kernel: ProposalBase,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         positions: Float[Array, " n_dims"],
         logpdf: TemperedPDF,
         temperatures: Float[Array, " n_temps"],
@@ -268,7 +268,7 @@ class ParallelTempering(Strategy):
     def _ensemble_step(
         self,
         kernel: ProposalBase,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         positions: Float[Array, "n_temps n_dims"],
         logpdf: TemperedPDF,
         temperatures: Float[Array, " n_temps"],
@@ -308,7 +308,7 @@ class ParallelTempering(Strategy):
     def _exchange_step_body(
         self,
         carry: tuple[
-            Key,
+            Key[Array, ""],
             Float[Array, "n_temps n_dims"],
             Float[Array, " n_temps"],
             int,
@@ -319,7 +319,7 @@ class ParallelTempering(Strategy):
         aux: None,
     ) -> tuple[
         tuple[
-            Key,
+            Key[Array, ""],
             Float[Array, "n_temps n_dims"],
             Float[Array, " n_temps"],
             int,
@@ -373,7 +373,7 @@ class ParallelTempering(Strategy):
 
     def _exchange(
         self,
-        key: Key,
+        key: Key[Array, ""],
         positions: Float[Array, "n_temps n_dims"],
         logpdf: TemperedPDF,
         temperatures: Float[Array, " n_temps"],

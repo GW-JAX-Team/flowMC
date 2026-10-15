@@ -56,7 +56,7 @@ class MALA(ProposalBase):
 
     def kernel(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         position: Float[Array, " n_dim"],
         log_prob: Float[Array, "1"],
         logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
@@ -90,7 +90,7 @@ class MALA(ProposalBase):
 
         def body(
             carry: tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
-            this_key: Key,
+            this_key: Key[Array, ""],
         ) -> tuple[
             tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
             tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],

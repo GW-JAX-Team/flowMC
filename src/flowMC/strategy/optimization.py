@@ -77,12 +77,12 @@ class AdamOptimization(Strategy):
 
     def __call__(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         resources: dict[str, Resource],
         initial_position: Float[Array, "n_chain n_dim"],
         data: dict,
     ) -> tuple[
-        Key,
+        Key[Array, ""],
         dict[str, Resource],
         Float[Array, "n_chain n_dim"],
     ]:
@@ -109,11 +109,11 @@ class AdamOptimization(Strategy):
 
     def optimize(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         objective: Callable,
         initial_position: Float[Array, "n_chain n_dim"],
         data: dict,
-    ) -> tuple[Key, Float[Array, "n_chain n_dim"], Float[Array, " n_chain"]]:
+    ) -> tuple[Key[Array, ""], Float[Array, "n_chain n_dim"], Float[Array, " n_chain"]]:
         """Optimization kernel that can be used independently of ``__call__``.
 
         Args:
@@ -154,7 +154,7 @@ class AdamOptimization(Strategy):
             return (key, params, opt_state), None
 
         def _single_optimize(
-            key: Key,
+            key: Key[Array, ""],
             initial_position: Float[Array, "n_dim"],
         ) -> Float[Array, "n_dim"]:
             opt_state = self.solver.init(initial_position)
