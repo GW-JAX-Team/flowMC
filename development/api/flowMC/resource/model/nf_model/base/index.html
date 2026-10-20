@@ -26,7 +26,7 @@
       
       
       <link rel="icon" href="../../../../../../assets/images/favicon.png">
-      <meta name="generator" content="zensical-0.0.70">
+      <meta name="generator" content="zensical-0.0.71">
     
     
       
@@ -2118,6 +2118,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#flowMC.resource.model.nf_model.base.NFModel.train_jit" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        train_jit
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#flowMC.resource.model.nf_model.base.NFModel.train_step" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3161,6 +3172,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#flowMC.resource.model.nf_model.base.NFModel.train_jit" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        train_jit
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#flowMC.resource.model.nf_model.base.NFModel.train_step" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3316,6 +3338,14 @@
               <td>
                 <div class="doc-md-description">
                   <p>Train for a single epoch.</p>
+                </div>
+              </td>
+            </tr>
+            <tr class="doc-section-item">
+              <td><code><a class="autorefs autorefs-internal" title="train_jit(rng: Key[Array, &#x27;&#x27;], data: Float[Array, &#x27;n_example n_dim&#x27;], optim: optax.GradientTransformation, state: optax.OptState, num_epochs: int, batch_size: int) -&gt; tuple[Key[Array, &#x27;&#x27;], Self, optax.OptState, Array] (flowMC.resource.model.nf_model.base.NFModel.train_jit)" href="./#flowMC.resource.model.nf_model.base.NFModel.train_jit">train_jit</a></code></td>
+              <td>
+                <div class="doc-md-description">
+                  <p>Train a normalizing flow model, as <code>train</code> does, inside <code>jax.jit</code>.</p>
                 </div>
               </td>
             </tr>
@@ -3859,6 +3889,194 @@ Output data and log determinant of the Jacobian.</p>
     <div class="doc doc-contents ">
 
         <p>Train for a single epoch.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="flowMC.resource.model.nf_model.base.NFModel.train_jit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">train_jit</span><span class="p">(</span><span class="n">rng</span><span class="p">:</span> <span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="n">Float</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">'n_example n_dim'</span><span class="p">],</span> <span class="n">optim</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">GradientTransformation</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Key</span><span class="p">[</span><span class="n">Array</span><span class="p">,</span> <span class="s1">''</span><span class="p">],</span> <span class="n">Self</span><span class="p">,</span> <span class="n">optax</span><span class="o">.</span><span class="n">OptState</span><span class="p">,</span> <span class="n">Array</span><span class="p">]</span></code>
+
+<a href="#flowMC.resource.model.nf_model.base.NFModel.train_jit" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Train a normalizing flow model, as <code>train</code> does, inside <code>jax.jit</code>.</p>
+<p>The epoch and batch loops are <code>jax.lax.scan</code>s, so this method can be
+called from jitted code. As in <code>train</code>, the data mean and covariance are
+set from <code>data</code> first, the batches are drawn in the same order, and the
+epoch with the lowest loss is returned. Here the loss of an epoch is the
+mean over its batches, and there is no progress bar.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>rng</code>
+            </td>
+            <td>
+                  <code><span title="jaxtyping.Key">Key</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>JAX PRNGKey.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="jaxtyping.Array">Array</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Training data.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optim</code>
+            </td>
+            <td>
+                  <code><span title="optax.GradientTransformation">GradientTransformation</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>state</code>
+            </td>
+            <td>
+                  <code><span title="optax.OptState">OptState</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer state.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>num_epochs</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of epochs to train for.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>batch_size</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Batch size; all of <code>data</code> forms one batch when it
+has fewer rows.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>rng</code></td>            <td>
+                  <code><span title="jaxtyping.Key">Key</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Updated JAX PRNGKey.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>model</code></td>            <td>
+                  <code><span title="typing.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Model after the epoch with the lowest loss.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>state</code></td>            <td>
+                  <code><span title="optax.OptState">OptState</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer state after that epoch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td><code>loss_values</code></td>            <td>
+                  <code><span title="jaxtyping.Array">Array</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Loss of each epoch.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
