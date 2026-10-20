@@ -217,6 +217,80 @@ class NFModel(eqx.Module, Resource):
 
         return rng, best_model, best_state, loss_values
 
+    def train_jit(
+        self: Self,
+        rng: Key[Array, ""],
+        data: Float[Array, "n_example n_dim"],
+        optim: optax.GradientTransformation,
+        state: optax.OptState,
+        num_epochs: int,
+        batch_size: int,
+    ) -> tuple[Key[Array, ""], Self, optax.OptState, Array]:
+        """Train a normalizing flow model, as `train` does, inside `jax.jit`.
+
+        The epoch and batch loops are `jax.lax.scan`s, so this method can be
+        called from jitted code. As in `train`, the data mean and covariance are
+        set from ``data`` first, the batches are drawn in the same order, and the
+        epoch with the lowest loss is returned. Here the loss of an epoch is the
+        mean over its batches, and there is no progress bar.
+
+        Args:
+            rng (Key): JAX PRNGKey.
+            data (Array): Training data.
+            optim (optax.GradientTransformation): Optimizer.
+            state (optax.OptState): Optimizer state.
+            num_epochs (int): Number of epochs to train for.
+            batch_size (int): Batch size; all of ``data`` forms one batch when it
+                has fewer rows.
+
+        Returns:
+            rng (Key): Updated JAX PRNGKey.
+            model (Self): Model after the epoch with the lowest loss.
+            state (optax.OptState): Optimizer state after that epoch.
+            loss_values (Array): Loss of each epoch.
+        """
+        model = eqx.tree_at(lambda m: m._data_mean, self, jnp.mean(data, axis=0))
+        model = eqx.tree_at(lambda m: m._data_cov, model, jnp.cov(data.T))
+        params, static = eqx.partition(model, eqx.is_array)
+        train_ds_size = len(data)
+        steps_per_epoch = train_ds_size // batch_size
+
+        def train_batch(carry, batch):
+            params, state = carry
+            loss, model, state = eqx.combine(params, static).train_step(
+                batch, optim, state
+            )
+            return (eqx.filter(model, eqx.is_array), state), loss
+
+        def train_epoch(carry, _):
+            rng, params, state, best = carry
+            rng, input_rng = jax.random.split(rng)
+            if steps_per_epoch > 0:
+                perms = jax.random.permutation(input_rng, train_ds_size)
+                perms = perms[: steps_per_epoch * batch_size]  # skip incomplete batch
+                batches = data[perms.reshape((steps_per_epoch, batch_size))]
+            else:
+                batches = data[None]
+            (params, state), losses = jax.lax.scan(
+                train_batch, (params, state), batches
+            )
+            loss = jnp.mean(losses)
+            best_loss, best_params, best_state = best
+            better = loss < best_loss
+            best_params, best_state = jax.tree.map(
+                lambda new, old: jnp.where(better, new, old),
+                (params, state),
+                (best_params, best_state),
+            )
+            best_loss = jnp.where(better, loss, best_loss).astype(best_loss.dtype)
+            return (rng, params, state, (best_loss, best_params, best_state)), loss
+
+        best = (jnp.asarray(jnp.inf), params, state)
+        (rng, _, _, (_, best_params, best_state)), loss_values = jax.lax.scan(
+            train_epoch, (rng, params, state, best), length=num_epochs
+        )
+        return rng, eqx.combine(best_params, static), best_state, loss_values
+
     def to_precision(self, precision: str = "float32") -> Self:
         """Convert all parameters to a given precision.
 

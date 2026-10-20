@@ -2,6 +2,7 @@ import equinox as eqx
 import jax
 import jax.numpy as jnp
 import numpy as np
+import optax
 import pytest
 
 from flowMC.resource.model.common import Gaussian
@@ -189,3 +190,68 @@ def test_rqspline_sample_log_prob_consistency():
         np.testing.assert_allclose(
             log_prob(samples), expected_log_prob, rtol=1e-5, atol=1e-5
         )
+
+
+def _training_problem(learning_rate=1e-2):
+    key_data, key_model = jax.random.split(jax.random.key(3))
+    data = jax.random.normal(key_data, (60, 2)) * jnp.array([2.0, 0.5]) + 1.0
+    model = MaskedCouplingRQSpline(2, 2, [8], 4, key_model)
+    optim = optax.adam(learning_rate)
+    state = optim.init(eqx.filter(model, eqx.is_inexact_array))
+    return model, data, optim, state
+
+
+def _assert_same_parameters(model_a, model_b):
+    leaves_a = jax.tree.leaves(eqx.filter(model_a, eqx.is_inexact_array))
+    leaves_b = jax.tree.leaves(eqx.filter(model_b, eqx.is_inexact_array))
+    assert len(leaves_a) == len(leaves_b)
+    for a, b in zip(leaves_a, leaves_b, strict=True):
+        np.testing.assert_allclose(a, b, rtol=1e-5, atol=1e-6)
+
+
+@pytest.mark.parametrize("batch_size", [20, 100])
+def test_train_jit_matches_train_for_one_epoch(batch_size):
+    # batch_size 100 > 60 rows: both train on all rows as one batch.
+    model, data, optim, state = _training_problem()
+    rng = jax.random.key(1)
+    rng_a, model_a, _, _ = model.train(
+        rng, data, optim, state, 1, batch_size, verbose=False
+    )
+    rng_b, model_b, _, losses = model.train_jit(rng, data, optim, state, 1, batch_size)
+
+    _assert_same_parameters(model_a, model_b)
+    assert jnp.array_equal(jax.random.key_data(rng_a), jax.random.key_data(rng_b))
+    assert losses.shape == (1,)
+
+
+def test_train_jit_runs_inside_jit_and_sets_the_data_statistics():
+    model, data, optim, state = _training_problem()
+
+    @eqx.filter_jit
+    def fit(model, state, rng):
+        return model.train_jit(rng, data, optim, state, 3, 20)
+
+    _, trained, _, losses = fit(model, state, jax.random.key(1))
+
+    assert losses.shape == (3,)
+    assert jnp.all(jnp.isfinite(losses))
+    np.testing.assert_allclose(trained.data_mean, jnp.mean(data, axis=0), rtol=1e-6)
+    np.testing.assert_allclose(trained.data_cov, jnp.cov(data.T), rtol=1e-6)
+
+
+def test_train_jit_returns_the_epoch_with_the_lowest_loss():
+    # A large learning rate makes the last epoch worse than an earlier one.
+    model, data, optim, state = _training_problem(learning_rate=0.3)
+    rng = jax.random.key(1)
+    _, best_model, best_state, losses = model.train_jit(rng, data, optim, state, 8, 20)
+    best_epoch = int(jnp.argmin(losses))
+    assert best_epoch < len(losses) - 1
+
+    _, rerun_model, rerun_state, _ = model.train_jit(
+        rng, data, optim, state, best_epoch + 1, 20
+    )
+    _assert_same_parameters(best_model, rerun_model)
+    for a, b in zip(
+        jax.tree.leaves(best_state), jax.tree.leaves(rerun_state), strict=True
+    ):
+        np.testing.assert_allclose(a, b, rtol=1e-5, atol=1e-6)
