@@ -3037,7 +3037,8 @@ Reduce <code>n_NFproposal_batch_size</code> (default <code>10000</code>): when <
 <h2 id="batch-the-chains">Batch the chains<a class="headerlink" href="#batch-the-chains" title="Permanent link">¤</a></h2>
 <p>This matters when your <code>logpdf</code> is expensive to evaluate.
 Sometimes the problem is not the <code>n_chains * n_global_steps</code> proposals, but that even a single <code>logpdf</code> evaluation per chain across all <code>n_chains</code> chains will not fit.
-In that case also set <code>chain_batch_size</code> to a small positive integer (default <code>0</code> means all chains are vmapped at once; smaller values use less memory) so the local sampler processes chains in sequential sub-batches.</p>
+In that case also set <code>chain_batch_size</code> so the local sampler processes chains in sequential sub-batches of that size; smaller values use less memory.
+Sub-batching only happens when <code>chain_batch_size</code> is greater than 1 and less than <code>n_chains</code>; otherwise (including the default <code>0</code>) all chains are processed in one <code>vmap</code>.</p>
 
 
 
