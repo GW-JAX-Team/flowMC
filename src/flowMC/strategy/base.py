@@ -20,12 +20,12 @@ class Strategy(ABC):
     @abstractmethod
     def __call__(
         self,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         resources: dict[str, Resource],
         initial_position: Float[Array, "n_chains n_dim"],
         data: dict,
     ) -> tuple[
-        Key,
+        Key[Array, ""],
         dict[str, Resource],
         Float[Array, "n_chains n_dim"],
     ]:

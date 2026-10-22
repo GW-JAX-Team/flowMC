@@ -42,7 +42,7 @@ class AffineCoupling(eqx.Module):
         n_features: int,
         n_hidden: int,
         mask: Array,
-        key: Key,
+        key: Key[Array, ""],
         dt: float = 1,
         scale: float = 1e-4,
     ):
@@ -137,7 +137,12 @@ class RealNVP(NFModel):
         return jax.lax.stop_gradient(jnp.atleast_2d(self._data_cov))
 
     def __init__(
-        self, n_features: int, n_layers: int, n_hidden: int, key: Key, **kwargs
+        self,
+        n_features: int,
+        n_layers: int,
+        n_hidden: int,
+        key: Key[Array, ""],
+        **kwargs,
     ) -> None:
         """
         Args:
@@ -179,7 +184,7 @@ class RealNVP(NFModel):
 
         self._n_features = n_features
 
-        def make_layer(i: int, key: Key):
+        def make_layer(i: int, key: Key[Array, ""]):
             key, scale_subkey, shift_subkey = jax.random.split(key, 3)
             mask = jnp.ones(n_features)
             mask = mask.at[: int(n_features / 2)].set(0)
@@ -194,7 +199,7 @@ class RealNVP(NFModel):
     def forward(
         self,
         x: Float[Array, " n_dim"],
-        key: Optional[Key] = None,
+        key: Optional[Key[Array, ""]] = None,
         condition: Optional[Float[Array, " n_condition"]] = None,
     ) -> tuple[Float[Array, " n_dim"], FloatScalar]:
         log_det: FloatScalar = jnp.zeros(())
@@ -227,7 +232,7 @@ class RealNVP(NFModel):
         (x, log_det), _ = jax.lax.scan(f, (x, log_det), dynamics, reverse=True)
         return x, log_det
 
-    def sample(self, rng_key: Key, n_samples: int) -> Array:
+    def sample(self, rng_key: Key[Array, ""], n_samples: int) -> Array:
         samples = self.base_dist.sample(rng_key, n_samples)
         samples = jax.vmap(self.inverse)(samples)[0]
         samples = samples * jnp.sqrt(jnp.diag(self.data_cov)) + self.data_mean

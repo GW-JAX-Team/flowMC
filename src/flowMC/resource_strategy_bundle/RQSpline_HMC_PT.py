@@ -45,7 +45,7 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
     def __init__(
         self,
         # --- Required ---
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         n_chains: int,
         n_dims: int,
         logpdf: Callable[[Float[Array, " n_dim"], dict], FloatScalar],
@@ -343,12 +343,12 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
         )
 
         def reset_steppers(
-            rng_key: Key,
+            rng_key: Key[Array, ""],
             resources: dict[str, Resource],
             initial_position: Float[Array, "n_chains n_dim"],
             data: dict,
         ) -> tuple[
-            Key,
+            Key[Array, ""],
             dict[str, Resource],
             Float[Array, "n_chains n_dim"],
         ]:
@@ -375,12 +375,12 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
         )
 
         def update_model(
-            rng_key: Key,
+            rng_key: Key[Array, ""],
             resources: dict[str, Resource],
             initial_position: Float[Array, "n_chains n_dim"],
             data: dict,
         ) -> tuple[
-            Key,
+            Key[Array, ""],
             dict[str, Resource],
             Float[Array, "n_chains n_dim"],
         ]:
@@ -415,12 +415,12 @@ class RQSpline_HMC_PT_Bundle(ResourceStrategyBundle):
         )
 
         def initialize_tempered_positions(
-            rng_key: Key,
+            rng_key: Key[Array, ""],
             resources: dict[str, Resource],
             initial_position: Float[Array, "n_chains n_dim"],
             data: dict,
         ) -> tuple[
-            Key,
+            Key[Array, ""],
             dict[str, Resource],
             Float[Array, "n_chains n_dim"],
         ]:

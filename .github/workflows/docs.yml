@@ -26,9 +26,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: astral-sh/setup-uv@v10.2.0
+      - uses: astral-sh/setup-uv@v10.3.0
         with:
-          enable-cache: true
           python-version: "3.12"
 
       - name: Install doc dependencies
@@ -49,8 +48,8 @@ jobs:
         shell: bash
         run: |
           shopt -s nullglob
-          for nb in docs/tutorials/*.ipynb; do
-            uv run jupyter nbconvert --to markdown "$nb" --output-dir docs/tutorials/
+          for nb in docs/tutorials/*.ipynb docs/guides/*.ipynb; do
+            uv run jupyter nbconvert --to markdown "$nb" --output-dir "$(dirname "$nb")/"
           done
 
       - name: Generate API stubs and versioned config

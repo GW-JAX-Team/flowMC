@@ -403,7 +403,7 @@ class MaskedCouplingRQSpline(NFModel):
         n_layers: int,
         hidden_size: Sequence[int],
         num_bins: int,
-        key: Key,
+        key: Key[Array, ""],
         spline_range: tuple[float, float] = (-10.0, 10.0),
         **kwargs,
     ) -> None:
@@ -449,7 +449,7 @@ class MaskedCouplingRQSpline(NFModel):
 
         self._n_features = n_features
 
-        def make_layer(i: int, key: Key):
+        def make_layer(i: int, key: Key[Array, ""]):
             mlp = MLP(
                 [n_features, *hidden_size, n_features * (num_bins * 3 + 1)],
                 key,
@@ -475,7 +475,7 @@ class MaskedCouplingRQSpline(NFModel):
     def forward(
         self,
         x: Float[Array, " n_dim"],
-        key: Optional[Key] = None,
+        key: Optional[Key[Array, ""]] = None,
         condition: Optional[Float[Array, " n_condition"]] = None,
     ) -> tuple[Float[Array, " n_dim"], FloatScalar]:
         log_det: FloatScalar = jnp.zeros(())
@@ -513,7 +513,9 @@ class MaskedCouplingRQSpline(NFModel):
         (x, log_det), _ = jax.lax.scan(f, (x, log_det), dynamics, reverse=True)
         return x, log_det
 
-    def sample(self, rng_key: Key, n_samples: int) -> Float[Array, "n_samples n_dim"]:
+    def sample(
+        self, rng_key: Key[Array, ""], n_samples: int
+    ) -> Float[Array, "n_samples n_dim"]:
         samples = self.base_dist.sample(rng_key, n_samples)
         samples = jax.vmap(self.inverse)(samples)[0]
         samples = samples * jnp.sqrt(jnp.diag(self.data_cov)) + self.data_mean

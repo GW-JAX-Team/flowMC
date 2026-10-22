@@ -56,7 +56,7 @@ class Sampler:
     # Essential parameters
     n_dim: int
     n_chains: int
-    rng_key: Key
+    rng_key: Key[Array, ""]
     resources: dict[str, Resource]
     strategies: dict[str, Strategy]
     strategy_order: Optional[list[str]]
@@ -72,7 +72,7 @@ class Sampler:
         *,
         n_dim: int,
         n_chains: int,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         resources: Optional[dict[str, Resource]] = None,
         strategies: Optional[dict[str, Strategy]] = None,
         strategy_order: Optional[list[str]] = None,
@@ -195,7 +195,7 @@ class Sampler:
 
     def _resume_from_checkpoint(
         self, ckpt_path: Path, data: dict
-    ) -> tuple[int, Key, Float[Array, "n_chains n_dim"]]:
+    ) -> tuple[int, Key[Array, ""], Float[Array, "n_chains n_dim"]]:
         """Load and validate a checkpoint; restore sampler state in-place.
 
         Mutates ``self.resources`` and ``self.strategies`` with the saved state.
@@ -308,7 +308,7 @@ class Sampler:
         self,
         ckpt_path: Path,
         strategy_idx: int,
-        rng_key: Key,
+        rng_key: Key[Array, ""],
         last_step: Float[Array, "n_chains n_dim"],
         data: dict,
         elapsed_time: float,
