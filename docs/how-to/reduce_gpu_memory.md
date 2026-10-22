@@ -14,4 +14,5 @@ Reduce `n_NFproposal_batch_size` (default `10000`): when `n_global_steps` exceed
 
 This matters when your `logpdf` is expensive to evaluate.
 Sometimes the problem is not the `n_chains * n_global_steps` proposals, but that even a single `logpdf` evaluation per chain across all `n_chains` chains will not fit.
-In that case also set `chain_batch_size` to a small positive integer (default `0` means all chains are vmapped at once; smaller values use less memory) so the local sampler processes chains in sequential sub-batches.
+In that case also set `chain_batch_size` so the local sampler processes chains in sequential sub-batches of that size; smaller values use less memory.
+Sub-batching only happens when `chain_batch_size` is greater than 1 and less than `n_chains`; otherwise (including the default `0`) all chains are processed in one `vmap`.
