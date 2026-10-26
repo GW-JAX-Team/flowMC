@@ -121,19 +121,37 @@
         <loc>https://gw-jax-team.github.io/flowMC/stable/contributing/</loc>
       </url>
       <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/dev/</loc>
+      </url>
+      <url>
         <loc>https://gw-jax-team.github.io/flowMC/stable/guides/</loc>
       </url>
       <url>
-        <loc>https://gw-jax-team.github.io/flowMC/stable/guides/architecture/</loc>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/guides/train_flow_match/</loc>
       </url>
       <url>
-        <loc>https://gw-jax-team.github.io/flowMC/stable/guides/bundles/</loc>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/guides/train_normalizing_flow/</loc>
       </url>
       <url>
-        <loc>https://gw-jax-team.github.io/flowMC/stable/guides/hyperparameters/</loc>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/how-to/</loc>
+      </url>
+      <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/how-to/reduce_gpu_memory/</loc>
       </url>
       <url>
         <loc>https://gw-jax-team.github.io/flowMC/stable/installation/</loc>
+      </url>
+      <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/notes/</loc>
+      </url>
+      <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/notes/architecture/</loc>
+      </url>
+      <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/notes/bundles/</loc>
+      </url>
+      <url>
+        <loc>https://gw-jax-team.github.io/flowMC/stable/notes/hyperparameters/</loc>
       </url>
       <url>
         <loc>https://gw-jax-team.github.io/flowMC/stable/quickstart/</loc>
@@ -149,11 +167,5 @@
       </url>
       <url>
         <loc>https://gw-jax-team.github.io/flowMC/stable/tutorials/parallel_tempering/</loc>
-      </url>
-      <url>
-        <loc>https://gw-jax-team.github.io/flowMC/stable/tutorials/train_flow_match/</loc>
-      </url>
-      <url>
-        <loc>https://gw-jax-team.github.io/flowMC/stable/tutorials/train_normalizing_flow/</loc>
       </url>
 </urlset>
