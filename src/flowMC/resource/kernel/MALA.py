@@ -54,6 +54,15 @@ class MALA(ProposalBase):
         self.periodic_mask = periodic_mask
         self.periodic_bounds = periodic_bounds
 
+    def init_cache(
+        self,
+        position: Float[Array, " n_dim"],
+        logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
+        data: PyTree,
+    ) -> tuple[Float[Array, "1"], Float[Array, " n_dim"]]:
+        """Return the log-probability at ``position`` and its gradient, the cache."""
+        return jax.value_and_grad(logpdf)(position, data)
+
     def kernel(
         self,
         rng_key: Key[Array, ""],
@@ -63,6 +72,9 @@ class MALA(ProposalBase):
         data: PyTree,
     ) -> tuple[Float[Array, " n_dim"], Float[Array, "1"], Bool[Array, "1"]]:
         """Metropolis-adjusted Langevin algorithm kernel for a single chain.
+
+        Evaluates the gradient at ``position`` before taking the step; chains that
+        take many steps should use `step`, which reuses it.
 
         Args:
             rng_key (Key): JAX PRNGKey for stochastic operations.
@@ -76,7 +88,28 @@ class MALA(ProposalBase):
             - new_log_prob: New log-probability of the chain.
             - acceptance_flag: Whether the new position is accepted.
         """
+        _, grad = self.init_cache(position, logpdf, data)
+        position, log_prob, _, do_accept = self.step(
+            rng_key, position, log_prob, grad, logpdf, data
+        )
+        return position, log_prob, do_accept
 
+    def step(
+        self,
+        rng_key: Key[Array, ""],
+        position: Float[Array, " n_dim"],
+        log_prob: Float[Array, "1"],
+        cache: Float[Array, " n_dim"],
+        logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
+        data: PyTree,
+    ) -> tuple[
+        Float[Array, " n_dim"],
+        Float[Array, "1"],
+        Float[Array, " n_dim"],
+        Bool[Array, "1"],
+    ]:
+        """One MALA step, where ``cache`` is the log-pdf gradient at ``position``."""
+        logger.debug("Compiling MALA step")
         periodic_mask = self.periodic_mask
         periodic_bounds = self.periodic_bounds
         lower = periodic_bounds[:, 0]
@@ -88,37 +121,6 @@ class MALA(ProposalBase):
             wrapped = lower + jnp.mod(x - lower, period)
             return jnp.where(periodic_mask, wrapped, x)
 
-        def body(
-            carry: tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
-            this_key: Key[Array, ""],
-        ) -> tuple[
-            tuple[Float[Array, " n_dim"], Float[Array, " n_dim"], dict],
-            tuple[Float[Array, " n_dim"], Float[Array, "1"], Float[Array, " n_dim"]],
-        ]:
-            logger.debug("Compiling MALA body")
-            this_position, dt, data = carry
-            dt2 = dt * dt
-            this_log_prob, this_d_log = jax.value_and_grad(logpdf)(this_position, data)
-            # MALA proposal: x' = x + (dt²/2) * ∇log p(x) + dt * ε, where ε ~ N(0, I)
-            proposal = this_position + dt2 * this_d_log / 2
-            proposal += dt * jax.random.normal(this_key, shape=this_position.shape)
-            proposal = wrap_periodic(proposal)
-            return (proposal, dt, data), (proposal, this_log_prob, this_d_log)
-
-        key1, key2 = jax.random.split(rng_key)
-
-        dt: Float[Array, " n_dim"] = self.step_size
-        dt2 = dt * dt
-
-        # Use scan to iterate twice: first to generate proposal from current position
-        # and compute its log_prob and gradient, then to compute log_prob and gradient
-        # at the proposed position. Note: proposal[1] from the second iteration is
-        # discarded; we only need logprob[1] and d_logprob[1] for the acceptance ratio.
-        # Using the same key twice is fine since proposal[1] is unused.
-        _, (proposal, logprob, d_logprob) = jax.lax.scan(
-            body, (position, dt, data), jnp.array([key1, key1])
-        )
-
         def periodic_diff(
             a: Float[Array, " n_dim"], b: Float[Array, " n_dim"]
         ) -> Float[Array, " n_dim"]:
@@ -128,19 +130,30 @@ class MALA(ProposalBase):
             periodic_diff_val = raw_diff - period * jnp.round(raw_diff / period)
             return jnp.where(periodic_mask, periodic_diff_val, raw_diff)
 
+        key1, key2 = jax.random.split(rng_key)
+        grad = cache
+        dt: Float[Array, " n_dim"] = self.step_size
+        dt2 = dt * dt
+
+        # MALA proposal: x' = x + (dt²/2) * ∇log p(x) + dt * ε, where ε ~ N(0, I)
+        proposal = position + dt2 * grad / 2
+        proposal += dt * jax.random.normal(key1, shape=position.shape)
+        proposal = wrap_periodic(proposal)
+        proposal_log_prob, proposal_grad = jax.value_and_grad(logpdf)(proposal, data)
+
         # Metropolis-Hastings ratio: log[p(proposal)/p(position)] + log[q(position|proposal)/q(proposal|position)]
         # For periodic dimensions, use minimum-image distances in the proposal density
-        ratio = logprob[1] - logprob[0]
+        ratio = proposal_log_prob - log_prob
 
         # Forward proposal: q(proposal | position) — how likely is the proposal given current position
-        fwd_mean = position + dt2 * d_logprob[0] / 2
-        fwd_diff = periodic_diff(proposal[0], fwd_mean)
+        fwd_mean = position + dt2 * grad / 2
+        fwd_diff = periodic_diff(proposal, fwd_mean)
         ratio -= multivariate_normal.logpdf(
             fwd_diff, jnp.zeros_like(fwd_diff), jnp.diag(dt2)
         )
 
         # Backward proposal: q(position | proposal) — how likely is the current position given the proposal
-        bwd_mean = proposal[0] + dt2 * d_logprob[1] / 2
+        bwd_mean = proposal + dt2 * proposal_grad / 2
         bwd_diff = periodic_diff(position, bwd_mean)
         ratio += multivariate_normal.logpdf(
             bwd_diff, jnp.zeros_like(bwd_diff), jnp.diag(dt2)
@@ -149,10 +162,11 @@ class MALA(ProposalBase):
         log_uniform = jnp.log(jax.random.uniform(key2))
         do_accept: Bool[Array, " n_dim"] = log_uniform < ratio
 
-        position = jnp.where(do_accept, proposal[0], position)
-        log_prob = jnp.where(do_accept, logprob[1], logprob[0])
+        position = jnp.where(do_accept, proposal, position)
+        log_prob = jnp.where(do_accept, proposal_log_prob, log_prob)
+        grad = jnp.where(do_accept, proposal_grad, grad)
 
-        return position, log_prob, do_accept
+        return position, log_prob, grad, do_accept
 
     def adapt_step_size(
         self, acceptance_rate: float, target_rate: float = 0.574

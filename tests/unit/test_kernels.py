@@ -1,6 +1,5 @@
 import jax
 import jax.numpy as jnp
-from jaxtyping import Array, Float, PyTree
 
 from flowMC.resource.buffers import Buffer
 from flowMC.resource.kernel.Gaussian_random_walk import GaussianRandomWalk
@@ -66,8 +65,7 @@ class TestHMC:
         assert result1[2] == result2[2]
 
     def test_leapfrog_reversible(self):
-        # Test whether the leapfrog kernel is reversible
-        n_chains = 1
+        # Test whether the leapfrog integrator is reversible
         HMC_obj = HMC(
             condition_matrix=jnp.ones(n_dims),
             step_size=1,
@@ -76,42 +74,38 @@ class TestHMC:
 
         rng_key = jax.random.key(42)
         rng_key, subkey = jax.random.split(rng_key)
-        initial_position = jax.random.normal(subkey, shape=(n_chains, n_dims)) * 1
-        initial_PE = jax.vmap(lambda x, data: -log_posterior(x, data))(
-            initial_position, None
-        )
+        initial_position = jax.random.normal(subkey, shape=(n_dims,))
+        initial_PE = -log_posterior(initial_position, None)
         rng_key, subkey = jax.random.split(rng_key)
         key1, _key2 = jax.random.split(subkey)
-
-        def potential(x: Float[Array, " n_dims"], data: PyTree) -> Float[Array, "1"]:
-            return -log_posterior(x, data)
-
-        def kinetic(
-            p: Float[Array, " n_dims"], metric: Float[Array, " n_dims"]
-        ) -> Float[Array, "1"]:
-            return 0.5 * (p**2 * metric).sum()
-
-        leapfrog_kernel = jax.tree_util.Partial(
-            HMC_obj.leapfrog_kernel, kinetic, potential
-        )
 
         initial_momentum = (
             jax.random.normal(key1, shape=initial_position.shape)
             * HMC_obj.condition_matrix**-0.5
         )
-        new_position, new_momentum = HMC_obj.leapfrog_step(
-            leapfrog_kernel,
-            initial_position,
-            initial_momentum,
-            None,
-            jnp.ones(n_dims),
+        _, initial_grad = HMC_obj.init_cache(initial_position, logpdf, None)
+        new_position, new_momentum, _, new_grad = HMC_obj.leapfrog(
+            initial_position, initial_momentum, initial_grad, logpdf, None
         )
-        rev_position, _rev_momentum = HMC_obj.leapfrog_step(
-            leapfrog_kernel, new_position, -new_momentum, None, jnp.ones(n_dims)
+        rev_position, _rev_momentum, rev_log_prob, _ = HMC_obj.leapfrog(
+            new_position, -new_momentum, new_grad, logpdf, None
         )
 
         assert jnp.allclose(rev_position, initial_position)
-        assert jnp.allclose(initial_PE, -log_posterior(rev_position, None))
+        assert jnp.allclose(initial_PE, -rev_log_prob)
+
+    def test_leapfrog_takes_n_leapfrog_steps(self):
+        """On a flat log-pdf each leapfrog step moves the position by ``step_size * p``."""
+        HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=0.1, n_leapfrog=5)
+
+        def flat(x, data=None):
+            return jnp.sum(x) * 0.0
+
+        momentum = jnp.array([1.0, -2.0])
+        position, _, _, _ = HMC_obj.leapfrog(
+            jnp.zeros(n_dims), momentum, jnp.zeros(n_dims), flat, None
+        )
+        assert jnp.allclose(position, 5 * 0.1 * momentum)
 
     def test_HMC_acceptance_rate(self):
         # Test acceptance rate goes to one when step size is small
@@ -346,6 +340,23 @@ class TestMALA:
         assert jnp.allclose(result1[0], result2[0])
         assert result1[1] == result2[1]
         assert result1[2] == result2[2]
+
+    def test_MALA_step_matches_kernel(self):
+        """`step` with the cached gradient takes the same step as `kernel`."""
+        MALA_obj = MALA(step_size=jnp.full(n_dims, 0.5))
+        position = jnp.array([0.3, -1.2])
+        log_prob, grad = MALA_obj.init_cache(position, logpdf, None)
+        key = jax.random.key(3)
+
+        kernel_result = MALA_obj.kernel(key, position, log_prob, logpdf, None)
+        new_position, new_log_prob, new_grad, do_accept = MALA_obj.step(
+            key, position, log_prob, grad, logpdf, None
+        )
+
+        assert jnp.allclose(new_position, kernel_result[0])
+        assert jnp.allclose(new_log_prob, kernel_result[1])
+        assert do_accept == kernel_result[2]
+        assert jnp.allclose(new_grad, jax.grad(log_posterior)(new_position))
 
     def test_MALA_acceptance_rate(self):
         # Test acceptance rate goes to one when the step size is small

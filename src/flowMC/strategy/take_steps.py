@@ -254,18 +254,22 @@ class TakeSerialSteps(TakeSteps):
 
         Args:
             kernel (ProposalBase): Proposal kernel.
-            carry (tuple): ``(key, position, log_prob, logpdf, data)``.
+            carry (tuple): ``(key, position, log_prob, cache, logpdf, data)``.
             aux (None): Unused scan auxiliary input.
 
         Returns:
             tuple: Updated carry and ``(position, log_prob, do_accept)`` outputs.
         """
-        key, position, log_prob, logpdf, data = carry
+        key, position, log_prob, cache, logpdf, data = carry
         key, subkey = jax.random.split(key)
-        position, log_prob, do_accept = kernel.kernel(
-            subkey, position, log_prob, logpdf, data
+        position, log_prob, cache, do_accept = kernel.step(
+            subkey, position, log_prob, cache, logpdf, data
         )
-        return (key, position, log_prob, logpdf, data), (position, log_prob, do_accept)
+        return (key, position, log_prob, cache, logpdf, data), (
+            position,
+            log_prob,
+            do_accept,
+        )
 
     def sample(
         self,
@@ -291,12 +295,13 @@ class TakeSerialSteps(TakeSteps):
         Returns:
             tuple: ``(positions, log_probs, do_accepts)`` each of length ``n_steps``.
         """
+        log_prob, cache = kernel.init_cache(initial_position, logpdf, data)
         (
-            (_last_key, _last_position, _last_log_prob, logpdf, data),
+            (_last_key, _last_position, _last_log_prob, _cache, logpdf, data),
             (positions, log_probs, do_accepts),
         ) = jax.lax.scan(
             jax.tree_util.Partial(self.body, kernel),
-            (rng_key, initial_position, logpdf(initial_position, data), logpdf, data),
+            (rng_key, initial_position, log_prob, cache, logpdf, data),
             length=self.n_steps,
         )
         return positions, log_probs, do_accepts

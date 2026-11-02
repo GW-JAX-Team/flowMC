@@ -2,6 +2,7 @@ import logging
 from collections.abc import Callable
 from typing import Optional, Self
 
+import equinox as eqx
 import jax
 import jax.numpy as jnp
 from equinox import tree_at
@@ -27,14 +28,10 @@ class HMC(ProposalBase):
 
     condition_matrix: Float[Array, " n_dim"]
     step_size: float
-    leapfrog_coefs: Float[Array, "n_leapfrog n_dim"]
+    n_leapfrog: int = eqx.field(static=True)
     periodic_mask: Bool[Array, " n_dim"]
     periodic_bounds: Float[Array, "n_dim 2"]
     ADAPTATION_RATE: float = 0.5
-
-    @property
-    def n_leapfrog(self) -> int:
-        return self.leapfrog_coefs.shape[0] - 2
 
     def __repr__(self):
         return (
@@ -68,10 +65,7 @@ class HMC(ProposalBase):
         self.condition_matrix = condition_matrix
         self.step_size = step_size
 
-        coefs = jnp.ones((n_leapfrog + 2, 2))
-        coefs = coefs.at[0].set(jnp.array([0, 0.5]))
-        coefs = coefs.at[-1].set(jnp.array([1, 0.5]))
-        self.leapfrog_coefs = coefs
+        self.n_leapfrog = n_leapfrog
 
         n_dim = (
             jnp.asarray(condition_matrix).shape[0]
@@ -104,38 +98,56 @@ class HMC(ProposalBase):
         )
         return potential(position, data) + kinetic(momentum, self.condition_matrix)
 
-    def leapfrog_kernel(self, kinetic, potential, carry, extras):
-        position, momentum, data, metric, index = carry
-        position = position + self.step_size * self.leapfrog_coefs[index][0] * jax.grad(
-            kinetic
-        )(momentum, metric)
-        # Wrap periodic dimensions after position update
+    def init_cache(
+        self,
+        position: Float[Array, " n_dim"],
+        logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
+        data: PyTree,
+    ) -> tuple[Float[Array, "1"], Float[Array, " n_dim"]]:
+        """Return the log-probability at ``position`` and its gradient, the cache."""
+        return jax.value_and_grad(logpdf)(position, data)
+
+    def leapfrog(
+        self,
+        position: Float[Array, " n_dim"],
+        momentum: Float[Array, " n_dim"],
+        grad: Float[Array, " n_dim"],
+        logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
+        data: PyTree,
+    ) -> tuple[
+        Float[Array, " n_dim"],
+        Float[Array, " n_dim"],
+        Float[Array, "1"],
+        Float[Array, " n_dim"],
+    ]:
+        """Integrate ``n_leapfrog`` leapfrog steps from ``position``.
+
+        ``grad`` is the log-pdf gradient at ``position``.  Each step evaluates the
+        gradient once, and the log-pdf is evaluated once at the end: a gradient
+        alone is cheaper than ``value_and_grad``.  Returns the end position and
+        momentum with the log-pdf and its gradient there.
+        """
+        logger.debug("Compiling leapfrog step")
         lower = self.periodic_bounds[:, 0]
         upper = self.periodic_bounds[:, 1]
         period = upper - lower
-        wrapped = lower + jnp.mod(position - lower, period)
-        position = jnp.where(self.periodic_mask, wrapped, position)
-        momentum = momentum - self.step_size * self.leapfrog_coefs[index][1] * jax.grad(
-            potential
-        )(position, data)
-        index = index + 1
-        return (position, momentum, data, metric, index), extras
 
-    def leapfrog_step(
-        self,
-        leapfrog_kernel: Callable,
-        position: Float[Array, " n_dim"],
-        momentum: Float[Array, " n_dim"],
-        data: PyTree,
-        metric: Float[Array, " n_dim"],
-    ) -> tuple[Float[Array, " n_dim"], Float[Array, " n_dim"]]:
-        logger.debug("Compiling leapfrog step")
-        (position, momentum, data, metric, _index), _ = jax.lax.scan(
-            leapfrog_kernel,
-            (position, momentum, data, metric, 0),
-            jnp.arange(self.n_leapfrog + 2),
+        def body(carry, _):
+            position, momentum, grad = carry
+            momentum = momentum + 0.5 * self.step_size * grad
+            # dK/dp for the kinetic energy K(p) = (1/2) * p^T * M * p, M diagonal
+            position = position + self.step_size * momentum * self.condition_matrix
+            # Wrap periodic dimensions after position update
+            wrapped = lower + jnp.mod(position - lower, period)
+            position = jnp.where(self.periodic_mask, wrapped, position)
+            grad = jax.grad(logpdf)(position, data)
+            momentum = momentum + 0.5 * self.step_size * grad
+            return (position, momentum, grad), None
+
+        (position, momentum, grad), _ = jax.lax.scan(
+            body, (position, momentum, grad), length=self.n_leapfrog
         )
-        return position, momentum
+        return position, momentum, logpdf(position, data), grad
 
     def kernel(
         self,
@@ -148,6 +160,9 @@ class HMC(ProposalBase):
         """Note that since the potential function is the negative log likelihood,
         hamiltonian is going down, but the likelihood value should go up.
 
+        Evaluates the gradient at ``position`` before taking the step; chains that
+        take many steps should use `step`, which reuses it.
+
         Args:
             rng_key (Key): Random key.
             position (Array): Current position.
@@ -158,20 +173,31 @@ class HMC(ProposalBase):
         Returns:
             tuple: (position, log_prob, do_accept).
         """
-
-        def potential(x: Float[Array, " n_dim"], data: PyTree) -> Float[Array, "1"]:
-            return -logpdf(x, data)
-
-        def kinetic(
-            p: Float[Array, " n_dim"], metric: Float[Array, " n_dim"]
-        ) -> Float[Array, "1"]:
-            # Kinetic energy: K(p) = (1/2) * p^T * M * p where M is diagonal
-            return 0.5 * jnp.sum(p**2 * metric)
-
-        leapfrog_kernel = jax.tree_util.Partial(
-            self.leapfrog_kernel, kinetic, potential
+        _, grad = self.init_cache(position, logpdf, data)
+        position, log_prob, _, do_accept = self.step(
+            rng_key, position, log_prob, grad, logpdf, data
         )
-        leapfrog_step = jax.tree_util.Partial(self.leapfrog_step, leapfrog_kernel)
+        return position, log_prob, do_accept
+
+    def step(
+        self,
+        rng_key: Key[Array, ""],
+        position: Float[Array, " n_dim"],
+        log_prob: Float[Array, "1"],
+        cache: Float[Array, " n_dim"],
+        logpdf: LogPDF | Callable[[Float[Array, " n_dim"], PyTree], Float[Array, "1"]],
+        data: PyTree,
+    ) -> tuple[
+        Float[Array, " n_dim"],
+        Float[Array, "1"],
+        Float[Array, " n_dim"],
+        Bool[Array, "1"],
+    ]:
+        """One HMC step, where ``cache`` is the log-pdf gradient at ``position``."""
+
+        def kinetic(p: Float[Array, " n_dim"]) -> Float[Array, "1"]:
+            # Kinetic energy: K(p) = (1/2) * p^T * M * p where M is diagonal
+            return 0.5 * jnp.sum(p**2 * self.condition_matrix)
 
         key1, key2 = jax.random.split(rng_key)
 
@@ -179,21 +205,21 @@ class HMC(ProposalBase):
         momentum: Float[Array, " n_dim"] = jax.random.normal(
             key1, shape=position.shape
         ) / jnp.sqrt(self.condition_matrix)
-        H = -log_prob + kinetic(momentum, self.condition_matrix)
-        proposed_position, proposed_momentum = leapfrog_step(
-            position, momentum, data, self.condition_matrix
+        H = -log_prob + kinetic(momentum)
+        proposed_position, proposed_momentum, proposed_log_prob, proposed_grad = (
+            self.leapfrog(position, momentum, cache, logpdf, data)
         )
-        proposed_PE = potential(proposed_position, data)
-        proposed_ham = proposed_PE + kinetic(proposed_momentum, self.condition_matrix)
+        proposed_ham = -proposed_log_prob + kinetic(proposed_momentum)
         log_acc = H - proposed_ham
         log_uniform = jnp.log(jax.random.uniform(key2))
 
         do_accept = log_uniform < log_acc
 
         position = jnp.where(do_accept, proposed_position, position)
-        log_prob = jnp.where(do_accept, -proposed_PE, log_prob)
+        log_prob = jnp.where(do_accept, proposed_log_prob, log_prob)
+        grad = jnp.where(do_accept, proposed_grad, cache)
 
-        return position, log_prob, do_accept
+        return position, log_prob, grad, do_accept
 
     def adapt_step_size(
         self, acceptance_rate: float, target_rate: float = 0.65

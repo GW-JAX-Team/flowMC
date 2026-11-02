@@ -2,6 +2,7 @@ from typing import ClassVar, Optional
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 import pytest
 from jaxtyping import Array, Float
 
@@ -165,6 +166,47 @@ class TestLocalStep:
             initial_position=positions,
             data={"data": jnp.arange(self.n_dims)},
         )
+
+    @pytest.mark.parametrize(
+        ("kernel_name", "n_logpdf_calls_per_step"),
+        [("MALA", 1), ("HMC", 11), ("GRW", 1)],
+    )
+    def test_take_local_step_reuses_logpdf_values(
+        self, kernel_name, n_logpdf_calls_per_step
+    ):
+        """Each chain evaluates its start once, then each step as few times as it can.
+
+        MALA and HMC carry the gradient from one step to the next, so a MALA step
+        evaluates only its proposal and an HMC step once per leapfrog step plus
+        once at the end of the trajectory.
+        """
+        n_calls = [0]
+
+        def count(marker):
+            n_calls[0] += int(np.size(marker))
+
+        def counted_log_posterior(x, data):
+            jax.debug.callback(count, x[0] * 0 + 1)
+            return log_posterior(x, data)
+
+        self.resources["logpdf"] = LogPDF(counted_log_posterior, n_dims=self.n_dims)
+        strategy = TakeSerialSteps(
+            "logpdf",
+            kernel_name,
+            "sampler_state",
+            ["test_position", "test_log_prob", "test_acceptance"],
+            self.n_batch,
+        )
+        positions = self.test_position.data[:, 0]
+        strategy(
+            rng_key=jax.random.key(0),
+            resources=self.resources,
+            initial_position=positions,
+            data={"data": jnp.arange(self.n_dims)},
+        )
+        jax.effects_barrier()
+        n_chains = positions.shape[0]
+        assert n_calls[0] == n_chains * (1 + self.n_batch * n_logpdf_calls_per_step)
 
     def test_take_local_step_chain_batch_size(self):
         # Use a chain_batch_size smaller than the number of chains to trigger batching logic
@@ -411,9 +453,13 @@ class TestTemperingStrategies:
         position = initial_position[0]
         data = {"data": jnp.arange(self.n_dims)}
 
-        log_prob = logpdf(position, data)
+        log_prob, cache = mala.init_cache(
+            position,
+            jax.tree_util.Partial(logpdf.tempered_log_pdf, jnp.array(1.0)),
+            data,
+        )
         carry, _extras = parallel_tempering_strat._individual_step_body(
-            mala, (key, position, log_prob, logpdf, jnp.array(1.0), data), None
+            mala, (key, position, log_prob, cache, logpdf, jnp.array(1.0), data), None
         )
 
         # TODO: Add assertions
@@ -485,25 +531,33 @@ class TestTemperingStrategies:
         logpdf = resources["logpdf"]
         temperatures = jnp.arange(self.n_temps) * 0.3 + 1
         data = {"data": jnp.arange(self.n_dims)}
-        jax.vmap(logpdf.tempered_log_pdf, in_axes=(None, 0, None))(
-            temperatures,
-            initial_position,
-            data,
-        )
         key = jax.random.split(key, self.n_chains)
         initial_position = jnp.concatenate(
             [initial_position[:, None, :], resources["tempered_positions"].data],
             axis=1,
         )
-        _positions, _log_probs, _do_accept = jax.jit(
-            jax.vmap(parallel_tempering_strat._exchange, in_axes=(0, 0, 0, None, None))
+        tempered_log_probs = jax.vmap(
+            jax.vmap(logpdf.tempered_log_pdf, in_axes=(0, 0, None)),
+            in_axes=(None, 0, None),
+        )(temperatures, initial_position, data)
+        _positions, log_probs, _do_accept = jax.jit(
+            jax.vmap(
+                parallel_tempering_strat._exchange, in_axes=(0, 0, 0, None, None, None)
+            )
         )(
             key,
             initial_position,
+            tempered_log_probs,
             logpdf,
             temperatures,
-            {"data": jnp.arange(self.n_dims)},
+            data,
         )
+
+        # The exchange recovers the untempered log-pdf from the tempered values.
+        untempered = jax.vmap(jax.vmap(logpdf, in_axes=(0, None)), in_axes=(0, None))(
+            _positions, data
+        )
+        assert jnp.allclose(log_probs, untempered, atol=1e-5)
 
     def test_adapt_temperatures(self):
         _key, _resources, parallel_tempering_strat, _initial_position = (
