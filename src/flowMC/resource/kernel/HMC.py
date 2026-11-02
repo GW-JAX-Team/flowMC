@@ -34,7 +34,7 @@ class HMC(ProposalBase):
 
     @property
     def n_leapfrog(self) -> int:
-        return self.leapfrog_coefs.shape[0] - 2
+        return self.leapfrog_coefs.shape[0] - 1
 
     def __repr__(self):
         return (
@@ -68,7 +68,8 @@ class HMC(ProposalBase):
         self.condition_matrix = condition_matrix
         self.step_size = step_size
 
-        coefs = jnp.ones((n_leapfrog + 2, 2))
+        # A half kick, then n_leapfrog drift-kick pairs with the last kick halved.
+        coefs = jnp.ones((n_leapfrog + 1, 2))
         coefs = coefs.at[0].set(jnp.array([0, 0.5]))
         coefs = coefs.at[-1].set(jnp.array([1, 0.5]))
         self.leapfrog_coefs = coefs
@@ -133,7 +134,7 @@ class HMC(ProposalBase):
         (position, momentum, data, metric, _index), _ = jax.lax.scan(
             leapfrog_kernel,
             (position, momentum, data, metric, 0),
-            jnp.arange(self.n_leapfrog + 2),
+            jnp.arange(self.n_leapfrog + 1),
         )
         return position, momentum
 
