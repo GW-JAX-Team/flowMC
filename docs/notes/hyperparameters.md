@@ -339,6 +339,7 @@ Set to `0` to disable this trigger and rely solely on the stability check.
 
 Log-prior function with signature `logprior(x, data) -> float`.
 Default is a flat prior that always returns `0`.
+With a prior, `logpdf` is the log-likelihood and the target is `logpdf + logprior`.
 The tempered log-density is
 
 $$\log \tilde{p}_T(x) = \frac{1}{T} \log \mathcal{L}(x) + \log \pi(x)$$

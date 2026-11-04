@@ -232,11 +232,15 @@ class RQSpline_GRW_PT_Bundle(ResourceStrategyBundle):
             model, n_NFproposal_batch_size=n_NFproposal_batch_size
         )
         optimizer = Optimizer(model=model, learning_rate=learning_rate)
-        logpdf = LogPDF(logpdf, n_dims=n_dims)
+        log_likelihood = LogPDF(logpdf, n_dims=n_dims)
+        # The untempered target is the posterior; only the likelihood is tempered.
+        logpdf = LogPDF(
+            lambda x, data: log_likelihood(x, data) + logprior(x, data), n_dims=n_dims
+        )
 
         # Here are the resources for the parallel tempering
         tempered_logpdf = TemperedPDF(
-            logpdf,
+            log_likelihood,
             logprior,
             n_dims=n_dims,
             n_temps=n_temperatures,
