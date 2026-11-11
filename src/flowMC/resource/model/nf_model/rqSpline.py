@@ -1,3 +1,7 @@
+# Portions adapted and modified for flowMC from Distrax.
+# Copyright 2021 DeepMind Technologies Limited. All Rights Reserved.
+# Licensed under the Apache License, Version 2.0; see LICENSE-Apache-2.0.
+
 import logging
 from collections.abc import Sequence
 from functools import partial

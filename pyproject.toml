@@ -12,12 +12,11 @@ authors = [
 maintainers = [
   {name = "Thomas Ng", email = "thomas.ng@nikhef.nl"}
 ]
-license = { file = "LICENSE" }
+license = "MIT AND Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
@@ -72,7 +71,7 @@ Changelog = "https://github.com/GW-JAX-Team/flowMC/releases"
 flowMC = { workspace = true }
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling>=1.27", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
