@@ -239,33 +239,10 @@ class TakeSerialSteps(TakeSteps):
     """TakeSerialSteps is a strategy that takes a number of steps in a serial manner,
     i.e. one after the other.
 
-    This uses jax.lax.scan to iterate over the steps and apply the kernel to the current
-    position. This is intended to be used for most local kernels that are dependent on
-    the previous step.
+    This uses the kernel's ``sample_chain`` to apply the kernel to the current
+    position step by step. This is intended to be used for most local kernels that
+    are dependent on the previous step.
     """
-
-    def body(
-        self,
-        kernel: ProposalBase,
-        carry: tuple,
-        aux: None,
-    ) -> tuple[tuple, tuple]:
-        """Single scan body: advance position by one kernel step.
-
-        Args:
-            kernel (ProposalBase): Proposal kernel.
-            carry (tuple): ``(key, position, log_prob, logpdf, data)``.
-            aux (None): Unused scan auxiliary input.
-
-        Returns:
-            tuple: Updated carry and ``(position, log_prob, do_accept)`` outputs.
-        """
-        key, position, log_prob, logpdf, data = carry
-        key, subkey = jax.random.split(key)
-        position, log_prob, do_accept = kernel.kernel(
-            subkey, position, log_prob, logpdf, data
-        )
-        return (key, position, log_prob, logpdf, data), (position, log_prob, do_accept)
 
     def sample(
         self,
@@ -279,7 +256,7 @@ class TakeSerialSteps(TakeSteps):
         Float[Array, " n_steps"],
         Float[Array, " n_steps"],
     ]:
-        """Advance a single chain serially using ``jax.lax.scan``.
+        """Advance a single chain serially using the kernel's ``sample_chain``.
 
         Args:
             kernel (ProposalBase): Proposal kernel.
@@ -291,15 +268,9 @@ class TakeSerialSteps(TakeSteps):
         Returns:
             tuple: ``(positions, log_probs, do_accepts)`` each of length ``n_steps``.
         """
-        (
-            (_last_key, _last_position, _last_log_prob, logpdf, data),
-            (positions, log_probs, do_accepts),
-        ) = jax.lax.scan(
-            jax.tree_util.Partial(self.body, kernel),
-            (rng_key, initial_position, logpdf(initial_position, data), logpdf, data),
-            length=self.n_steps,
+        return kernel.sample_chain(
+            rng_key, initial_position, logpdf, data, self.n_steps
         )
-        return positions, log_probs, do_accepts
 
 
 class TakeGroupSteps(TakeSteps):

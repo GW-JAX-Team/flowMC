@@ -3,6 +3,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float, PyTree
 
 from flowMC.resource.buffers import Buffer
+from flowMC.resource.kernel.base import ProposalBase
 from flowMC.resource.kernel.Gaussian_random_walk import GaussianRandomWalk
 from flowMC.resource.kernel.HMC import HMC
 from flowMC.resource.kernel.MALA import MALA
@@ -363,6 +364,20 @@ class TestMALA:
         assert jnp.allclose(result1[0], result2[0])
         assert result1[1] == result2[1]
         assert result1[2] == result2[2]
+
+    def test_MALA_sample_chain_matches_kernel_steps(self):
+        """The single-gradient chain takes the same steps as calling `kernel` in turn."""
+        MALA_obj = MALA(step_size=jnp.full(n_dims, 1.5))
+        position = jnp.array([0.3, -1.2])
+        key = jax.random.key(3)
+
+        chain = MALA_obj.sample_chain(key, position, logpdf, None, 20)
+        steps = ProposalBase.sample_chain(MALA_obj, key, position, logpdf, None, 20)
+
+        assert jnp.allclose(chain[0], steps[0])
+        assert jnp.allclose(chain[1], steps[1])
+        assert jnp.array_equal(chain[2], steps[2])
+        assert 0 < jnp.mean(chain[2]) < 1
 
     def test_MALA_acceptance_rate(self):
         # Test acceptance rate goes to one when the step size is small

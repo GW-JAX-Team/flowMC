@@ -147,76 +147,6 @@ class ParallelTempering(Strategy):
 
         return rng_key, resources, positions[:, 0]
 
-    def _individual_step_body(
-        self,
-        kernel: ProposalBase,
-        carry: tuple[
-            Key[Array, ""],
-            Float[Array, " n_dims"],
-            Float[Array, "1"],
-            TemperedPDF,
-            Float[Array, " n_temps"],
-            dict,
-        ],
-        aux,
-    ) -> tuple[
-        tuple[
-            Key[Array, ""],
-            Float[Array, " n_dims"],
-            Float[Array, "1"],
-            TemperedPDF,
-            Float[Array, " n_temps"],
-            dict,
-        ],
-        tuple[
-            Float[Array, " n_dims"],
-            Float[Array, "1"],
-            Bool[Array, "1"],
-        ],
-    ]:
-        """Take a step using the kernel and the tempered logpdf.
-        This should not be called directly but instead used in a
-        jax.lax.scan to take multiple steps.
-
-        Args:
-            kernel (ProposalBase): The kernel to use.
-            carry (tuple): The current state of the chain.
-                - key (Key): jax random key.
-                - position (Float[Array, "n_dims"]): Current position of the chain.
-                - log_prob (Float[Array, "1"]): Current log probability of the chain.
-                - logpdf (TemperedPDF): The tempered LogPDF class.
-                - temperatures (Float[Array, "n_temps"]): Array of temperatures.
-                - data (dict): Additional data to pass to the logpdf.
-            aux (None): Not used.
-        Returns:
-            tuple: Updated carry and the result of the kernel step.
-                - carry (tuple): Updated state of the chain.
-                    - key (Key): jax random key.
-                    - position (Float[Array, "n_dims"]): New position of the chain.
-                    - log_prob (Float[Array, "1"]): New log probability of the chain.
-                    - logpdf (TemperedPDF): The tempered LogPDF class.
-                    - temperatures (Float[Array, "n_temps"]): Array of temperatures.
-                    - data (dict): Additional data to pass to the logpdf.
-                - result (tuple): Result of the kernel step.
-                    - position (Float[Array, "n_dims"]): New position of the chain.
-                    - log_prob (Float[Array, "1"]): New log probability of the chain.
-                    - do_accept (Bool[Array, "1"]): Whether the new position is accepted.
-        """
-        key, position, log_prob, logpdf, temperatures, data = carry
-        key, subkey = jax.random.split(key)
-        position, log_prob, do_accept = kernel.kernel(
-            subkey,
-            position,
-            log_prob,
-            jax.tree_util.Partial(logpdf.tempered_log_pdf, temperatures),
-            data,
-        )
-        return (key, position, log_prob, logpdf, temperatures, data), (
-            position,
-            log_prob,
-            do_accept,
-        )
-
     def _individal_step(
         self,
         kernel: ProposalBase,
@@ -247,23 +177,14 @@ class ParallelTempering(Strategy):
                 - log_probs (Float[Array, "1"]): Log probabilities of the chain.
                 - do_accept (Bool[Array, "1"]): Acceptance flag for the new position.
         """
-        log_probs = jax.tree_util.Partial(logpdf.tempered_log_pdf, temperatures)(
-            positions, data
+        positions, log_probs, do_accept = kernel.sample_chain(
+            rng_key,
+            positions,
+            jax.tree_util.Partial(logpdf.tempered_log_pdf, temperatures),
+            data,
+            self.n_steps,
         )
-
-        (
-            (_key, position, log_prob, logpdf, temperatures, data),
-            (
-                positions,
-                log_probs,
-                do_accept,
-            ),
-        ) = jax.lax.scan(
-            jax.tree_util.Partial(self._individual_step_body, kernel),
-            ((rng_key, positions, log_probs, logpdf, temperatures, data)),
-            length=self.n_steps,
-        )
-        return position, log_prob, do_accept
+        return positions[-1], log_probs[-1], do_accept
 
     def _ensemble_step(
         self,

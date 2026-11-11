@@ -166,6 +166,44 @@ class TestLocalStep:
             data={"data": jnp.arange(self.n_dims)},
         )
 
+    @pytest.mark.parametrize(
+        ("kernel_name", "n_logpdf_calls_per_step"),
+        [("MALA", 1), ("HMC", 12), ("GRW", 1)],
+    )
+    def test_take_local_step_logpdf_calls(self, kernel_name, n_logpdf_calls_per_step):
+        """Each chain evaluates its start once, then each step a fixed number of times.
+
+        MALA carries the gradient from one step to the next, so a step evaluates
+        only its proposal.
+        """
+        n_calls = [0]
+
+        def count(marker):
+            n_calls[0] += int(jnp.size(marker))
+
+        def counted_log_posterior(x, data):
+            jax.debug.callback(count, x[0] * 0 + 1)
+            return log_posterior(x, data)
+
+        self.resources["logpdf"] = LogPDF(counted_log_posterior, n_dims=self.n_dims)
+        strategy = TakeSerialSteps(
+            "logpdf",
+            kernel_name,
+            "sampler_state",
+            ["test_position", "test_log_prob", "test_acceptance"],
+            self.n_batch,
+        )
+        positions = self.test_position.data[:, 0]
+        strategy(
+            rng_key=jax.random.key(0),
+            resources=self.resources,
+            initial_position=positions,
+            data={"data": jnp.arange(self.n_dims)},
+        )
+        jax.effects_barrier()
+        n_chains = positions.shape[0]
+        assert n_calls[0] == n_chains * (1 + self.n_batch * n_logpdf_calls_per_step)
+
     def test_take_local_step_chain_batch_size(self):
         # Use a chain_batch_size smaller than the number of chains to trigger batching logic
         chain_batch_size = 2
@@ -402,23 +440,6 @@ class TestTemperingStrategies:
         )
 
         return key, resources, parallel_tempering_strat, initial_position
-
-    def test_individual_step_body(self):
-        key, resources, parallel_tempering_strat, initial_position = self.initialize()
-        mala = resources["MALA"]
-        logpdf = resources["logpdf"]
-        key, _subkey = jax.random.split(key)
-        position = initial_position[0]
-        data = {"data": jnp.arange(self.n_dims)}
-
-        log_prob = logpdf(position, data)
-        carry, _extras = parallel_tempering_strat._individual_step_body(
-            mala, (key, position, log_prob, logpdf, jnp.array(1.0), data), None
-        )
-
-        # TODO: Add assertions
-
-        assert carry[1].shape == (self.n_dims,)
 
     def test_individual_step(self):
         key, resources, parallel_tempering_strat, initial_position = self.initialize()
