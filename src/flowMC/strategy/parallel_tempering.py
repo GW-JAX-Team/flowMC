@@ -112,7 +112,7 @@ class ParallelTempering(Strategy):
 
         rng_key, subkey = jax.random.split(rng_key)
         subkey = jax.random.split(subkey, initial_position.shape[0])
-        positions, _log_probs, do_accepts = eqx.filter_jit(
+        positions, log_probs, do_accepts = eqx.filter_jit(
             eqx.filter_vmap(
                 jax.tree_util.Partial(self._ensemble_step, kernel),
                 in_axes=(0, 0, None, None, None),
@@ -129,8 +129,8 @@ class ParallelTempering(Strategy):
         rng_key, subkey = jax.random.split(rng_key)
         subkey = jax.random.split(subkey, initial_position.shape[0])
         positions, _log_probs, do_accepts = eqx.filter_jit(
-            eqx.filter_vmap(self._exchange, in_axes=(0, 0, None, None, None))
-        )(subkey, positions, tempered_logpdf, temperatures.data, data)
+            eqx.filter_vmap(self._exchange, in_axes=(0, 0, 0, None, None, None))
+        )(subkey, positions, log_probs, tempered_logpdf, temperatures.data, data)
 
         mean_accs = jnp.mean(do_accepts)
         logger.debug(f"Mean acceptance of exchange steps in PT: {mean_accs:.4f}")
@@ -296,6 +296,7 @@ class ParallelTempering(Strategy):
         self,
         key: Key[Array, ""],
         positions: Float[Array, "n_temps n_dims"],
+        tempered_log_probs: Float[Array, " n_temps"],
         logpdf: TemperedPDF,
         temperatures: Float[Array, " n_temps"],
         data: dict,
@@ -310,6 +311,8 @@ class ParallelTempering(Strategy):
         Args:
             key (Key): jax random key for reproducibility.
             positions (Float[Array, "n_temps n_dims"]): Current positions for all temperatures.
+            tempered_log_probs (Float[Array, "n_temps"]): Tempered log probability of
+                each position at its own temperature.
             logpdf (TemperedPDF): The tempered log probability density function.
             temperatures (Float[Array, "n_temps"]): Array of temperatures.
             data (dict): Additional data to pass to the logpdf.
@@ -323,7 +326,12 @@ class ParallelTempering(Strategy):
 
         logger.debug("Exchanging walkers between temperatures")
 
-        log_probs = jax.vmap(logpdf, in_axes=(0, None))(positions, data)
+        # The tempered log-pdf is ``log_pdf / T + log_prior``, so the untempered
+        # values the exchange needs follow without evaluating the log-pdf again.
+        log_probs = temperatures * (
+            tempered_log_probs
+            - jax.vmap(logpdf.log_prior, in_axes=(0, None))(positions, data)
+        )
         (key, positions, log_probs, _idx, logpdf, temperatures, data), do_accept = (
             jax.lax.scan(
                 self._exchange_step_body,

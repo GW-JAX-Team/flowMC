@@ -506,25 +506,33 @@ class TestTemperingStrategies:
         logpdf = resources["logpdf"]
         temperatures = jnp.arange(self.n_temps) * 0.3 + 1
         data = {"data": jnp.arange(self.n_dims)}
-        jax.vmap(logpdf.tempered_log_pdf, in_axes=(None, 0, None))(
-            temperatures,
-            initial_position,
-            data,
-        )
         key = jax.random.split(key, self.n_chains)
         initial_position = jnp.concatenate(
             [initial_position[:, None, :], resources["tempered_positions"].data],
             axis=1,
         )
-        _positions, _log_probs, _do_accept = jax.jit(
-            jax.vmap(parallel_tempering_strat._exchange, in_axes=(0, 0, 0, None, None))
+        tempered_log_probs = jax.vmap(
+            jax.vmap(logpdf.tempered_log_pdf, in_axes=(0, 0, None)),
+            in_axes=(None, 0, None),
+        )(temperatures, initial_position, data)
+        positions, log_probs, _do_accept = jax.jit(
+            jax.vmap(
+                parallel_tempering_strat._exchange, in_axes=(0, 0, 0, None, None, None)
+            )
         )(
             key,
             initial_position,
+            tempered_log_probs,
             logpdf,
             temperatures,
-            {"data": jnp.arange(self.n_dims)},
+            data,
         )
+
+        # The exchange recovers the untempered log-pdf from the tempered values.
+        untempered = jax.vmap(jax.vmap(logpdf, in_axes=(0, None)), in_axes=(0, None))(
+            positions, data
+        )
+        assert jnp.allclose(log_probs, untempered, atol=1e-5)
 
     def test_adapt_temperatures(self):
         _key, _resources, parallel_tempering_strat, _initial_position = (
