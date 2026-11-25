@@ -13,6 +13,7 @@ htmlcov/
 # Virtual environments
 .venv/
 venv/
+.venv
 
 # IDE / Editor
 .vscode/
