@@ -113,6 +113,23 @@ class TestHMC:
         assert jnp.allclose(rev_position, initial_position)
         assert jnp.allclose(initial_PE, -log_posterior(rev_position, None))
 
+    def test_leapfrog_takes_n_leapfrog_steps(self):
+        """On a flat log-pdf each leapfrog step moves the position by ``step_size * p``."""
+        HMC_obj = HMC(condition_matrix=jnp.ones(n_dims), step_size=0.1, n_leapfrog=5)
+
+        def kinetic(p, metric):
+            return 0.5 * (p**2 * metric).sum()
+
+        def flat(x, data):
+            return jnp.sum(x) * 0.0
+
+        leapfrog_kernel = jax.tree_util.Partial(HMC_obj.leapfrog_kernel, kinetic, flat)
+        momentum = jnp.array([1.0, -2.0])
+        position, _ = HMC_obj.leapfrog_step(
+            leapfrog_kernel, jnp.zeros(n_dims), momentum, None, jnp.ones(n_dims)
+        )
+        assert jnp.allclose(position, 5 * 0.1 * momentum)
+
     def test_HMC_acceptance_rate(self):
         # Test acceptance rate goes to one when step size is small
 

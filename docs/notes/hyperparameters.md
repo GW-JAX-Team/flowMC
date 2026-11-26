@@ -148,33 +148,38 @@ Higher values improve the flow fit but increase training time per loop.
 
 ### mala_step_size
 
-*MALA bundles only.* Initial step size for MALA.
+*MALA bundles only.*
+Initial step size for MALA.
 Default `1e-1`.
 Accepts either a scalar (broadcast to all dimensions) or a 1-D array of length `n_dims` to set a different initial step size per dimension.
 The optimal MALA acceptance rate is ~57%, and `adapt_step_size` will drive the step size toward that target automatically.
 
 ### hmc_step_size
 
-*HMC bundles only.* Initial leapfrog step size.
+*HMC bundles only.*
+Initial leapfrog step size.
 Default `0.1`.
 The optimal HMC acceptance rate is ~65%.
 
 ### hmc_n_leapfrog
 
-*HMC bundles only.* Number of leapfrog steps per HMC proposal.
+*HMC bundles only.*
+Number of leapfrog steps per HMC proposal.
 Default `10`.
 More steps produce proposals further along the trajectory but increase cost per step.
 
 ### condition_matrix
 
-*HMC bundles only.* Diagonal of the inverse mass matrix (preconditioning matrix).
+*HMC bundles only.*
+Diagonal of the inverse mass matrix (preconditioning matrix).
 Default `1` (scalar, broadcast to all dimensions).
 Pass a 1-D array of length `n_dims` to set per-dimension scales.
 Useful when parameters have very different characteristic scales.
 
 ### grw_step_size
 
-*GRW bundles only.* Initial step size for the Gaussian random walk proposal.
+*GRW bundles only.*
+Initial step size for the Gaussian random walk proposal.
 Default `1e-1`.
 Accepts either a scalar (broadcast to all dimensions) or a 1-D array of length `n_dims` to set a different initial step size per dimension.
 The optimal random-walk acceptance rate is ~23%.
@@ -339,6 +344,7 @@ Set to `0` to disable this trigger and rely solely on the stability check.
 
 Log-prior function with signature `logprior(x, data) -> float`.
 Default is a flat prior that always returns `0`.
+With a prior, `logpdf` is the log-likelihood and the target is `logpdf + logprior`.
 The tempered log-density is
 
 $$\log \tilde{p}_T(x) = \frac{1}{T} \log \mathcal{L}(x) + \log \pi(x)$$

@@ -467,3 +467,32 @@ class TestRQSplineGRWPTBundle:
                 n_epochs=1,
                 global_thinning=10,
             )
+
+
+@pytest.mark.parametrize(
+    "bundle_cls",
+    [RQSpline_MALA_PT_Bundle, RQSpline_HMC_PT_Bundle, RQSpline_GRW_PT_Bundle],
+)
+def test_pt_bundle_tempers_only_the_likelihood(bundle_cls):
+    def logprior(x, _):
+        return -0.5 * ((x - 3.0) ** 2).sum()
+
+    bundle = bundle_cls(
+        rng_key=jax.random.key(0),
+        n_chains=2,
+        n_dims=3,
+        logpdf=logpdf,
+        n_local_steps=10,
+        n_global_steps=5,
+        n_training_loops=2,
+        n_production_loops=1,
+        n_epochs=3,
+        logprior=logprior,
+    )
+    x = jnp.array([0.5, -1.0, 2.0])
+    log_likelihood, log_prior = logpdf(x, {}), logprior(x, {})
+    assert jnp.isclose(bundle.resources["logpdf"](x, {}), log_likelihood + log_prior)
+    assert jnp.isclose(
+        bundle.resources["tempered_logpdf"].tempered_log_pdf(4.0, x, {}),
+        log_likelihood / 4.0 + log_prior,
+    )
