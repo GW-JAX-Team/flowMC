@@ -48,6 +48,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 .jax-cache/
+jax_cache/
 
 # Translations
 *.mo
@@ -108,3 +109,8 @@ dmypy.json
 celerybeat-schedule
 celerybeat.pid
 *.sage.py
+
+# --- Repo-specific (flowMC) ---
+
+# Default Sampler output directory
+/outdir
