@@ -4588,25 +4588,30 @@ Higher values improve the flow fit but increase training time per loop.</p>
 <hr />
 <h2 id="local-sampler-parameters">Local sampler parameters<a class="headerlink" href="#local-sampler-parameters" title="Permanent link">¤</a></h2>
 <h3 id="mala_step_size">mala_step_size<a class="headerlink" href="#mala_step_size" title="Permanent link">¤</a></h3>
-<p><em>MALA bundles only.</em> Initial step size for MALA.
+<p><em>MALA bundles only.</em>
+Initial step size for MALA.
 Default <code>1e-1</code>.
 Accepts either a scalar (broadcast to all dimensions) or a 1-D array of length <code>n_dims</code> to set a different initial step size per dimension.
 The optimal MALA acceptance rate is ~57%, and <code>adapt_step_size</code> will drive the step size toward that target automatically.</p>
 <h3 id="hmc_step_size">hmc_step_size<a class="headerlink" href="#hmc_step_size" title="Permanent link">¤</a></h3>
-<p><em>HMC bundles only.</em> Initial leapfrog step size.
+<p><em>HMC bundles only.</em>
+Initial leapfrog step size.
 Default <code>0.1</code>.
 The optimal HMC acceptance rate is ~65%.</p>
 <h3 id="hmc_n_leapfrog">hmc_n_leapfrog<a class="headerlink" href="#hmc_n_leapfrog" title="Permanent link">¤</a></h3>
-<p><em>HMC bundles only.</em> Number of leapfrog steps per HMC proposal.
+<p><em>HMC bundles only.</em>
+Number of leapfrog steps per HMC proposal.
 Default <code>10</code>.
 More steps produce proposals further along the trajectory but increase cost per step.</p>
 <h3 id="condition_matrix">condition_matrix<a class="headerlink" href="#condition_matrix" title="Permanent link">¤</a></h3>
-<p><em>HMC bundles only.</em> Diagonal of the inverse mass matrix (preconditioning matrix).
+<p><em>HMC bundles only.</em>
+Diagonal of the inverse mass matrix (preconditioning matrix).
 Default <code>1</code> (scalar, broadcast to all dimensions).
 Pass a 1-D array of length <code>n_dims</code> to set per-dimension scales.
 Useful when parameters have very different characteristic scales.</p>
 <h3 id="grw_step_size">grw_step_size<a class="headerlink" href="#grw_step_size" title="Permanent link">¤</a></h3>
-<p><em>GRW bundles only.</em> Initial step size for the Gaussian random walk proposal.
+<p><em>GRW bundles only.</em>
+Initial step size for the Gaussian random walk proposal.
 Default <code>1e-1</code>.
 Accepts either a scalar (broadcast to all dimensions) or a 1-D array of length <code>n_dims</code> to set a different initial step size per dimension.
 The optimal random-walk acceptance rate is ~23%.</p>
