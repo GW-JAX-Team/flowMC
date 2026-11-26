@@ -3,7 +3,7 @@ import jax
 import jax.numpy as jnp
 import optax
 import pytest
-from diffrax import Dopri5
+from diffrax import Dopri5, ODETerm, diffeqsolve
 
 from flowMC.resource.model.common import MLP
 from flowMC.resource.model.flowmatching.base import (
@@ -54,6 +54,22 @@ class TestSolver:
         logp_arr = jnp.asarray(logp)
         assert logp_arr.size == 1
         assert jnp.isfinite(logp_arr).all()
+
+    def test_log_prob_matches_change_of_variables(self):
+        n_dim = 2
+        mlp = MLP([n_dim + 1, 16, n_dim], key=jax.random.key(1), scale=3.0)
+        solver = Solver(model=mlp, method=Dopri5())
+
+        def forward(x0):
+            term = ODETerm(lambda t, x, args: mlp(jnp.append(x, t)))
+            return diffeqsolve(term, Dopri5(), t0=0.0, t1=1.0, dt0=1e-2, y0=x0).ys[-1]
+
+        x0 = jnp.array([0.3, -0.7])
+        expected = (
+            jax.scipy.stats.norm.logpdf(x0).sum()
+            - jnp.linalg.slogdet(jax.jacrev(forward)(x0))[1]
+        )
+        assert jnp.allclose(solver.log_prob(forward(x0), dt=1e-2), expected)
 
     @pytest.mark.parametrize("dt", [1e-2, 1e-1, 0.5])
     def test_sample_various_dt(self, solver, dt):
@@ -122,7 +138,7 @@ class TestFlowMatchingModel:
         assert samples.shape == (n_samples, n_dim)
         assert jnp.isfinite(samples).all()
         logp = eqx.filter_vmap(model.log_prob)(samples)
-        assert logp.shape == (n_samples, 1)
+        assert logp.shape == (n_samples,)
         assert jnp.isfinite(logp).all()
 
     @pytest.mark.parametrize("n_samples", [1, 5, 10])

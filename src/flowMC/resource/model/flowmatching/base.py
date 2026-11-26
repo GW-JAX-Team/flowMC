@@ -64,7 +64,7 @@ class Solver(eqx.Module):
         return sols
 
     def log_prob(self, x1: Float[Array, " n_dims"], dt: float = 1e-1) -> FloatScalar:
-        """Compute the log probability of the initial condition x1.
+        """Compute the log probability of a sample x1.
         This solves the ODE backward, i.e. from the posterior to the prior.
         """
 
@@ -97,15 +97,9 @@ class Solver(eqx.Module):
                 raise RuntimeError("Diffrax did not save any solution values")
             return sol.ys
 
-        _x0, log_p = solve_ode(x1, dt)
-        return (
-            logpdf(
-                x1,
-                mean=self.model.n_output * jnp.zeros(self.model.n_output),
-                cov=jnp.eye(self.model.n_output),
-            )
-            + log_p
-        )
+        x0, log_p = solve_ode(x1, dt)
+        n_dims = self.model.n_output
+        return logpdf(x0[-1], mean=jnp.zeros(n_dims), cov=jnp.eye(n_dims)) + log_p[-1]
 
 
 class Scheduler:
