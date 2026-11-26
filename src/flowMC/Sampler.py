@@ -9,6 +9,7 @@ from typing import Optional, Protocol, runtime_checkable
 import equinox as eqx
 import jax
 import jax.numpy as jnp
+from jax.experimental.compilation_cache import compilation_cache
 from jaxtyping import Array, Float, Key, PyTree
 
 from flowMC.resource.base import Resource
@@ -121,6 +122,8 @@ class Sampler:
             cache_dir.mkdir(parents=True, exist_ok=True)
             current_cache = getattr(jax.config, "jax_compilation_cache_dir", None)
             if current_cache is None:
+                # Changing the setting alone leaves JAX's previous cache handle open.
+                compilation_cache.reset_cache()
                 jax.config.update("jax_compilation_cache_dir", str(cache_dir))
                 jax.config.update("jax_persistent_cache_min_compile_time_secs", 0.0)
             elif current_cache != str(cache_dir):
@@ -515,8 +518,11 @@ class Sampler:
         if ckpt_path is not None:
             ckpt_path.unlink(missing_ok=True)
         if self.checkpoint_interval > 0:
-            shutil.rmtree(Path(self.outdir) / "jax_cache", ignore_errors=True)
-            jax.config.update("jax_compilation_cache_dir", None)
+            cache_dir = Path(self.outdir) / "jax_cache"
+            if jax.config.jax_compilation_cache_dir == str(cache_dir):
+                jax.config.update("jax_compilation_cache_dir", None)
+                compilation_cache.reset_cache()
+            shutil.rmtree(cache_dir, ignore_errors=True)
 
     # TODO: Implement quick access and summary functions that operates on buffer
 

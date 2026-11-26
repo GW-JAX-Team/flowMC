@@ -7,6 +7,7 @@ from typing import ClassVar
 import jax
 import jax.numpy as jnp
 import pytest
+from jax.experimental.compilation_cache import compilation_cache
 
 from flowMC.resource.states import State
 from flowMC.Sampler import Sampler
@@ -109,6 +110,48 @@ class TestTrainingPhaseEndIndices:
             ["init_pt", "a", "b", "a", "b", "reset_steppers", "c"]
         )._training_loop_end_indices()
         assert result == {2, 4}
+
+
+# ── JAX compilation cache ─────────────────────────────────────────────────────
+
+
+class TestJaxCache:
+    @pytest.fixture(autouse=True)
+    def _restore_cache_setting(self):
+        original = jax.config.jax_compilation_cache_dir
+        yield
+        jax.config.update("jax_compilation_cache_dir", original)
+        compilation_cache.reset_cache()
+
+    def _sampler(self, tmp_path):
+        strategies = {"a": _PassthroughStrategy("a")}
+        return Sampler(
+            n_dim=2,
+            n_chains=3,
+            rng_key=jax.random.key(0),
+            resources={},
+            strategies=strategies,
+            strategy_order=["a"],
+            outdir=str(tmp_path),
+        )
+
+    def test_cache_is_released_after_sample(self, tmp_path, recwarn):
+        jax.config.update("jax_compilation_cache_dir", None)
+        sampler = self._sampler(tmp_path)
+        jax.jit(lambda x: jnp.sin(x) * 2)(jnp.ones(3)).block_until_ready()
+        sampler.sample(jnp.zeros((3, 2)), {})
+
+        assert jax.config.jax_compilation_cache_dir is None
+        assert not (tmp_path / "jax_cache").exists()
+        jax.jit(lambda x: jnp.cos(x) + 3)(jnp.ones(3)).block_until_ready()
+        assert not [w for w in recwarn if "compilation cache" in str(w.message)]
+
+    def test_other_cache_setting_is_kept(self, tmp_path):
+        other = str(tmp_path / "other_cache")
+        jax.config.update("jax_compilation_cache_dir", other)
+        sampler = self._sampler(tmp_path / "run")
+        sampler.sample(jnp.zeros((3, 2)), {})
+        assert jax.config.jax_compilation_cache_dir == other
 
 
 # ── checkpoint write ──────────────────────────────────────────────────────────
